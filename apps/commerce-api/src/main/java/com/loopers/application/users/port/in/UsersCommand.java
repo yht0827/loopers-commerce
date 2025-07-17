@@ -3,28 +3,20 @@ package com.loopers.application.users.port.in;
 import com.loopers.domain.users.UsersModel;
 
 public record UsersCommand(
-	String userId,
-	String name,
-	String password,
-	String email,
-	String phone,
-	String birthday,
-	Integer age,
-	String gender,
-	String description
+        String userId,
+        String name,
+        String email,
+        String birthday,
+        String gender
 ) {
 
-	public UsersModel toEntity() {
-		return UsersModel.builder()
-			.userId(userId)
-			.name(name)
-			.password(password)
-			.email(email)
-			.phone(phone)
-			.birthday(birthday)
-			.age(age)
-			.gender(gender)
-			.description(description)
-			.build();
-	}
+    public UsersModel toEntity() {
+        return UsersModel.builder()
+                .userId(userId)
+                .name(name)
+                .email(email)
+                .birthday(birthday)
+                .gender(gender)
+                .build();
+    }
 }
