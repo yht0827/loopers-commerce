@@ -1,5 +1,7 @@
 package com.loopers.domain.users;
 
+import java.util.regex.Pattern;
+
 import com.loopers.domain.BaseEntity;
 import com.loopers.support.error.CoreException;
 import com.loopers.support.error.ErrorType;
@@ -17,16 +19,35 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class UsersModel extends BaseEntity {
 
+	private static final Pattern USER_ID_PATTERN = Pattern.compile("^[a-zA-Z0-9]{1,10}$");
+	private static final Pattern BIRTHDAY_PATTERN = Pattern.compile("^\\d{4}-\\d{2}-\\d{2}$");
+	private static final Pattern EMAIL_PATTERN = Pattern.compile(
+		"^[a-zA-Z0-9_!#$%&'*+/=?`^{|}~-]+(?:\\.[a-zA-Z0-9_!#$%&'*+/=?`^{|}~-]+)*@(?:[a-zA-Z0-9](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?\\.)"
+			+ "+[a-zA-Z0-9](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?$");
+
+	private String userId;
 	private String name;
 	private String password;
 	private String email;
 	private String phone;
+	private String birthday;
 	private Integer age;
 	private String gender;
 	private String description;
 
 	@Builder
-	public UsersModel(String name, String password, String email, String phone, Integer age, String gender, String description) {
+	public UsersModel(String userId, String name, String password, String email, String phone, String birthday, Integer age,
+		String gender, String description) {
+
+		if (userId == null || !USER_ID_PATTERN.matcher(userId).matches()) {
+			throw new CoreException(ErrorType.BAD_REQUEST, "아이디는 영문, 숫자를 포함하여 10자 이내여야 합니다.");
+		}
+		if (birthday == null || !BIRTHDAY_PATTERN.matcher(birthday).matches()) {
+			throw new CoreException(ErrorType.BAD_REQUEST, "생년월일은 yyyy-MM-dd 형식이어야 합니다.");
+		}
+		if (email == null || !EMAIL_PATTERN.matcher(email).matches()) {
+			throw new CoreException(ErrorType.BAD_REQUEST, "유효하지 않은 이메일 형식입니다.");
+		}
 
 		if (name == null || name.isBlank()) {
 			throw new CoreException(ErrorType.BAD_REQUEST, "이름은 비어있을 수 없습니다.");
@@ -35,10 +56,12 @@ public class UsersModel extends BaseEntity {
 			throw new CoreException(ErrorType.BAD_REQUEST, "설명은 비어있을 수 없습니다.");
 		}
 
+		this.userId = userId;
 		this.name = name;
 		this.password = password;
 		this.email = email;
 		this.phone = phone;
+		this.birthday = birthday;
 		this.age = age;
 		this.gender = gender;
 		this.description = description;
