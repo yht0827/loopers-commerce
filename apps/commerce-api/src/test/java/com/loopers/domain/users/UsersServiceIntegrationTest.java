@@ -90,4 +90,48 @@ public class UsersServiceIntegrationTest {
             assertThrows(CoreException.class, () -> usersService.join(duplicateUserCommand));
         }
     }
+
+    @DisplayName("유저를 조회할 때,")
+    @Nested
+    class Get {
+
+        @DisplayName("해당 ID 의 회원이 존재할 경우, 회원 정보가 반환된다.")
+        @Test
+        void shouldReturnUserInfo_whenUserExists() {
+            // arrange
+            String userId = "yht0827";
+            String name = "양희태";
+            String email = "yht0827@naver.com";
+            String birthday = "1999-01-01";
+            String gender = "M";
+            UsersModel savedUser = usersService.join(new UsersCommand(userId, name, email, birthday, gender));
+
+            // act
+            UsersModel foundUser = usersService.me(savedUser.getId());
+
+            // assert
+            assertAll(
+                    () -> assertThat(foundUser).isNotNull(),
+                    () -> assertThat(foundUser.getUserId()).isEqualTo(userId),
+                    () -> assertThat(foundUser.getName()).isEqualTo(name),
+                    () -> assertThat(foundUser.getEmail()).isEqualTo(email),
+                    () -> assertThat(foundUser.getBirthday()).isEqualTo(birthday),
+                    () -> assertThat(foundUser.getGender()).isEqualTo(gender)
+            );
+
+        }
+
+
+        @DisplayName("해당 ID 의 회원이 존재하지 않을 경우, null 이 반환된다.")
+        @Test
+        void shouldThrowException_whenUserDoesNotExist() {
+            // arrange
+            long nonExistentUserId = 999L;
+
+            // act & assert
+            // 존재하지 않는 사용자를 조회 시 CoreException 이 발생하는 것을 검증합니다.
+            assertThrows(CoreException.class, () -> usersService.me(nonExistentUserId));
+
+        }
+    }
 }

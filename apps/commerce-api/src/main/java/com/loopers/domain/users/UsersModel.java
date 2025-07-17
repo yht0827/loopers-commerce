@@ -45,7 +45,7 @@ public class UsersModel extends BaseEntity {
     }
 
     private void validateGender(String gender) {
-        if (userId == null || gender.isBlank()) {
+        if (gender == null || gender.isBlank()) {
             throw new CoreException(ErrorType.BAD_REQUEST, "성별은 비어있을 수 없습니다.");
         }
     }
