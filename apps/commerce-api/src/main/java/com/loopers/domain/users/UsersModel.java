@@ -14,7 +14,7 @@ import java.util.regex.Pattern;
 
 @Entity
 @Getter
-@Table(name = "Users")
+@Table(name = "users")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class UsersModel extends BaseEntity {
 
