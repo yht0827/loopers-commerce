@@ -35,12 +35,19 @@ public class UsersModel extends BaseEntity {
         validateUserId(userId);
         validateBirthday(birthday);
         validateEmail(email);
+        validateGender(gender);
 
         this.userId = userId;
         this.name = name;
         this.email = email;
         this.birthday = birthday;
         this.gender = gender;
+    }
+
+    private void validateGender(String gender) {
+        if (userId == null || gender.isBlank()) {
+            throw new CoreException(ErrorType.BAD_REQUEST, "성별은 비어있을 수 없습니다.");
+        }
     }
 
     private void validateUserId(String userId) {
@@ -60,4 +67,6 @@ public class UsersModel extends BaseEntity {
             throw new CoreException(ErrorType.BAD_REQUEST, "유효하지 않은 이메일 형식입니다.");
         }
     }
+
+
 }
