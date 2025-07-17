@@ -1,4 +1,8 @@
 package com.loopers.infrastructure.users;
 
-public interface UsersJpaRepository {
+import org.springframework.data.jpa.repository.JpaRepository;
+
+import com.loopers.domain.users.UsersModel;
+
+public interface UsersJpaRepository extends JpaRepository<UsersModel, Long> {
 }
