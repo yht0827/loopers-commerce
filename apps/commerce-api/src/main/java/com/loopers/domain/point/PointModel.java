@@ -1,6 +1,8 @@
 package com.loopers.domain.point;
 
 import com.loopers.domain.BaseEntity;
+import com.loopers.support.error.CoreException;
+import com.loopers.support.error.ErrorType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
@@ -19,8 +21,16 @@ public class PointModel extends BaseEntity {
 
     @Builder
     public PointModel(Long userId, Long balance) {
+        validateBalance(balance);
+
         this.userId = userId;
         this.balance = balance;
+    }
+
+    private void validateBalance(Long balance) {
+        if (balance == null || balance < 0) {
+            throw new CoreException(ErrorType.BAD_REQUEST, "잔액은 0보다 작을 수 없습니다.");
+        }
     }
 
     /**

@@ -1,5 +1,6 @@
 package com.loopers.domain.point;
 
+import com.loopers.application.point.port.in.PointCommand;
 import com.loopers.infrastructure.point.PointJpaRepository;
 import com.loopers.support.error.CoreException;
 import com.loopers.utils.DatabaseCleanUp;
@@ -66,4 +67,22 @@ public class PointServiceIntegrationTest {
             assertThrows(CoreException.class, () -> pointService.getPoint(nonExistentUserId));
         }
     }
+
+    @DisplayName("포인트를 생성할 때,")
+    @Nested
+    class Post {
+        @DisplayName("존재하지 않는 유저 ID 로 충전을 시도한 경우, 실패한다.")
+        @Test
+        void shouldFailWhenChargingWithNonExistentUserId() {
+            // arrange
+            Long nonExistentUserId = 999L;
+            Long amount = 1000L;
+            PointCommand command = new PointCommand(nonExistentUserId, amount);
+
+            // act and assert
+            assertThrows(CoreException.class, () -> pointService.charge(command));
+        }
+
+    }
+
 }

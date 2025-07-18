@@ -3,6 +3,8 @@ package com.loopers.interfaces.api.point;
 import com.loopers.domain.point.PointModel;
 import com.loopers.infrastructure.point.PointJpaRepository;
 import com.loopers.interfaces.api.ApiResponse;
+import com.loopers.interfaces.api.point.port.in.PointRequest;
+import com.loopers.interfaces.api.point.port.out.ChargeResponse;
 import com.loopers.interfaces.api.point.port.out.PointResponse;
 import com.loopers.utils.DatabaseCleanUp;
 import org.junit.jupiter.api.AfterEach;
@@ -89,6 +91,68 @@ public class PointV1ApiE2ETest {
 
             // assert
             assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+        }
+
+    }
+
+    @DisplayName("POST /api/v1/charge")
+    @Nested
+    class Post {
+
+        @Test
+        @DisplayName("존재하는 유저가 1000원을 충전할 경우, 충전된 보유 총량을 응답으로 반환한다.")
+        void chargePoint_success() {
+            // arrange
+            Long userId = 1L;
+            Long initialBalance = 500L;
+            Long chargeAmount = 1000L;
+
+            pointJpaRepository.save(new PointModel(userId, initialBalance));
+
+            PointRequest pointRequest = new PointRequest(userId, chargeAmount);
+            HttpEntity<PointRequest> requestEntity = new HttpEntity<>(pointRequest);
+
+            String requestUrl = "/api/v1/point/charge";
+
+            // act
+            ParameterizedTypeReference<ApiResponse<ChargeResponse>> responseType = new ParameterizedTypeReference<>() {
+            };
+            ResponseEntity<ApiResponse<ChargeResponse>> response =
+                    testRestTemplate.exchange(requestUrl, HttpMethod.POST, requestEntity, responseType);
+
+            // assert
+            ChargeResponse responseData = response.getBody().data();
+
+            assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+            assertThat(response.getBody()).isNotNull();
+            assertThat(response.getBody().data().balance()).isEqualTo(initialBalance + chargeAmount);
+        }
+
+        @Test
+        @DisplayName("존재하지 않는 유저로 요청할 경우, 404 Not Found 응답을 반환한다.")
+        void chargePoint_fail_when_user_not_found() {
+            // arrange
+            long nonExistentUserId = 999L;
+            long chargeAmount = 1000L;
+
+            PointRequest pointRequest = new PointRequest(nonExistentUserId, chargeAmount);
+            HttpEntity<PointRequest> requestEntity = new HttpEntity<>(pointRequest);
+
+            String requestUrl = "/api/v1/point/charge";
+
+            // act
+            ParameterizedTypeReference<ApiResponse<ChargeResponse>> responseType = new ParameterizedTypeReference<>() {
+            };
+
+            ResponseEntity<ApiResponse<ChargeResponse>> response = testRestTemplate.exchange(
+                    requestUrl,
+                    HttpMethod.POST,
+                    requestEntity,
+                    responseType
+            );
+
+            // assert
+            assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
         }
 
     }
