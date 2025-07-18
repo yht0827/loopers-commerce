@@ -6,6 +6,7 @@ import com.loopers.interfaces.api.point.port.out.ChargeResponse;
 import com.loopers.interfaces.api.point.port.out.PointResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletRequest;
 
 @Tag(name = "Users V1 API", description = "Users API 입니다.")
 public interface PointV1ApiSpec {
@@ -20,5 +21,5 @@ public interface PointV1ApiSpec {
             summary = "포인트 조회",
             description = "사용자의 포인트를 조회합니다."
     )
-    ApiResponse<PointResponse> get(final Long id);
+    ApiResponse<PointResponse> get(HttpServletRequest servletRequest);
 }
