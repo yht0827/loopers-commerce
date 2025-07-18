@@ -4,6 +4,8 @@ import com.loopers.application.users.facade.UsersFacade;
 import com.loopers.interfaces.api.ApiResponse;
 import com.loopers.interfaces.api.users.port.in.UsersRequest;
 import com.loopers.interfaces.api.users.port.out.UsersResponse;
+import com.loopers.support.util.UserIdentifier;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -23,7 +25,8 @@ public class UsersV1Controller implements UsersV1ApiSpec {
 
     @GetMapping("/me")
     @Override
-    public ApiResponse<UsersResponse> me(@RequestHeader(value = "X-USER-ID") final Long id) {
+    public ApiResponse<UsersResponse> me(HttpServletRequest servletRequest) {
+        Long id = UserIdentifier.getUserId(servletRequest);
         UsersResponse response = UsersResponse.from(usersFacade.me(id));
         return ApiResponse.success(response);
     }

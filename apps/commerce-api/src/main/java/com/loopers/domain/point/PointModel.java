@@ -15,7 +15,7 @@ import lombok.NoArgsConstructor;
 public class PointModel extends BaseEntity {
 
     private Long userId;
-    private Long balance;
+    private Long balance = 0L;
 
     @Builder
     public PointModel(Long userId, Long balance) {
