@@ -1,4 +1,8 @@
 package com.loopers.infrastructure.point;
 
-public interface PointJpaRepository {
+import com.loopers.domain.point.PointModel;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+public interface PointJpaRepository extends JpaRepository<PointModel, Long> {
+
 }

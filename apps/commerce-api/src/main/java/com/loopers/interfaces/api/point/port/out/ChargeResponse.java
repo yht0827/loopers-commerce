@@ -2,12 +2,12 @@ package com.loopers.interfaces.api.point.port.out;
 
 import com.loopers.application.point.port.out.PointInfo;
 
-public record PointResponse(
+public record ChargeResponse(
         Long id,
         Long balance
 ) {
-    public static PointResponse from(final PointInfo info) {
-        return new PointResponse(
+    public static ChargeResponse from(final PointInfo info) {
+        return new ChargeResponse(
                 info.id(),
                 info.balance()
         );

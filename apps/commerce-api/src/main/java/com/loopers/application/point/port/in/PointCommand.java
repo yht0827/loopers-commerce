@@ -1,4 +1,7 @@
 package com.loopers.application.point.port.in;
 
-public record PointCommand() {
+public record PointCommand(
+        Long userId,
+        Long balance
+) {
 }
