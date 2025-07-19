@@ -25,8 +25,8 @@ public class UsersV1Controller implements UsersV1ApiSpec {
 
     @GetMapping("/me")
     @Override
-    public ApiResponse<UsersResponse> me(HttpServletRequest servletRequest) {
-        Long id = UserIdentifier.getUserId(servletRequest);
+    public ApiResponse<UsersResponse> me(@RequestHeader("X-USER-ID") Long id) {
+        UserIdentifier.getUserId(servletRequest);
         UsersResponse response = UsersResponse.from(usersFacade.me(id));
         return ApiResponse.success(response);
     }

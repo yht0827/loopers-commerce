@@ -10,7 +10,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-public class UsersModelTest {
+public class UsersEntityTest {
     @DisplayName("회원 모델을 생성할 때, ")
     @Nested
     class Create {
@@ -25,15 +25,15 @@ public class UsersModelTest {
             String gender = "M";
 
             // act
-            UsersModel usersModel = new UsersModel(userId, name, email, birthday, gender);
+            UsersEntity usersEntity = new UsersEntity(userId, name, email, birthday, gender);
 
             // assert
             assertAll(
-                    () -> assertThat(usersModel.getId()).isNotNull(),
-                    () -> assertThat(usersModel.getName()).isEqualTo(name),
-                    () -> assertThat(usersModel.getEmail()).isEqualTo(email),
-                    () -> assertThat(usersModel.getBirthday()).isEqualTo(birthday),
-                    () -> assertThat(usersModel.getGender()).isEqualTo(gender)
+                    () -> assertThat(usersEntity.getId()).isNotNull(),
+                    () -> assertThat(usersEntity.getName()).isEqualTo(name),
+                    () -> assertThat(usersEntity.getEmail()).isEqualTo(email),
+                    () -> assertThat(usersEntity.getBirthday()).isEqualTo(birthday),
+                    () -> assertThat(usersEntity.getGender()).isEqualTo(gender)
             );
         }
 
@@ -48,7 +48,7 @@ public class UsersModelTest {
             String gender = "M";
 
             // act
-            CoreException result = assertThrows(CoreException.class, () -> new UsersModel(userId, name, email, birthday, gender));
+            CoreException result = assertThrows(CoreException.class, () -> new UsersEntity(userId, name, email, birthday, gender));
 
             // assert
             assertThat(result.getErrorType()).isEqualTo(ErrorType.BAD_REQUEST);
@@ -66,7 +66,7 @@ public class UsersModelTest {
             String gender = "M";
 
             // act
-            CoreException result = assertThrows(CoreException.class, () -> new UsersModel(userId, name, email, birthday, gender));
+            CoreException result = assertThrows(CoreException.class, () -> new UsersEntity(userId, name, email, birthday, gender));
 
             // assert
             assertThat(result.getErrorType()).isEqualTo(ErrorType.BAD_REQUEST);
@@ -84,7 +84,7 @@ public class UsersModelTest {
             String gender = "M";
 
             // act
-            CoreException result = assertThrows(CoreException.class, () -> new UsersModel(userId, name, email, birthday, gender));
+            CoreException result = assertThrows(CoreException.class, () -> new UsersEntity(userId, name, email, birthday, gender));
 
             // assert
             assertThat(result.getErrorType()).isEqualTo(ErrorType.BAD_REQUEST);

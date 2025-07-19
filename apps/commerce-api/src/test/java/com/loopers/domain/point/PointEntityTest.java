@@ -4,26 +4,27 @@ import com.loopers.support.error.CoreException;
 import com.loopers.support.error.ErrorType;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-public class PointModelTest {
+public class PointEntityTest {
 
     @DisplayName("회원 모델을 생성할 때, ")
     @Nested
     class Create {
 
         @DisplayName("0 이하의 정수로 포인트를 충전 시 실패한다.")
-        @Test
-        void failWhenChargingWithZeroOrNegativeAmount() {
+        @ParameterizedTest
+        @ValueSource(longs = {0L, -100L, -1L})
+        void failWhenChargingWithZeroOrNegativeAmount(Long balance) {
             // arrange
             Long userId = 0L;
-            Long balance = -1L;
 
             // act
-            CoreException result = assertThrows(CoreException.class, () -> new PointModel(userId, balance));
+            CoreException result = assertThrows(CoreException.class, () -> new PointEntity(userId, balance));
 
             // assert
             assertThat(result.getErrorType()).isEqualTo(ErrorType.BAD_REQUEST);

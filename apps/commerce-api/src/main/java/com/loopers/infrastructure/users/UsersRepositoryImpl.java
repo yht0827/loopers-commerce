@@ -1,6 +1,6 @@
 package com.loopers.infrastructure.users;
 
-import com.loopers.domain.users.UsersModel;
+import com.loopers.domain.users.UsersEntity;
 import com.loopers.domain.users.UsersRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
@@ -13,12 +13,12 @@ public class UsersRepositoryImpl implements UsersRepository {
     private final UsersJpaRepository usersJpaRepository;
 
     @Override
-    public UsersModel save(final UsersModel usersModel) {
-        return usersJpaRepository.save(usersModel);
+    public UsersEntity save(final UsersEntity usersEntity) {
+        return usersJpaRepository.save(usersEntity);
     }
 
     @Override
-    public Optional<UsersModel> find(final Long id) {
+    public Optional<UsersEntity> find(final Long id) {
         return usersJpaRepository.findById(id);
     }
 

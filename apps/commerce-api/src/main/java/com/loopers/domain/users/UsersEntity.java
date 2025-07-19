@@ -16,7 +16,7 @@ import java.util.regex.Pattern;
 @Getter
 @Table(name = "users")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class UsersModel extends BaseEntity {
+public class UsersEntity extends BaseEntity {
 
     private static final Pattern USER_ID_PATTERN = Pattern.compile("^[a-zA-Z0-9]{1,10}$");
     private static final Pattern BIRTHDAY_PATTERN = Pattern.compile("^\\d{4}-\\d{2}-\\d{2}$");
@@ -31,7 +31,7 @@ public class UsersModel extends BaseEntity {
     private String gender;
 
     @Builder
-    public UsersModel(String userId, String name, String email, String birthday, String gender) {
+    public UsersEntity(String userId, String name, String email, String birthday, String gender) {
         validateUserId(userId);
         validateBirthday(birthday);
         validateEmail(email);

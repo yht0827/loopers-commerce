@@ -1,6 +1,6 @@
 package com.loopers.application.users.port.in;
 
-import com.loopers.domain.users.UsersModel;
+import com.loopers.domain.users.UsersEntity;
 
 public record UsersCommand(
         String userId,
@@ -10,8 +10,8 @@ public record UsersCommand(
         String gender
 ) {
 
-    public UsersModel toEntity() {
-        return UsersModel.builder()
+    public UsersEntity toEntity() {
+        return UsersEntity.builder()
                 .userId(userId)
                 .name(name)
                 .email(email)

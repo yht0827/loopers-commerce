@@ -14,13 +14,13 @@ import lombok.NoArgsConstructor;
 @Getter
 @Table(name = "point")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class PointModel extends BaseEntity {
+public class PointEntity extends BaseEntity {
 
     private Long userId;
     private Long balance = 0L;
 
     @Builder
-    public PointModel(Long userId, Long balance) {
+    public PointEntity(Long userId, Long balance) {
         validateBalance(balance);
 
         this.userId = userId;
