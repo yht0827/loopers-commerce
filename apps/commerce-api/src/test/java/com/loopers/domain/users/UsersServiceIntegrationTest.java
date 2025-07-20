@@ -107,7 +107,7 @@ public class UsersServiceIntegrationTest {
             UsersEntity savedUser = usersService.join(new UsersCommand(userId, name, email, birthday, gender));
 
             // act
-            UsersEntity foundUser = usersService.me(savedUser.getId());
+            UsersEntity foundUser = usersService.getUserById(savedUser.getId());
 
             // assert
             assertAll(
@@ -130,7 +130,7 @@ public class UsersServiceIntegrationTest {
 
             // act & assert
             // 존재하지 않는 사용자를 조회 시 CoreException 이 발생하는 것을 검증합니다.
-            assertThrows(CoreException.class, () -> usersService.me(nonExistentUserId));
+            assertThrows(CoreException.class, () -> usersService.getUserById(nonExistentUserId));
 
         }
     }

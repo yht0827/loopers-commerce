@@ -1,4 +1,4 @@
-package com.loopers.application.users.facade;
+package com.loopers.application.users;
 
 import com.loopers.application.users.port.in.UsersCommand;
 import com.loopers.application.users.port.out.UsersInfo;
@@ -17,8 +17,8 @@ public class UsersFacade {
         return UsersInfo.from(usersEntity);
     }
 
-    public UsersInfo me(final Long id) {
-        UsersEntity usersEntity = usersService.me(id);
+    public UsersInfo getUserById(final Long id) {
+        UsersEntity usersEntity = usersService.getUserById(id);
         return UsersInfo.from(usersEntity);
     }
 

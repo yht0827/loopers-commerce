@@ -1,4 +1,4 @@
-package com.loopers.application.point.facade;
+package com.loopers.application.point;
 
 
 import com.loopers.application.point.port.in.PointCommand;

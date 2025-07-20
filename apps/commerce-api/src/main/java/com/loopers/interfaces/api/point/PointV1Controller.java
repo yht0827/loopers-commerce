@@ -1,13 +1,12 @@
 package com.loopers.interfaces.api.point;
 
 
-import com.loopers.application.point.facade.PointFacade;
+import com.loopers.application.point.PointFacade;
+import com.loopers.application.point.port.out.PointInfo;
 import com.loopers.interfaces.api.ApiResponse;
 import com.loopers.interfaces.api.point.port.in.PointRequest;
 import com.loopers.interfaces.api.point.port.out.ChargeResponse;
 import com.loopers.interfaces.api.point.port.out.PointResponse;
-import com.loopers.support.util.UserIdentifier;
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -21,15 +20,16 @@ public class PointV1Controller implements PointV1ApiSpec {
     @PostMapping("/charge")
     @Override
     public ApiResponse<ChargeResponse> charge(@RequestBody final PointRequest pointRequest) {
-        ChargeResponse response = ChargeResponse.from(pointFacade.charge(pointRequest.toCommand()));
+        PointInfo pointInfo = pointFacade.charge(pointRequest.toCommand());
+        ChargeResponse response = ChargeResponse.from(pointInfo);
         return ApiResponse.success(response);
     }
 
     @GetMapping
     @Override
-    public ApiResponse<PointResponse> get(HttpServletRequest servletRequest) {
-        Long id = UserIdentifier.getUserId(servletRequest);
-        PointResponse response = PointResponse.from(pointFacade.get(id));
+    public ApiResponse<PointResponse> getPointById(@RequestHeader("X-USER-ID") final Long id) {
+        PointInfo pointInfo = pointFacade.get(id);
+        PointResponse response = PointResponse.from(pointInfo);
         return ApiResponse.success(response);
     }
 }

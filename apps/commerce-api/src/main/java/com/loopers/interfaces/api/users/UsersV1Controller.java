@@ -1,11 +1,10 @@
 package com.loopers.interfaces.api.users;
 
-import com.loopers.application.users.facade.UsersFacade;
+import com.loopers.application.users.UsersFacade;
+import com.loopers.application.users.port.out.UsersInfo;
 import com.loopers.interfaces.api.ApiResponse;
 import com.loopers.interfaces.api.users.port.in.UsersRequest;
 import com.loopers.interfaces.api.users.port.out.UsersResponse;
-import com.loopers.support.util.UserIdentifier;
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -19,15 +18,16 @@ public class UsersV1Controller implements UsersV1ApiSpec {
     @PostMapping
     @Override
     public ApiResponse<UsersResponse> join(@RequestBody final UsersRequest request) {
-        UsersResponse response = UsersResponse.from(usersFacade.join(request.toCommand()));
+        UsersInfo usersInfo = usersFacade.join(request.toCommand());
+        UsersResponse response = UsersResponse.from(usersInfo);
         return ApiResponse.success(response);
     }
 
     @GetMapping("/me")
     @Override
-    public ApiResponse<UsersResponse> me(@RequestHeader("X-USER-ID") Long id) {
-        UserIdentifier.getUserId(servletRequest);
-        UsersResponse response = UsersResponse.from(usersFacade.me(id));
+    public ApiResponse<UsersResponse> getUserById(@RequestHeader("X-USER-ID") final Long id) {
+        UsersInfo usersInfo = usersFacade.getUserById(id);
+        UsersResponse response = UsersResponse.from(usersInfo);
         return ApiResponse.success(response);
     }
 

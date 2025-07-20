@@ -21,7 +21,7 @@ public class UsersService {
     }
 
     @Transactional(readOnly = true)
-    public UsersEntity me(final Long id) {
+    public UsersEntity getUserById(final Long id) {
         return usersRepository.find(id)
                 .orElseThrow(() -> new CoreException(ErrorType.NOT_FOUND, "해당 [id = " + id + "]의 회원을 찾을 수 없습니다."));
     }
