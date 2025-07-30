@@ -42,10 +42,10 @@ public class PointServiceIntegrationTest {
             Long userId = 1L;
             Long balance = 1000L;
 
-            PointModel pointModel = pointJpaRepository.save(new PointModel(userId, balance));
+            Point point = pointJpaRepository.save(new Point(userId, balance));
 
             // act
-            PointModel result = pointService.getPoint(pointModel.getUserId());
+            Point result = pointService.getPoint(point.getUserId());
 
             // assert
             assertAll(
@@ -61,7 +61,7 @@ public class PointServiceIntegrationTest {
             Long nonExistentUserId = 999L;
             Long balance = 1000L;
 
-            PointModel pointModel = pointJpaRepository.save(new PointModel(nonExistentUserId, balance));
+            Point point = pointJpaRepository.save(new Point(nonExistentUserId, balance));
 
             // act and assert
             assertThrows(CoreException.class, () -> pointService.getPoint(nonExistentUserId));
