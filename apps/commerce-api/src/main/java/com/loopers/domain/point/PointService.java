@@ -14,17 +14,17 @@ public class PointService {
     private final PointRepository pointRepository;
 
     @Transactional
-    public PointModel charge(final PointCommand command) {
-        PointModel pointModel = pointRepository.findByUsersId(command.userId())
+    public Point charge(final PointCommand command) {
+        Point point = pointRepository.findByUsersId(command.userId())
                 .orElseThrow(() -> new CoreException(ErrorType.NOT_FOUND, " 해당 [id = " + command.userId() + "]의 포인트가 존재하지 않습니다."));
 
-        pointModel.charge(command.balance());
+        point.charge(command.balance());
 
-        return pointRepository.save(pointModel);
+        return pointRepository.save(point);
     }
 
     @Transactional(readOnly = true)
-    public PointModel getPoint(final Long usersId) {
+    public Point getPoint(final Long usersId) {
         return pointRepository.findByUsersId(usersId)
                 .orElseThrow(() -> new CoreException(ErrorType.NOT_FOUND, " 해당 [id = " + usersId + "]의 포인트가 존재하지 않습니다."));
     }

@@ -51,12 +51,12 @@ public class UsersServiceIntegrationTest {
             UsersCommand command = new UsersCommand(userId, name, email, birthday, gender);
 
             // act
-            UsersModel result = usersService.join(command);
+            Users result = usersService.join(command);
 
             // assert
-            ArgumentCaptor<UsersModel> captor = ArgumentCaptor.forClass(UsersModel.class);
+            ArgumentCaptor<Users> captor = ArgumentCaptor.forClass(Users.class);
             verify(usersJpaRepository, times(1)).save(captor.capture());
-            UsersModel savedUser = captor.getValue();
+            Users savedUser = captor.getValue();
 
             assertAll(
                     () -> assertThat(result).isNotNull(),
@@ -104,10 +104,10 @@ public class UsersServiceIntegrationTest {
             String email = "yht0827@naver.com";
             String birthday = "1999-01-01";
             String gender = "M";
-            UsersModel savedUser = usersService.join(new UsersCommand(userId, name, email, birthday, gender));
+            Users savedUser = usersService.join(new UsersCommand(userId, name, email, birthday, gender));
 
             // act
-            UsersModel foundUser = usersService.me(savedUser.getId());
+            Users foundUser = usersService.me(savedUser.getId());
 
             // assert
             assertAll(
