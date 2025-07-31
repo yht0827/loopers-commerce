@@ -2,10 +2,12 @@ package com.loopers.infrastructure.product;
 
 import java.util.Optional;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
+import com.loopers.domain.product.Product;
 import com.loopers.domain.product.ProductRepository;
-import com.loopers.domain.product.entity.Product;
 
 import lombok.RequiredArgsConstructor;
 
@@ -18,4 +20,15 @@ public class ProductRepositoryImpl implements ProductRepository {
 	public Optional<Product> findById(final Long id) {
 		return productJpaRepository.findById(id);
 	}
+
+	@Override
+	public Page<Product> getProductList(final Pageable pageable) {
+		return productJpaRepository.search(pageable);
+	}
+
+	@Override
+	public Page<Product> findByBrandId(final Long brandId, final Pageable pageable) {
+		return productJpaRepository.findByBrandId(brandId, pageable);
+	}
+
 }
