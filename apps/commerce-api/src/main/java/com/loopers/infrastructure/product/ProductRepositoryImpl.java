@@ -2,10 +2,12 @@ package com.loopers.infrastructure.product;
 
 import java.util.Optional;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
+import com.loopers.domain.product.Product;
 import com.loopers.domain.product.ProductRepository;
-import com.loopers.domain.product.entity.Product;
 
 import lombok.RequiredArgsConstructor;
 
