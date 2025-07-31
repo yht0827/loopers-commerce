@@ -1,4 +1,4 @@
-package com.loopers.interfaces.api.api.product;
+package com.loopers.interfaces.api.product;
 
 import com.loopers.application.product.ProductDetailResult;
 import com.loopers.domain.product.LikeCount;

@@ -1,4 +1,4 @@
-package com.loopers.interfaces.api.api.brand;
+package com.loopers.interfaces.api.brand;
 
 import java.util.List;
 

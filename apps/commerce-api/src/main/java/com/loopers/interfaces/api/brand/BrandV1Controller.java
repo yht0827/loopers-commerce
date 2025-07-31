@@ -1,4 +1,4 @@
-package com.loopers.interfaces.api.api.brand;
+package com.loopers.interfaces.api.brand;
 
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.GetMapping;
