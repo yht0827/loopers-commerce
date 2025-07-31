@@ -1,9 +1,6 @@
 package com.loopers.domain.product.entity.vo;
 
-import java.util.Arrays;
-
-import com.loopers.support.error.CoreException;
-import com.loopers.support.error.ErrorType;
+import com.loopers.support.util.EnumMapper;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -17,11 +14,10 @@ public enum StockHistoryType {
 
 	private final String description;
 
-	public static StockHistoryType from(String type) {
-		return Arrays.stream(values())
-			.filter(it -> it.name().equalsIgnoreCase(type))
-			.findFirst()
-			.orElseThrow(() -> new CoreException(ErrorType.BAD_REQUEST, "유효하지 않은 재고 기록 타입입니다."));
-	}
+	// 미리 생성된 매퍼를 static final로 선언
+	private static final EnumMapper<StockHistoryType> MAPPER = new EnumMapper<>(StockHistoryType.class);
 
+	public static StockHistoryType from(String type) {
+		return MAPPER.from(type, "유효하지 않은 재고 기록 타입입니다.");
+	}
 }
