@@ -28,4 +28,5 @@ public class Like {
 	public Like(LikeId targetId) {
 		this.targetId = targetId;
 	}
+
 }

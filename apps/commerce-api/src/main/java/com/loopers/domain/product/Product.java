@@ -35,4 +35,8 @@ public class Product extends BaseTimeEntity {
 		this.likeCount = likeCount;
 		this.quantity = quantity;
 	}
+
+	public void updateLikeCount(LikeCount newLikeCount) {
+		this.likeCount = newLikeCount;
+	}
 }
