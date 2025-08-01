@@ -42,4 +42,12 @@ public class Point extends BaseTimeEntity {
 	public void charge(Long amount) {
 		this.balance += amount;
 	}
+
+	public void use() {
+		if (this.balance <= 0) {
+			throw new CoreException(ErrorType.BAD_REQUEST, "포인트가 부족합니다.");
+		}
+		this.balance--;
+	}
+
 }

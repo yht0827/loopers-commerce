@@ -21,17 +21,14 @@ public class Order extends BaseTimeEntity {
 	@Column(name = "user_id")
 	private Long userId;
 
-	private OrderNumber orderNumber;
-
 	private TotalOrderPrice totalOrderPrice;
 
 	@Enumerated(EnumType.STRING)
 	private OrderStatus status;
 
 	@Builder
-	public Order(Long userId, OrderNumber orderNumber, TotalOrderPrice totalOrderPrice, OrderStatus status) {
+	public Order(Long userId, TotalOrderPrice totalOrderPrice, OrderStatus status) {
 		this.userId = userId;
-		this.orderNumber = orderNumber;
 		this.totalOrderPrice = totalOrderPrice;
 		this.status = status;
 	}
