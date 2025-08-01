@@ -17,16 +17,11 @@ public class ProductService {
 		return products.map(ProductInfo::from);
 	}
 
-	public ProductInfo findById(final Long productId) {
+	public ProductInfo getProductDetail(final Long productId) {
 		Product product = productRepository.findById(productId)
 			.orElseThrow(() -> new IllegalArgumentException("해당 [id = " + productId + "]의 상품을 찾을 수 없습니다."));
 
 		return ProductInfo.from(product);
-	}
-
-	public Page<ProductInfo> getProductsByBrandId(final Long brandId, final Pageable pageable) {
-		Page<Product> products = productRepository.findByBrandId(brandId, pageable);
-		return products.map(ProductInfo::from);
 	}
 }
 

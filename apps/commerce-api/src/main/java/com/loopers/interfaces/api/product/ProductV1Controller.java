@@ -28,8 +28,8 @@ public class ProductV1Controller {
 	}
 
 	@GetMapping("/{productId}")
-	public ApiResponse<ProductDetailResponse> getProductById(@PathVariable final Long productId) {
-		ProductDetailResult product = productFacade.getProductById(productId);
+	public ApiResponse<ProductDetailResponse> getProductDetail(@PathVariable final Long productId) {
+		ProductDetailResult product = productFacade.getProductDetail(productId);
 		ProductDetailResponse response = ProductDetailResponse.from(product);
 		return ApiResponse.success(response);
 	}
