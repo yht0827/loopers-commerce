@@ -12,8 +12,8 @@ public class ProductService {
 
 	private final ProductRepository productRepository;
 
-	public Page<ProductInfo> getProductList(final Pageable pageable) {
-		Page<Product> products = productRepository.getProductList(pageable);
+	public Page<ProductInfo> getProductList(final Long brandId, final Pageable pageable) {
+		Page<Product> products = productRepository.getProductList(brandId, pageable);
 		return products.map(ProductInfo::from);
 	}
 

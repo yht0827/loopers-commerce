@@ -10,7 +10,6 @@ import com.loopers.domain.brand.BrandService;
 import com.loopers.domain.product.ProductInfo;
 import com.loopers.domain.product.ProductService;
 import com.loopers.domain.product.ProductSortType;
-import com.loopers.interfaces.api.product.ProductRequest;
 
 import lombok.RequiredArgsConstructor;
 
@@ -21,10 +20,8 @@ public class ProductFacade {
 	private final ProductService productService;
 	private final BrandService brandService;
 
-	public ProductListResult getProductList(final ProductRequest productRequest, final Pageable pageable) {
-		ProductSortType sortType = ProductSortType.from(productRequest.sort());
-		Page<ProductInfo> products = productService.getProductList(
-			PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), sortType.getSort()));
+	public ProductListResult getProductList(final Long brandId, final Pageable pageable) {
+		Page<ProductInfo> products = productService.getProductList(brandId, pageable);
 		return ProductListResult.from(products);
 	}
 

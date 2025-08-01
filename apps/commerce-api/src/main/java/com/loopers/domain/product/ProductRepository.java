@@ -8,8 +8,6 @@ import org.springframework.data.domain.Pageable;
 public interface ProductRepository {
 	Optional<Product> findById(final Long id);
 
-	Page<Product> getProductList(final Pageable pageable);
-
-	Page<Product> findByBrandId(final Long brandId, final Pageable pageable);
+	Page<Product> getProductList(final Long brandId, final Pageable pageable);
 }
 
