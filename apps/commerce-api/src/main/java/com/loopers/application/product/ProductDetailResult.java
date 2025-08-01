@@ -1,0 +1,15 @@
+package com.loopers.application.product;
+
+import com.loopers.domain.product.LikeCount;
+import com.loopers.domain.product.Price;
+import com.loopers.domain.product.ProductInfo;
+import com.loopers.domain.product.ProductName;
+import com.loopers.domain.product.Quantity;
+
+public record ProductDetailResult(
+	Long productId, ProductName productName, Price price, LikeCount likeCount, Quantity quantity) {
+	public static ProductDetailResult from(ProductInfo productInfo) {
+		return new ProductDetailResult(productInfo.productId(), productInfo.productName(), productInfo.price(),
+			productInfo.likeCount(), productInfo.quantity());
+	}
+}

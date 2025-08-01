@@ -1,5 +1,7 @@
 package com.loopers.domain.order;
 
+import org.hibernate.tool.schema.TargetType;
+
 import com.loopers.support.util.EnumMapper;
 
 import lombok.Getter;
@@ -17,9 +19,9 @@ public enum OrderStatus {
 	private final String description;
 
 	// 미리 생성된 매퍼를 static final로 선언
-	private static final EnumMapper<OrderStatus> MAPPER = new EnumMapper<>(OrderStatus.class);
+	private static final EnumMapper<TargetType> MAPPER = new EnumMapper<>(TargetType.class);
 
-	public static OrderStatus from(String type) {
+	public static TargetType from(String type) {
 		return MAPPER.from(type, "유효하지 않은 주문 상태 타입입니다.");
 	}
 

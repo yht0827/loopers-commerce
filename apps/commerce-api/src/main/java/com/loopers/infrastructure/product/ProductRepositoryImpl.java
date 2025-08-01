@@ -20,4 +20,15 @@ public class ProductRepositoryImpl implements ProductRepository {
 	public Optional<Product> findById(final Long id) {
 		return productJpaRepository.findById(id);
 	}
+
+	@Override
+	public Page<Product> getProductList(final Pageable pageable) {
+		return productJpaRepository.search(pageable);
+	}
+
+	@Override
+	public Page<Product> findByBrandId(final Long brandId, final Pageable pageable) {
+		return productJpaRepository.findByBrandId(brandId, pageable);
+	}
+
 }
