@@ -1,7 +1,6 @@
 package com.loopers.domain.order;
 
-import com.loopers.domain.BaseTimeEntity;
-
+import com.loopers.domain.BaseEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
@@ -12,25 +11,25 @@ import lombok.NoArgsConstructor;
 
 @Entity
 @Getter
-@Table(name = "order_Items")
+@Table(name = "order_items")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class OrderItem extends BaseTimeEntity {
+public class OrderItem extends BaseEntity {
 
-	@Column(name = "order_id")
-	private Long orderId;
+    @Column(name = "order_id")
+    private Long orderId;
 
-	@Column(name = "product_id")
-	private Long productId;
+    @Column(name = "product_id")
+    private Long productId;
 
-	private Quantity quantity;
+    private Quantity quantity;
 
-	private Price price;
+    private Price price;
 
-	@Builder
-	public OrderItem(Long orderId, Long productId, Quantity quantity, Price price) {
-		this.orderId = orderId;
-		this.productId = productId;
-		this.quantity = quantity;
-		this.price = price;
-	}
+    @Builder
+    public OrderItem(Long orderId, Long productId, Quantity quantity, Price price) {
+        this.orderId = orderId;
+        this.productId = productId;
+        this.quantity = quantity;
+        this.price = price;
+    }
 }

@@ -1,7 +1,6 @@
 package com.loopers.domain.brand;
 
-import com.loopers.domain.BaseTimeEntity;
-
+import com.loopers.domain.BaseEntity;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
@@ -13,7 +12,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @Table(name = "brands")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Brand extends BaseTimeEntity {
+public class Brand extends BaseEntity {
 
 	private BrandName name;
 
