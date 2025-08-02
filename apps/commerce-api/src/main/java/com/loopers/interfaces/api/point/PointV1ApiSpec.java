@@ -1,5 +1,7 @@
 package com.loopers.interfaces.api.point;
 
+import org.springframework.web.bind.annotation.RequestHeader;
+
 import com.loopers.interfaces.api.ApiResponse;
 import com.loopers.interfaces.api.point.port.in.PointRequest;
 import com.loopers.interfaces.api.point.port.out.ChargeResponse;
@@ -21,5 +23,5 @@ public interface PointV1ApiSpec {
             summary = "포인트 조회",
             description = "사용자의 포인트를 조회합니다."
     )
-    ApiResponse<PointResponse> get(HttpServletRequest servletRequest);
+    ApiResponse<PointResponse> get(final Long userId);
 }

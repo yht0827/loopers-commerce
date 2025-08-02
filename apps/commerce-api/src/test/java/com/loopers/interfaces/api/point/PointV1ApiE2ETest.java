@@ -1,6 +1,6 @@
 package com.loopers.interfaces.api.point;
 
-import com.loopers.domain.point.PointModel;
+import com.loopers.domain.point.Point;
 import com.loopers.infrastructure.point.PointJpaRepository;
 import com.loopers.interfaces.api.ApiResponse;
 import com.loopers.interfaces.api.point.port.in.PointRequest;
@@ -55,7 +55,7 @@ public class PointV1ApiE2ETest {
             long userId = 1L;
             long balance = 1000L;
 
-            pointJpaRepository.save(new PointModel(userId, balance));
+            pointJpaRepository.save(new Point(userId, balance));
 
             // act
             HttpHeaders headers = new HttpHeaders();
@@ -107,7 +107,7 @@ public class PointV1ApiE2ETest {
             Long initialBalance = 500L;
             Long chargeAmount = 1000L;
 
-            pointJpaRepository.save(new PointModel(userId, initialBalance));
+            pointJpaRepository.save(new Point(userId, initialBalance));
 
             PointRequest pointRequest = new PointRequest(userId, chargeAmount);
             HttpEntity<PointRequest> requestEntity = new HttpEntity<>(pointRequest);
