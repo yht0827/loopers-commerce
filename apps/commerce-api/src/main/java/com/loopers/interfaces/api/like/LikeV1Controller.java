@@ -6,15 +6,14 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.loopers.application.like.LikeFacade;
 import com.loopers.application.like.LikeResult;
 import com.loopers.interfaces.api.ApiResponse;
-import com.loopers.support.util.UserIdentifier;
 
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -25,8 +24,7 @@ public class LikeV1Controller {
 
 	@PostMapping("/products/{productId}")
 	public ApiResponse<LikeResponse> likeProduct(
-		@PathVariable Long productId, HttpServletRequest servletRequest) {
-		Long userId = UserIdentifier.getUserId(servletRequest);
+		@PathVariable Long productId, @RequestHeader final Long userId) {
 		LikeResult likeResult = likeFacade.likeProduct(userId, productId);
 		LikeResponse response = LikeResponse.from(likeResult);
 		return ApiResponse.success(response);
@@ -34,15 +32,13 @@ public class LikeV1Controller {
 
 	@DeleteMapping("/products/{productId}")
 	public ApiResponse<Void> unlikeProduct(
-		@PathVariable Long productId, HttpServletRequest servletRequest) {
-		Long userId = UserIdentifier.getUserId(servletRequest);
+		@PathVariable Long productId, @RequestHeader final Long userId) {
 		likeFacade.unlikeProduct(userId, productId);
 		return ApiResponse.success(null);
 	}
 
 	@GetMapping("/products")
-	public ApiResponse<List<LikeResponse>> getLikedProductList(HttpServletRequest servletRequest) {
-		Long userId = UserIdentifier.getUserId(servletRequest);
+	public ApiResponse<List<LikeResponse>> getLikedProductList(@RequestHeader final Long userId) {
 		List<LikeResult> likedProductList = likeFacade.getLikedProductList(userId);
 
 		List<LikeResponse> response = likedProductList.stream()

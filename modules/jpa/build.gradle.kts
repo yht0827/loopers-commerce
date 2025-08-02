@@ -14,6 +14,9 @@ dependencies {
     // jdbc-mysql
     runtimeOnly("com.mysql:mysql-connector-j")
 
+    // web
+    api("org.springframework.boot:spring-boot-starter-web")
+
     testImplementation("org.testcontainers:mysql")
 
     testFixturesImplementation("org.springframework.boot:spring-boot-starter-data-jpa")

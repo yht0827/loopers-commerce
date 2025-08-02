@@ -20,7 +20,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 @SpringBootTest
-public class UsersServiceIntegrationTest {
+public class UserServiceIntegrationTest {
     @Autowired
     private UsersService usersService;
 
@@ -51,12 +51,12 @@ public class UsersServiceIntegrationTest {
             UsersCommand command = new UsersCommand(userId, name, email, birthday, gender);
 
             // act
-            Users result = usersService.join(command);
+            User result = usersService.join(command);
 
             // assert
-            ArgumentCaptor<Users> captor = ArgumentCaptor.forClass(Users.class);
+            ArgumentCaptor<User> captor = ArgumentCaptor.forClass(User.class);
             verify(usersJpaRepository, times(1)).save(captor.capture());
-            Users savedUser = captor.getValue();
+            User savedUser = captor.getValue();
 
             assertAll(
                     () -> assertThat(result).isNotNull(),
@@ -104,10 +104,10 @@ public class UsersServiceIntegrationTest {
             String email = "yht0827@naver.com";
             String birthday = "1999-01-01";
             String gender = "M";
-            Users savedUser = usersService.join(new UsersCommand(userId, name, email, birthday, gender));
+            User savedUser = usersService.join(new UsersCommand(userId, name, email, birthday, gender));
 
             // act
-            Users foundUser = usersService.me(savedUser.getId());
+            User foundUser = usersService.me(savedUser.getId());
 
             // assert
             assertAll(
