@@ -1,6 +1,7 @@
 package com.loopers.domain.point;
 
 import com.loopers.domain.BaseEntity;
+import com.loopers.domain.common.UserId;
 import com.loopers.support.error.CoreException;
 import com.loopers.support.error.ErrorType;
 
@@ -13,15 +14,15 @@ import lombok.NoArgsConstructor;
 
 @Entity
 @Getter
-@Table(name = "point")
+@Table(name = "points")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Point extends BaseEntity {
 
-	private Long userId;
+	private UserId userId;
 	private Long balance = 0L;
 
 	@Builder
-	public Point(Long userId, Long balance) {
+	public Point(UserId userId, Long balance) {
 		validateBalance(balance);
 
 		this.userId = userId;

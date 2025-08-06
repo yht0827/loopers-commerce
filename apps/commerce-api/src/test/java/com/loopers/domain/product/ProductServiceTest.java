@@ -17,6 +17,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 
+import com.loopers.domain.common.BrandId;
+
 @ExtendWith(MockitoExtension.class)
 public class ProductServiceTest {
 
@@ -50,7 +52,7 @@ public class ProductServiceTest {
 	void getProductDetail_success() {
 		// given
 		Long productId = 1L;
-		Product product = Product.builder().brandId(1L).build();
+		Product product = Product.builder().brandId(new BrandId(1L)).build();
 		when(productRepository.findById(productId)).thenReturn(Optional.of(product));
 
 		// when

@@ -10,6 +10,10 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
+import com.loopers.domain.common.Price;
+import com.loopers.domain.common.Quantity;
+import com.loopers.domain.common.UserId;
+
 public class OrderTest {
 
 	@DisplayName("주문 모델을 생성할 때,")
@@ -33,14 +37,14 @@ public class OrderTest {
 
 			// act
 			Order order = Order.builder()
-				.userId(userId)
+				.userId(new UserId(userId))
 				.totalOrderPrice(totalOrderPrice)
 				.status(OrderStatus.PENDING)
 				.build();
 
 			// assert
 			assertAll(
-				() -> assertThat(order.getUserId()).isEqualTo(userId),
+				() -> assertThat(order.getUserId()).isEqualTo(new UserId(userId)),
 				() -> assertThat(order.getStatus()).isEqualTo(OrderStatus.PENDING),
 				() -> assertThat(order.getTotalOrderPrice()).isEqualTo(new TotalOrderPrice(7000L)));
 		}
@@ -54,7 +58,7 @@ public class OrderTest {
 			// act
 			// Order 엔티티가 직접 총액을 계산하도록 로직을 변경했다고 가정
 			Order order = Order.builder()
-				.userId(userId)
+				.userId(new UserId(userId))
 				.totalOrderPrice(new TotalOrderPrice(0L)) // 총액 0
 				.status(OrderStatus.PENDING)
 				.build();

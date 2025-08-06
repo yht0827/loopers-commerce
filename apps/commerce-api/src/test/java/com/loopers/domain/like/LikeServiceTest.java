@@ -12,12 +12,13 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import com.loopers.domain.common.BrandId;
+import com.loopers.domain.common.Price;
+import com.loopers.domain.common.Quantity;
 import com.loopers.domain.product.LikeCount;
-import com.loopers.domain.product.Price;
 import com.loopers.domain.product.Product;
 import com.loopers.domain.product.ProductName;
 import com.loopers.domain.product.ProductRepository;
-import com.loopers.domain.product.Quantity;
 import com.loopers.support.error.CoreException;
 
 @ExtendWith(MockitoExtension.class)
@@ -75,7 +76,7 @@ public class LikeServiceTest {
 		// given
 		LikeId likeId = new LikeId(1L, 4L);
 		Like like = new Like(likeId);
-		Product mockProduct = new Product(1L, new ProductName("테스트 상품"), new Price(10000L), new LikeCount(10L), new Quantity(6L));
+		Product mockProduct = new Product(new BrandId(1L), new ProductName("테스트 상품"), new Price(10000L), new LikeCount(10L), new Quantity(6L));
 
 		when(likeRepository.findById(likeId.userId())).thenReturn(Optional.of(like));
 		when(productRepository.findById(likeId.targetId())).thenReturn(Optional.of(mockProduct));

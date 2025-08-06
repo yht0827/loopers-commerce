@@ -1,4 +1,4 @@
-package com.loopers.domain.product;
+package com.loopers.domain.common;
 
 import java.io.Serializable;
 
@@ -15,18 +15,18 @@ public record Quantity(Long quantity) implements Serializable {
 		}
 	}
 
-	public boolean isSufficient(long amount) {
+	public boolean isSufficient(Long amount) {
 		return this.quantity >= amount;
 	}
 
-	public Quantity subtract(long amount) {
+	public Quantity subtract(Long amount) {
 		if (!isSufficient(amount)) {
 			throw new CoreException(ErrorType.BAD_REQUEST, "재고가 충분하지 않습니다.");
 		}
 		return new Quantity(this.quantity - amount);
 	}
 
-	public Quantity add(long amount) {
+	public Quantity add(Long amount) {
 		return new Quantity(this.quantity + amount);
 	}
 }
