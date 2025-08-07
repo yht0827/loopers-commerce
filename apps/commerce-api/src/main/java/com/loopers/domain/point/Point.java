@@ -29,26 +29,24 @@ public class Point extends BaseEntity {
 		this.balance = balance;
 	}
 
-	private void validateBalance(Long balance) {
+	private void validateBalance(final Long balance) {
 		if (balance == null || balance < 0) {
 			throw new CoreException(ErrorType.BAD_REQUEST, "잔액은 0보다 작을 수 없습니다.");
 		}
 	}
 
-	/**
-	 * 포인트를 충전합니다.
-	 *
-	 * @param amount 충전할 포인트 금액
-	 */
-	public void charge(Long amount) {
+	public void charge(final Long amount) {
+		if (this.balance < 1) {
+			throw new CoreException(ErrorType.BAD_REQUEST, "충전할 금액은 1 이상이어야 합니다.");
+		}
 		this.balance += amount;
 	}
 
-	public void use() {
-		if (this.balance <= 0) {
-			throw new CoreException(ErrorType.BAD_REQUEST, "포인트가 부족합니다.");
+	public void use(final Long amount) {
+		if (this.balance < amount) {
+			throw new CoreException(ErrorType.BAD_REQUEST, "보유한 포인트가 부족합니다.");
 		}
-		this.balance--;
+		this.balance -= amount;
 	}
 
 }
