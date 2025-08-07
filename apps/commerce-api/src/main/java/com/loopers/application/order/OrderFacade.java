@@ -23,13 +23,16 @@ public class OrderFacade {
 		return OrderResult.from(order);
 	}
 
-	public List<OrderResult> getOrdersById(Long userId) {
-		List<OrderInfo> orderList = orderService.getOrdersById(userId);
+	public List<OrderResult> getOrders(final OrderCriteria.GetOrders criteria) {
+		OrderCommand.GetOrders command = criteria.toCommand();
+		List<OrderInfo> orderList = orderService.getOrders(command);
 		return orderList.stream().map(OrderResult::from).toList();
 	}
 
-	public OrderResult getOrderDetails(Long userId, Long orderId) {
-		OrderInfo orderInfo = orderService.getOrderDetails(userId, orderId);
+	public OrderResult getOrder(final OrderCriteria.GetOrder criteria) {
+		OrderCommand.GetOrder command = criteria.toCommand();
+
+		OrderInfo orderInfo = orderService.getOrder(command);
 		return OrderResult.from(orderInfo);
 	}
 

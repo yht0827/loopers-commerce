@@ -20,4 +20,18 @@ public record OrderCriteria() {
 		}
 	}
 
+	public record GetOrders(Long userId) {
+
+		public OrderCommand.GetOrders toCommand() {
+			return new OrderCommand.GetOrders(userId);
+		}
+	}
+
+	public record GetOrder(Long userId, Long orderId) {
+
+		public OrderCommand.GetOrder toCommand() {
+			return new OrderCommand.GetOrder(userId, orderId);
+		}
+	}
+
 }
