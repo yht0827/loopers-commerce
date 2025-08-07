@@ -8,6 +8,7 @@ import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.loopers.domain.BaseEntity;
 import com.loopers.domain.common.Price;
 import com.loopers.domain.common.ProductId;
 import com.loopers.domain.common.Quantity;
@@ -52,30 +53,40 @@ public class OrderService {
 				.build();
 		}).toList();
 
-		// 사용자 포인트 확인
+		// 할인 전 총 주문 금액 계산
+		Long totalOrderPrice = orderItems.stream()
+			.mapToLong(item -> item.getPrice().price() * item.getQuantity().quantity())
+			.sum();
+
+		// 쿠폰 및 포인트 할인 적용
 		Point point = pointRepository.findByUsersId(command.userId())
 			.orElseThrow(() -> new CoreException(ErrorType.NOT_FOUND, " 해당 [id = " + command.userId() + "]의 포인트가 존재하지 않습니다."));
 
-		// 쿠폰 확인
-		Coupon coupon = couponRepository.findById(command.userId())
-			.orElseThrow(() -> new CoreException(ErrorType.NOT_FOUND, " 해당 [id = " + command.userId() + "]의 쿠폰이 존재하지 않습니다."));
+		Long pointBalance = point.getBalance();
+		Long couponDiscount = 0L;
 
-		// 쿠폰 사용
-		coupon.use();
+		// 쿠폰 확인 및 쿠폰 사용
+		if (command.couponId() != null) {
+			Coupon coupon = couponRepository.findById(command.couponId())
+				.orElseThrow(
+					() -> new CoreException(ErrorType.NOT_FOUND, "해당 [id = " + command.couponId() + "]의 쿠폰이 존재하지 않습니다."));
 
-		// 포인트 차감
-		Long balance = point.getBalance();
-		point.use(balance);
+			coupon.use();
 
-		// 주문 총 가격 계산
-		Long totalPrice = orderItems.stream()
-			.mapToLong(item -> item.getPrice().price() * item.getQuantity().quantity())
-			.sum();
+			couponDiscount = coupon.getDiscountValue().discountValue();
+		}
+
+		// 실제 사용할 포인트 계산 (쿠폰 할인 후 남은 잔액)
+		Long finalPointToUse = Math.min(pointBalance, pointBalance - couponDiscount);
+		point.use(finalPointToUse);
 
 		// 주문 저장
 		Order newOrder = Order.builder()
 			.userId(new UserId(command.userId()))
-			.totalOrderPrice(new TotalOrderPrice(totalPrice))
+			.totalOrderPrice(new TotalOrderPrice(totalOrderPrice))
+			.pointUsedAmount(new PointUsedAmount(pointBalance))
+			.couponDiscountAmount(new CouponDiscountAmount(couponDiscount))
+			.finalPaymentAmount(new FinalPaymentAmount(finalPointToUse))
 			.status(OrderStatus.PENDING)
 			.build();
 
@@ -93,21 +104,16 @@ public class OrderService {
 			return Collections.emptyList();
 		}
 
-		List<Long> orderIds = orderList.stream()
-			.map(Order::getId)
-			.collect(Collectors.toList());
+		List<Long> orderIds = orderList.stream().map(Order::getId).collect(Collectors.toList());
 
 		List<OrderItem> allOrderItems = orderItemRepository.findAllByOrderIdIn(orderIds);
 
-		Map<Long, List<OrderItem>> orderItemMap = allOrderItems.stream()
-			.collect(Collectors.groupingBy(orderItem -> orderItem.getOrderId().orderId()));
+		Map<Long, List<OrderItem>> orderItemMap = allOrderItems.stream().collect(Collectors.groupingBy(BaseEntity::getId));
 
-		return orderList.stream()
-			.map(order -> {
-				List<OrderItem> orderItems = orderItemMap.getOrDefault(order.getId(), Collections.emptyList());
-				return OrderInfo.from(order, orderItems);
-			})
-			.collect(Collectors.toList());
+		return orderList.stream().map(order -> {
+			List<OrderItem> orderItems = orderItemMap.getOrDefault(order.getId(), Collections.emptyList());
+			return OrderInfo.from(order, orderItems);
+		}).collect(Collectors.toList());
 	}
 
 	@Transactional(readOnly = true)

@@ -8,7 +8,8 @@ import lombok.RequiredArgsConstructor;
 @Getter
 @RequiredArgsConstructor
 public enum CouponType {
-	PRODUCT, BRAND;
+	FIXED_AMOUNT,
+	PERCENTAGE;
 
 	private static final EnumMapper<CouponType> MAPPER = new EnumMapper<>(CouponType.class);
 

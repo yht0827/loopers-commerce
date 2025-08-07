@@ -20,18 +20,23 @@ public class Order extends BaseEntity {
 
 	private UserId userId;
 	private TotalOrderPrice totalOrderPrice;
+	private PointUsedAmount pointUsedAmount;
 	private CouponDiscountAmount couponDiscountAmount;
+	private FinalPaymentAmount finalPaymentAmount;
 	private OrderNumber orderNumber;
 
 	@Enumerated(EnumType.STRING)
 	private OrderStatus status;
 
 	@Builder
-	public Order(UserId userId, TotalOrderPrice totalOrderPrice, CouponDiscountAmount couponDiscountAmount,
-		OrderNumber orderNumber, OrderStatus status) {
+	public Order(UserId userId, TotalOrderPrice totalOrderPrice, PointUsedAmount pointUsedAmount,
+		CouponDiscountAmount couponDiscountAmount, FinalPaymentAmount finalPaymentAmount, OrderNumber orderNumber,
+		OrderStatus status) {
 		this.userId = userId;
 		this.totalOrderPrice = totalOrderPrice;
+		this.pointUsedAmount = pointUsedAmount;
 		this.couponDiscountAmount = couponDiscountAmount;
+		this.finalPaymentAmount = finalPaymentAmount;
 		this.orderNumber = orderNumber;
 		this.status = status;
 	}
