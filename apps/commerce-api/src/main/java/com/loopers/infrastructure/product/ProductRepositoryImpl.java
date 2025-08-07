@@ -32,6 +32,16 @@ public class ProductRepositoryImpl implements ProductRepository {
 	}
 
 	@Override
+	public Optional<Product> findByIdWithPessimisticLock(Long id) {
+		return productJpaRepository.findByIdWithPessimisticLock(id);
+	}
+
+	@Override
+	public Optional<Product> findByIdWithOptimisticLock(Long id) {
+		return productJpaRepository.findByIdWithOptimisticLock(id);
+	}
+
+	@Override
 	public Page<Product> getProductList(final BrandId brandId, final Pageable pageable) {
 		JPAQuery<Product> query = jpaQueryFactory.selectFrom(product)
 			.where(product.brandId.eq(brandId));

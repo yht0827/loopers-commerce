@@ -7,6 +7,7 @@ import com.loopers.support.error.ErrorType;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
+import jakarta.persistence.Version;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -20,6 +21,9 @@ public class Point extends BaseEntity {
 
 	private UserId userId;
 	private Long balance = 0L;
+
+	@Version
+	private Long version;
 
 	@Builder
 	public Point(UserId userId, Long balance) {

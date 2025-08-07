@@ -10,6 +10,10 @@ import com.loopers.domain.common.BrandId;
 public interface ProductRepository {
 	Optional<Product> findById(final Long id);
 
+	Optional<Product> findByIdWithPessimisticLock(Long id);
+
+	Optional<Product> findByIdWithOptimisticLock(Long id);
+
 	Page<Product> getProductList(final BrandId brandId, final Pageable pageable);
 }
 

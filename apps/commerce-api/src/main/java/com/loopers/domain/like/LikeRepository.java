@@ -13,5 +13,10 @@ public interface LikeRepository {
 
 	List<Like> getAllLikedByUserId(Long userId);
 
-	Optional<Like> findByUserIdAndProductId(Long userId, Long productId); // 이 메서드는 필요에 따라 추가할 수 있습니다.
+	Optional<Like> findByUserIdAndProductId(Long userId, Long productId);
+
+	Optional<Like> findByUserIdAndProductIdWithPessimisticLock(Long userId, Long productId);
+
+	Optional<Like> findByUserIdAndProductIdWithOptimisticLock(Long userId, Long productId);
+
 }

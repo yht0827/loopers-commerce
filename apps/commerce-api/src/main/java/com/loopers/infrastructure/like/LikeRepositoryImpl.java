@@ -40,4 +40,14 @@ public class LikeRepositoryImpl implements LikeRepository {
 		return likeJpaRepository.findByUserIdAndProductId(userId, productId);
 	}
 
+	@Override
+	public Optional<Like> findByUserIdAndProductIdWithPessimisticLock(Long userId, Long productId) {
+		return likeJpaRepository.findByUserIdAndProductIdWithPessimisticLock(userId, productId);
+	}
+
+	@Override
+	public Optional<Like> findByUserIdAndProductIdWithOptimisticLock(Long userId, Long productId) {
+		return likeJpaRepository.findByUserIdAndProductIdWithOptimisticLock(userId, productId);
+	}
+
 }

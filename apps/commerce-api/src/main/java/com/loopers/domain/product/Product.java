@@ -7,6 +7,7 @@ import com.loopers.domain.common.Quantity;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
+import jakarta.persistence.Version;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -27,6 +28,9 @@ public class Product extends BaseEntity {
 	private LikeCount likeCount;
 
 	private Quantity quantity;
+
+	@Version
+	private Long version;
 
 	@Builder
 	public Product(BrandId brandId, ProductName name, Price price, LikeCount likeCount, Quantity quantity) {
