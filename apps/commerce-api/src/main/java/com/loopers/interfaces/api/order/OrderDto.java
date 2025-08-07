@@ -5,6 +5,7 @@ import java.util.List;
 import com.loopers.application.order.OrderCriteria;
 import com.loopers.application.order.OrderResult;
 import com.loopers.domain.common.OrderId;
+import com.loopers.domain.common.UserId;
 import com.loopers.domain.order.OrderStatus;
 import com.loopers.domain.order.TotalOrderPrice;
 
@@ -40,7 +41,7 @@ public record OrderDto() {
 			}
 		}
 
-		public record OrderResponse(Long orderId, Long userId, TotalOrderPrice totalPrice, OrderStatus status) {
+		public record OrderResponse(Long orderId, UserId userId, TotalOrderPrice totalPrice, OrderStatus status) {
 			public static OrderResponse from(OrderResult orderResult) {
 				return new OrderResponse(orderResult.orderId(), orderResult.userId(), orderResult.totalPrice(),
 					orderResult.status());

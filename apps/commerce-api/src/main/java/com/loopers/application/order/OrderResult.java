@@ -1,12 +1,13 @@
 package com.loopers.application.order;
 
+import com.loopers.domain.common.UserId;
 import com.loopers.domain.order.OrderInfo;
 import com.loopers.domain.order.OrderStatus;
 import com.loopers.domain.order.TotalOrderPrice;
 
 public record OrderResult(
 	Long orderId,
-	Long userId,
+	UserId userId,
 	TotalOrderPrice totalPrice,
 	OrderStatus status
 ) {

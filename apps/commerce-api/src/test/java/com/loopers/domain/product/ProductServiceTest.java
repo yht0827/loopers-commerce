@@ -32,7 +32,7 @@ public class ProductServiceTest {
 	@DisplayName("상품 목록 조회 시, Repository로부터 받은 Product 페이지를 ProductInfo 페이지로 변환하여 반환한다.")
 	void getProductList_success() {
 		// given
-		Long brandId = 1L;
+		BrandId brandId = new BrandId(1L);
 		PageRequest pageable = PageRequest.of(0, 10);
 		List<Product> products = List.of(Product.builder().build());
 		Page<Product> productPage = new PageImpl<>(products, pageable, 1);

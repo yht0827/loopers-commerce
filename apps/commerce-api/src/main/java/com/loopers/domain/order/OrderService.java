@@ -86,7 +86,7 @@ public class OrderService {
 			.totalOrderPrice(new TotalOrderPrice(totalOrderPrice))
 			.pointUsedAmount(new PointUsedAmount(pointBalance))
 			.couponDiscountAmount(new CouponDiscountAmount(couponDiscount))
-			.finalPaymentAmount(new FinalPaymentAmount(finalPointToUse))
+			.finalPaymentAmount(new FinalPaymentAmount(totalOrderPrice - couponDiscount))
 			.status(OrderStatus.PENDING)
 			.build();
 

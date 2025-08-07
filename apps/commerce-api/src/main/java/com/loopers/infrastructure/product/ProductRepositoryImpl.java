@@ -10,6 +10,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.support.PageableExecutionUtils;
 import org.springframework.stereotype.Repository;
 
+import com.loopers.domain.common.BrandId;
 import com.loopers.domain.product.Product;
 import com.loopers.domain.product.ProductRepository;
 import com.querydsl.core.types.Order;
@@ -31,7 +32,7 @@ public class ProductRepositoryImpl implements ProductRepository {
 	}
 
 	@Override
-	public Page<Product> getProductList(final Long brandId, final Pageable pageable) {
+	public Page<Product> getProductList(final BrandId brandId, final Pageable pageable) {
 		JPAQuery<Product> query = jpaQueryFactory.selectFrom(product)
 			.where(product.brandId.eq(brandId));
 
