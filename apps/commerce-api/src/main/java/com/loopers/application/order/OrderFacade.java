@@ -4,9 +4,9 @@ import java.util.List;
 
 import org.springframework.stereotype.Component;
 
+import com.loopers.domain.order.OrderCommand;
 import com.loopers.domain.order.OrderInfo;
 import com.loopers.domain.order.OrderService;
-import com.loopers.interfaces.api.order.OrderItemRequest;
 
 import lombok.RequiredArgsConstructor;
 
@@ -16,8 +16,9 @@ public class OrderFacade {
 
 	private final OrderService orderService;
 
-	public OrderResult createOrder(Long userId, List<OrderItemRequest> itemRequests) {
-		OrderInfo order = orderService.createOrder(userId, itemRequests);
+	public OrderResult createOrder(final OrderCriteria.CreateOrder criteria) {
+		OrderCommand.CreateOrder command = criteria.toCommand();
+		OrderInfo order = orderService.createOrder(command);
 
 		return OrderResult.from(order);
 	}
