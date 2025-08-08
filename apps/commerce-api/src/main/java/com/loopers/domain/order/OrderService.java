@@ -41,7 +41,7 @@ public class OrderService {
 			Product product = productRepository.findByIdWithPessimisticLock(request.productId())
 				.orElseThrow(() -> new CoreException(ErrorType.NOT_FOUND, "상품을 찾을 수 없습니다."));
 
-			product.decreaseStock(request.quantity());
+			product.decreaseStock(new Quantity(request.quantity()));
 
 			return OrderItem.builder()
 				.productId(new ProductId(product.getId()))

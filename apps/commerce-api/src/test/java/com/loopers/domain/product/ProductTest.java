@@ -48,7 +48,7 @@ public class ProductTest {
 			long orderQuantity = 5L;
 
 			// act and assert
-			boolean sufficient = product.getQuantity().isSufficient(orderQuantity);
+			boolean sufficient = product.getQuantity().isSufficient(new Quantity(orderQuantity));
 			assertThat(sufficient).isTrue();
 		}
 
@@ -59,7 +59,7 @@ public class ProductTest {
 			long orderQuantity = 15L; // 재고(10)보다 많은 수량
 
 			// act and assert
-			boolean insufficient = product.getQuantity().isSufficient(orderQuantity);
+			boolean insufficient = product.getQuantity().isSufficient(new Quantity(orderQuantity));
 			assertThat(insufficient).isFalse();
 		}
 
@@ -70,7 +70,7 @@ public class ProductTest {
 			long decreaseAmount = 3L;
 
 			// act
-			product.decreaseStock(decreaseAmount);
+			product.decreaseStock(new Quantity(decreaseAmount));
 
 			// assert
 			Long quantity = product.getQuantity().quantity();
@@ -98,7 +98,7 @@ public class ProductTest {
 			long orderQuantity = 15L; // 재고(10)보다 많은 수량
 
 			// act and assert
-			assertThatThrownBy(() -> product.decreaseStock(orderQuantity))
+			assertThatThrownBy(() -> product.decreaseStock(new Quantity(orderQuantity)))
 				.isInstanceOf(CoreException.class)
 				.hasMessage("재고가 충분하지 않습니다.");
 		}
