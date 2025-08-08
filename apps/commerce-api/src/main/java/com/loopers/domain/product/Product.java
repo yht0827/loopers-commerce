@@ -46,6 +46,6 @@ public class Product extends BaseEntity {
 	}
 
 	public void decreaseStock(Long amount) {
-		this.quantity.subtract(amount);
+		this. quantity = quantity.subtract(amount);
 	}
 }

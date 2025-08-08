@@ -25,7 +25,7 @@ public class OrderV1Controller {
 	private final OrderFacade orderFacade;
 
 	@PostMapping
-	public ApiResponse<OrderDto.V1.OrderResponse> createOrder(@RequestHeader final Long userId,
+	public ApiResponse<OrderDto.V1.OrderResponse> createOrder(@RequestHeader(value = "X-USER-ID") final Long userId,
 		@RequestBody final OrderDto.V1.OrderRequest orderRequest) {
 		OrderCriteria.CreateOrder criteria = orderRequest.toCriteria(userId);
 		OrderResult orderResult = orderFacade.createOrder(criteria);

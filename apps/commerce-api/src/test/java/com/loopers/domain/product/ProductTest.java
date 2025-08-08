@@ -73,7 +73,8 @@ public class ProductTest {
 			product.decreaseStock(decreaseAmount);
 
 			// assert
-			assertThat(product.getQuantity().quantity()).isEqualTo(7L);
+			Long quantity = product.getQuantity().quantity();
+			assertThat(quantity).isEqualTo(7L);
 		}
 
 		@DisplayName("좋아요 수를 업데이트하면, 정상적으로 반영된다.")

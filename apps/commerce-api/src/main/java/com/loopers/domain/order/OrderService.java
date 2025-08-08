@@ -1,5 +1,13 @@
 package com.loopers.domain.order;
 
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import com.loopers.domain.BaseEntity;
 import com.loopers.domain.common.Price;
 import com.loopers.domain.common.ProductId;
@@ -13,14 +21,8 @@ import com.loopers.domain.product.Product;
 import com.loopers.domain.product.ProductRepository;
 import com.loopers.support.error.CoreException;
 import com.loopers.support.error.ErrorType;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
+import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
@@ -37,7 +39,8 @@ public class OrderService {
 
         // 요청된 상품 정보로 OrderItem 리스트 생성
         List<OrderItem> orderItems = command.items().stream().map(request -> {
-            Product product = productRepository.findById(request.productId())
+
+			Product product = productRepository.findByIdWithOptimisticLock(request.productId())
                     .orElseThrow(() -> new CoreException(ErrorType.NOT_FOUND, "상품을 찾을 수 없습니다."));
 
             // 재고 차감
@@ -46,7 +49,7 @@ public class OrderService {
 
             return OrderItem.builder()
                     .productId(new ProductId(product.getId()))
-                    .quantity(new Quantity(product.getQuantity().quantity()))
+                    .quantity(new Quantity(request.quantity()))
                     .price(new Price(product.getPrice().price()))
                     .build();
         }).toList();
@@ -57,7 +60,7 @@ public class OrderService {
                 .sum();
 
         // 쿠폰 및 포인트 할인 적용
-        Point point = pointRepository.findByUsersId(command.userId())
+        Point point = pointRepository.findByUserIdWithOptimisticLock(command.userId())
                 .orElseThrow(() -> new CoreException(ErrorType.NOT_FOUND, " 해당 [id = " + command.userId() + "]의 포인트가 존재하지 않습니다."));
 
         Long pointBalance = point.getBalance();
@@ -65,7 +68,7 @@ public class OrderService {
 
         // 쿠폰 확인 및 쿠폰 사용
         if (command.couponId() != null) {
-            Coupon coupon = couponRepository.findById(command.couponId())
+            Coupon coupon = couponRepository.findByIdWithOptimisticLock(command.couponId())
                     .orElseThrow(
                             () -> new CoreException(ErrorType.NOT_FOUND, "해당 [id = " + command.couponId() + "]의 쿠폰이 존재하지 않습니다."));
 
@@ -74,22 +77,20 @@ public class OrderService {
         }
 
         // 쿠폰 할인 후 결제할 금액
-        long priceAfterCouponDiscount = totalOrderPrice - couponDiscount;
+        long finalPaymentAmount = totalOrderPrice - couponDiscount;
 
 
         // 실제 사용할 포인트 계산 (쿠폰 할인 후 남은 금액과 보유 포인트 중 적은 금액)
-        long pointsToUse = Math.min(pointBalance, priceAfterCouponDiscount);
+        long pointsToUse = Math.min(pointBalance, finalPaymentAmount);
         point.use(pointsToUse);
 
         // 최종 결제 금액
-        long finalPaymentAmount = priceAfterCouponDiscount - pointsToUse;
-
 
         // 주문 저장
         Order newOrder = Order.builder()
                 .userId(new UserId(command.userId()))
                 .totalOrderPrice(new TotalOrderPrice(totalOrderPrice))
-                .pointUsedAmount(new PointUsedAmount(pointBalance))
+                .pointUsedAmount(new PointUsedAmount(pointsToUse))
                 .couponDiscountAmount(new CouponDiscountAmount(couponDiscount))
                 .finalPaymentAmount(new FinalPaymentAmount(finalPaymentAmount))
                 .status(OrderStatus.PENDING)

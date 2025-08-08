@@ -23,7 +23,7 @@ public class LikeService {
 	@Transactional
 	public LikeInfo likeProduct(Long userId, Long productId) {
 		// 상품 존재 여부 확인
-		Product product = productRepository.findById(userId)
+		Product product = productRepository.findByIdWithPessimisticLock(userId)
 			.orElseThrow(() -> new CoreException(ErrorType.NOT_FOUND, "상품을 찾을 수 없습니다."));
 
 		// 이미 좋아요를 눌렀는지 확인
