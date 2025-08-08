@@ -158,7 +158,7 @@ public class OrderConcurrencyTest {
         Long productId = 1L;
 
         long initialPoints = point.getBalance();
-        long pointsToUsePerOrder = 100L;
+        long pointsToUsePerOrder = 1000L;
 
         // when
         for (int i = 0; i < numberOfThreads; i++) {
