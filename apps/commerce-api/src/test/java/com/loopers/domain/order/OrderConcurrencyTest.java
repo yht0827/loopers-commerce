@@ -2,12 +2,15 @@ package com.loopers.domain.order;
 
 import static org.assertj.core.api.Assertions.*;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import com.loopers.domain.common.*;
+import com.loopers.domain.coupon.Coupon;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -19,10 +22,6 @@ import com.loopers.application.order.OrderCriteria;
 import com.loopers.application.order.OrderFacade;
 import com.loopers.domain.brand.Brand;
 import com.loopers.domain.brand.BrandName;
-import com.loopers.domain.common.BrandId;
-import com.loopers.domain.common.Price;
-import com.loopers.domain.common.Quantity;
-import com.loopers.domain.common.UserId;
 import com.loopers.domain.point.Point;
 import com.loopers.domain.product.LikeCount;
 import com.loopers.domain.product.Product;
@@ -132,5 +131,49 @@ public class OrderConcurrencyTest {
 		assertThat(successCount.get()).isEqualTo(numberOfThreads);
 		assertThat(failCount.get()).isEqualTo(0);
 	}
+
+    @Test
+    @DisplayName("서로 다른 주문을 동시에 수행해도, 포인트가 정상적으로 차감되어야 한다.")
+    void createOrder_concurrency_with_points() throws InterruptedException {
+        // given
+        int numberOfThreads = 10;
+        ExecutorService executorService = Executors.newFixedThreadPool(32);
+        CountDownLatch latch = new CountDownLatch(numberOfThreads);
+        AtomicInteger successCount = new AtomicInteger(0);
+        AtomicInteger failCount = new AtomicInteger(0);
+        Long userId = 1L;
+        Long productId = 1L;
+
+        long initialPoints = point.getBalance();
+        long pointsToUsePerOrder = 100L;
+
+        // when
+        for (int i = 0; i < numberOfThreads; i++) {
+            final int index = i;
+            executorService.submit(() -> {
+                try {
+                    OrderCriteria.CreateOrder createOrder = new OrderCriteria
+                            .CreateOrder(userId, List.of(new OrderCriteria.CreateOrder.OrderItem(productId, 1L)), null);
+
+                    orderFacade.createOrder(createOrder);
+                    successCount.incrementAndGet();
+                } catch (Exception e) {
+                    failCount.incrementAndGet();
+                } finally {
+                    latch.countDown();
+                }
+            });
+        }
+
+        latch.await();
+        executorService.shutdown();
+
+        // then
+        Point resultPoint = pointJpaRepository.findByUserId(1L).orElseThrow();
+
+        assertThat(resultPoint.getBalance()).isEqualTo(initialPoints - (successCount.get() * pointsToUsePerOrder));
+        assertThat(successCount.get()).isEqualTo(numberOfThreads);
+        assertThat(failCount.get()).isZero();
+    }
 
 }
