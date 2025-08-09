@@ -1,15 +1,24 @@
 package com.loopers.domain.order;
 
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.loopers.domain.BaseEntity;
+import com.loopers.domain.common.Price;
+import com.loopers.domain.common.ProductId;
+import com.loopers.domain.common.Quantity;
+import com.loopers.domain.common.UserId;
+import com.loopers.domain.coupon.Coupon;
+import com.loopers.domain.coupon.CouponRepository;
 import com.loopers.domain.point.Point;
 import com.loopers.domain.point.PointRepository;
 import com.loopers.domain.product.Product;
 import com.loopers.domain.product.ProductRepository;
-import com.loopers.interfaces.api.order.OrderItemRequest;
 import com.loopers.support.error.CoreException;
 import com.loopers.support.error.ErrorType;
 
@@ -20,62 +29,103 @@ import lombok.RequiredArgsConstructor;
 public class OrderService {
 
 	private final OrderRepository orderRepository;
+	private final OrderItemRepository orderItemRepository;
 	private final ProductRepository productRepository;
 	private final PointRepository pointRepository;
+	private final CouponRepository couponRepository;
 
-	@Transactional
-	public OrderInfo createOrder(Long userId, List<OrderItemRequest> itemRequests) {
+	public List<OrderItem> createOrderItems(List<OrderCommand.CreateOrder.OrderItem> itemCommands) {
 
-		// 1. 요청된 상품 정보로 OrderItem 리스트 생성
-		List<OrderItem> orderItems = itemRequests.stream().map(request -> {
-			Product product = productRepository.findById(request.productId())
+
+		return itemCommands.stream().map(request -> {
+			Product product = productRepository.findByIdWithPessimisticLock(request.productId())
 				.orElseThrow(() -> new CoreException(ErrorType.NOT_FOUND, "상품을 찾을 수 없습니다."));
 
-			// 재고 차감
-			product.decreaseStock(request.quantity());
+			product.decreaseStock(new Quantity(request.quantity()));
 
 			return OrderItem.builder()
-				.productId(product.getId())
-				.quantity(new Quantity(product.getQuantity().quantity()))
+				.productId(new ProductId(product.getId()))
+				.quantity(new Quantity(request.quantity()))
 				.price(new Price(product.getPrice().price()))
 				.build();
 		}).toList();
+	}
 
-		// 2. 주문 총 가격 계산
-		Long totalPrice = orderItems.stream()
+	public Long calculateTotalOrderPrice(List<OrderItem> orderItems) {
+		return orderItems.stream()
 			.mapToLong(item -> item.getPrice().price() * item.getQuantity().quantity())
 			.sum();
+	}
 
-		// 3. 사용자 포인트 확인
-		Point point = pointRepository.findByUsersId(userId)
-			.orElseThrow(() -> new CoreException(ErrorType.NOT_FOUND, " 해당 [id = " + userId + "]의 포인트가 존재하지 않습니다."));
+	public DiscountInfo applyDiscounts(OrderCommand.CreateOrder command, Long totalOrderPrice) {
+		Point point = pointRepository.findByUserIdWithOptimisticLock(command.userId())
+			.orElseThrow(() -> new CoreException(ErrorType.NOT_FOUND, " 해당 [id = " + command.userId() + "]의 포인트가 존재하지 않습니다."));
 
-		// 4. 포인트 차감
-		point.use();
+		Long pointBalance = point.getBalance();
+		Long couponDiscount = 0L;
 
-		// 5. 주문 저장
+		if (command.couponId() != null) {
+			Coupon coupon = couponRepository.findByIdWithOptimisticLock(command.couponId())
+				.orElseThrow(
+					() -> new CoreException(ErrorType.NOT_FOUND, "해당 [id = " + command.couponId() + "]의 쿠폰이 존재하지 않습니다."));
+
+			coupon.use();
+			couponDiscount = coupon.calculateDisCount(pointBalance);
+		}
+
+		long amountAfterCouponDiscount = totalOrderPrice - couponDiscount;
+		long pointsToUse = Math.min(pointBalance, amountAfterCouponDiscount);
+		point.use(pointsToUse);
+		return new DiscountInfo(couponDiscount, pointsToUse);
+	}
+
+	public OrderInfo saveOrder(OrderCommand.CreateOrder command, List<OrderItem> orderItems, Long totalOrderPrice,
+		DiscountInfo discountInfo) {
+		long finalPaymentAmount = totalOrderPrice - discountInfo.couponDiscount() - discountInfo.pointsToUse();
+
 		Order newOrder = Order.builder()
-			.userId(userId)
-			.totalOrderPrice(new TotalOrderPrice(totalPrice))
+			.userId(new UserId(command.userId()))
+			.totalOrderPrice(new TotalOrderPrice(totalOrderPrice))
+			.pointUsedAmount(new PointUsedAmount(discountInfo.pointsToUse()))
+			.couponDiscountAmount(new CouponDiscountAmount(discountInfo.couponDiscount()))
+			.finalPaymentAmount(new FinalPaymentAmount(finalPaymentAmount))
 			.status(OrderStatus.PENDING)
 			.build();
 
 		Order order = orderRepository.save(newOrder);
 
-		return OrderInfo.from(order);
+		List<OrderItem> orderItemList = orderItemRepository.saveAll(orderItems);
+
+		return OrderInfo.from(order, orderItemList);
 	}
 
 	@Transactional(readOnly = true)
-	public List<OrderInfo> getOrdersById(Long userId) {
-		List<Order> orderList = orderRepository.findAllOrdersByUserId(userId);
-		return orderList.stream().map(OrderInfo::from).toList();
+	public List<OrderInfo> getOrders(final OrderCommand.GetOrders command) {
+		List<Order> orderList = orderRepository.findAllOrdersByUserId(command.userId());
+
+		if (orderList.isEmpty()) {
+			return Collections.emptyList();
+		}
+
+		List<Long> orderIds = orderList.stream().map(Order::getId).collect(Collectors.toList());
+
+		List<OrderItem> allOrderItems = orderItemRepository.findAllByOrderIdIn(orderIds);
+
+		Map<Long, List<OrderItem>> orderItemMap = allOrderItems.stream().collect(Collectors.groupingBy(BaseEntity::getId));
+
+		return orderList.stream().map(order -> {
+			List<OrderItem> orderItems = orderItemMap.getOrDefault(order.getId(), Collections.emptyList());
+			return OrderInfo.from(order, orderItems);
+		}).collect(Collectors.toList());
 	}
 
 	@Transactional(readOnly = true)
-	public OrderInfo getOrderDetails(Long userId, Long orderId) {
-		Order order = orderRepository.findByIdAndUserId(orderId, userId)
+	public OrderInfo getOrder(final OrderCommand.GetOrder command) {
+		Order order = orderRepository.findByIdAndUserId(command.orderId(), command.userId())
 			.orElseThrow(() -> new CoreException(ErrorType.NOT_FOUND, "주문을 찾을 수 없습니다."));
 
-		return OrderInfo.from(order);
+		List<OrderItem> orderItems = orderItemRepository.findAllByOrderId(command.orderId());
+
+		return OrderInfo.from(order, orderItems);
 	}
 }

@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.loopers.domain.product.LikeCount;
 import com.loopers.domain.product.Product;
 import com.loopers.domain.product.ProductRepository;
 import com.loopers.support.error.CoreException;
@@ -22,7 +23,7 @@ public class LikeService {
 	@Transactional
 	public LikeInfo likeProduct(Long userId, Long productId) {
 		// 상품 존재 여부 확인
-		Product product = productRepository.findById(userId)
+		Product product = productRepository.findByIdWithPessimisticLock(userId)
 			.orElseThrow(() -> new CoreException(ErrorType.NOT_FOUND, "상품을 찾을 수 없습니다."));
 
 		// 이미 좋아요를 눌렀는지 확인
@@ -31,7 +32,8 @@ public class LikeService {
 		}
 
 		// 상품의 좋아요 수
-		product.updateLikeCount(product.getLikeCount().increase());
+		LikeCount likeCount = product.getLikeCount().increase();
+		product.updateLikeCount(likeCount);
 
 		// 좋아요 정보 저장
 		LikeId likeId = new LikeId(userId, productId);
@@ -52,7 +54,8 @@ public class LikeService {
 			.orElseThrow(() -> new CoreException(ErrorType.NOT_FOUND, "좋아요 정보를 찾을 수 없습니다."));
 
 		// 상품의 좋아요 수 감소
-		product.updateLikeCount(product.getLikeCount().decrease());
+		LikeCount likeCount = product.getLikeCount().decrease();
+		product.updateLikeCount(likeCount);
 
 		// 좋아요 정보 삭제
 		likeRepository.delete(productLike);

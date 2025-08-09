@@ -1,10 +1,13 @@
-package com.loopers.domain.order;
+package com.loopers.domain.common;
 
 import java.io.Serializable;
 
 import com.loopers.support.error.CoreException;
 import com.loopers.support.error.ErrorType;
 
+import jakarta.persistence.Embeddable;
+
+@Embeddable
 public record OrderId(Long orderId) implements Serializable {
 	public OrderId {
 		if (orderId == null || orderId <= 0) {

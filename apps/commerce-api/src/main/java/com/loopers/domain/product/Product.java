@@ -1,9 +1,13 @@
 package com.loopers.domain.product;
 
 import com.loopers.domain.BaseEntity;
-import jakarta.persistence.Column;
+import com.loopers.domain.common.BrandId;
+import com.loopers.domain.common.Price;
+import com.loopers.domain.common.Quantity;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
+import jakarta.persistence.Version;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -15,8 +19,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Product extends BaseEntity {
 
-	@Column(name = "brand_id")
-	private Long brandId;
+	private BrandId brandId;
 
 	private ProductName name;
 
@@ -26,8 +29,11 @@ public class Product extends BaseEntity {
 
 	private Quantity quantity;
 
+	@Version
+	private Long version;
+
 	@Builder
-	public Product(Long brandId, ProductName name, Price price, LikeCount likeCount, Quantity quantity) {
+	public Product(BrandId brandId, ProductName name, Price price, LikeCount likeCount, Quantity quantity) {
 		this.brandId = brandId;
 		this.name = name;
 		this.price = price;
@@ -39,7 +45,7 @@ public class Product extends BaseEntity {
 		this.likeCount = likeCount;
 	}
 
-	public void decreaseStock(long amount) {
-		this.quantity = this.quantity.subtract(amount);
+	public void decreaseStock(Quantity quantity) {
+		this. quantity = quantity.subtract(quantity);
 	}
 }

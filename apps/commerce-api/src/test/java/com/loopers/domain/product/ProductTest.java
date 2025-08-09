@@ -8,6 +8,8 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
+import com.loopers.domain.common.Price;
+import com.loopers.domain.common.Quantity;
 import com.loopers.support.error.CoreException;
 
 public class ProductTest {
@@ -46,7 +48,7 @@ public class ProductTest {
 			long orderQuantity = 5L;
 
 			// act and assert
-			boolean sufficient = product.getQuantity().isSufficient(orderQuantity);
+			boolean sufficient = product.getQuantity().isSufficient(new Quantity(orderQuantity));
 			assertThat(sufficient).isTrue();
 		}
 
@@ -57,7 +59,7 @@ public class ProductTest {
 			long orderQuantity = 15L; // 재고(10)보다 많은 수량
 
 			// act and assert
-			boolean insufficient = product.getQuantity().isSufficient(orderQuantity);
+			boolean insufficient = product.getQuantity().isSufficient(new Quantity(orderQuantity));
 			assertThat(insufficient).isFalse();
 		}
 
@@ -68,10 +70,11 @@ public class ProductTest {
 			long decreaseAmount = 3L;
 
 			// act
-			product.decreaseStock(decreaseAmount);
+			product.decreaseStock(new Quantity(decreaseAmount));
 
 			// assert
-			assertThat(product.getQuantity().quantity()).isEqualTo(7L);
+			Long quantity = product.getQuantity().quantity();
+			assertThat(quantity).isEqualTo(7L);
 		}
 
 		@DisplayName("좋아요 수를 업데이트하면, 정상적으로 반영된다.")
@@ -95,7 +98,7 @@ public class ProductTest {
 			long orderQuantity = 15L; // 재고(10)보다 많은 수량
 
 			// act and assert
-			assertThatThrownBy(() -> product.decreaseStock(orderQuantity))
+			assertThatThrownBy(() -> product.decreaseStock(new Quantity(orderQuantity)))
 				.isInstanceOf(CoreException.class)
 				.hasMessage("재고가 충분하지 않습니다.");
 		}
