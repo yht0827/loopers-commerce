@@ -13,6 +13,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import com.loopers.domain.common.BrandId;
 import com.loopers.support.error.CoreException;
 import com.loopers.support.error.ErrorType;
 
@@ -29,7 +30,7 @@ public class BrandServiceTest {
 	@DisplayName("브랜드 ID로 조회 성공")
 	void getBrandById_success() {
 		// given
-		Long brandId = 1L;
+		BrandId brandId = new BrandId(1L);
 		Brand brand = new Brand(new BrandName("나이키"));
 		BrandInfo expectedBrandInfo = BrandInfo.from(brand);
 
@@ -50,7 +51,7 @@ public class BrandServiceTest {
 	@DisplayName("존재하지 않는 브랜드 ID로 조회 시 예외 발생")
 	void getBrandById_notFound_throwsException() {
 		// given - 테스트 준비
-		Long nonExistentBrandId = 99L;
+		BrandId nonExistentBrandId = new BrandId(99L);
 
 		when(brandRepository.findById(nonExistentBrandId)).thenReturn(Optional.empty());
 

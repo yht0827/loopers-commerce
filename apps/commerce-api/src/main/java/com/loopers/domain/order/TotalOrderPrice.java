@@ -5,6 +5,9 @@ import java.io.Serializable;
 import com.loopers.support.error.CoreException;
 import com.loopers.support.error.ErrorType;
 
+import jakarta.persistence.Embeddable;
+
+@Embeddable
 public record TotalOrderPrice(Long totalPrice) implements Serializable {
 	public TotalOrderPrice {
 		if (totalPrice == null || totalPrice < 0) {

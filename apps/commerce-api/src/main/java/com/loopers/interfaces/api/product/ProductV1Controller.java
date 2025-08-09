@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.loopers.application.product.ProductDetailResult;
 import com.loopers.application.product.ProductFacade;
 import com.loopers.application.product.ProductListResult;
+import com.loopers.domain.common.BrandId;
 import com.loopers.domain.product.ProductSortType;
 import com.loopers.interfaces.api.ApiResponse;
 
@@ -25,7 +26,7 @@ public class ProductV1Controller {
 
 	@GetMapping
 	public ApiResponse<ProductListResponse> getProductList(
-		@RequestParam(required = false) Long brandId,
+		@RequestParam(required = false) BrandId brandId,
 		@RequestParam(defaultValue = "latest") String sort,
 		@RequestParam(defaultValue = "0") int page,
 		@RequestParam(defaultValue = "20") int size) {

@@ -4,6 +4,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import com.loopers.domain.common.BrandId;
+
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -12,7 +14,7 @@ public class ProductService {
 
 	private final ProductRepository productRepository;
 
-	public Page<ProductInfo> getProductList(final Long brandId, final Pageable pageable) {
+	public Page<ProductInfo> getProductList(final BrandId brandId, final Pageable pageable) {
 		Page<Product> products = productRepository.getProductList(brandId, pageable);
 		return products.map(ProductInfo::from);
 	}

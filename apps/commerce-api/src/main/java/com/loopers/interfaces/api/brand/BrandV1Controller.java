@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.loopers.application.brand.BrandFacade;
 import com.loopers.application.brand.BrandResult;
+import com.loopers.domain.common.BrandId;
 import com.loopers.interfaces.api.ApiResponse;
 
 import lombok.RequiredArgsConstructor;
@@ -18,7 +19,7 @@ public class BrandV1Controller {
 	private final BrandFacade brandFacade;
 
 	@GetMapping("/{brandId}")
-	public ApiResponse<BrandResponse> getBrandById(@PathVariable final Long brandId) {
+	public ApiResponse<BrandResponse> getBrandById(@PathVariable final BrandId brandId) {
 		BrandResult brandResult = brandFacade.getBrandById(brandId);
 		BrandResponse brandResponse = BrandResponse.from(brandResult);
 		return ApiResponse.success(brandResponse);

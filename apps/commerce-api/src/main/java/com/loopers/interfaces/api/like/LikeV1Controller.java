@@ -23,16 +23,14 @@ public class LikeV1Controller {
 	private final LikeFacade likeFacade;
 
 	@PostMapping("/products/{productId}")
-	public ApiResponse<LikeResponse> likeProduct(
-		@PathVariable Long productId, @RequestHeader final Long userId) {
+	public ApiResponse<LikeResponse> likeProduct(@RequestHeader final Long userId, @PathVariable final Long productId) {
 		LikeResult likeResult = likeFacade.likeProduct(userId, productId);
 		LikeResponse response = LikeResponse.from(likeResult);
 		return ApiResponse.success(response);
 	}
 
 	@DeleteMapping("/products/{productId}")
-	public ApiResponse<Void> unlikeProduct(
-		@PathVariable Long productId, @RequestHeader final Long userId) {
+	public ApiResponse<Void> unlikeProduct(@PathVariable Long productId, @RequestHeader final Long userId) {
 		likeFacade.unlikeProduct(userId, productId);
 		return ApiResponse.success(null);
 	}
@@ -41,9 +39,7 @@ public class LikeV1Controller {
 	public ApiResponse<List<LikeResponse>> getLikedProductList(@RequestHeader final Long userId) {
 		List<LikeResult> likedProductList = likeFacade.getLikedProductList(userId);
 
-		List<LikeResponse> response = likedProductList.stream()
-			.map(LikeResponse::from)
-			.toList();
+		List<LikeResponse> response = likedProductList.stream().map(LikeResponse::from).toList();
 
 		return ApiResponse.success(response);
 	}

@@ -1,18 +1,23 @@
 package com.loopers.domain.order;
 
+import java.util.List;
+
+import com.loopers.domain.common.UserId;
+
 public record OrderInfo(
 	Long orderId,
-	Long userId,
+	UserId userId,
 	TotalOrderPrice totalPrice,
-	OrderStatus status
+	OrderStatus status,
+	List<OrderItem> items
 ) {
-
-	public static OrderInfo from(Order order) {
+	public static OrderInfo from(Order order, List<OrderItem> items) {
 		return new OrderInfo(
 			order.getId(),
 			order.getUserId(),
 			order.getTotalOrderPrice(),
-			order.getStatus()
+			order.getStatus(),
+			items
 		);
 	}
 
