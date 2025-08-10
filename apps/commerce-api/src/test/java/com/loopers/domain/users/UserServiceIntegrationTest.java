@@ -107,7 +107,7 @@ public class UserServiceIntegrationTest {
             User savedUser = usersService.join(new UsersCommand(userId, name, email, birthday, gender));
 
             // act
-            User foundUser = usersService.me(savedUser.getId());
+            User foundUser = usersService.me(savedUser.getUserId());
 
             // assert
             assertAll(
@@ -126,7 +126,7 @@ public class UserServiceIntegrationTest {
         @Test
         void shouldThrowException_whenUserDoesNotExist() {
             // arrange
-            long nonExistentUserId = 999L;
+            String nonExistentUserId = "nonExistentUser";
 
             // act & assert
             // 존재하지 않는 사용자를 조회 시 CoreException 이 발생하는 것을 검증합니다.

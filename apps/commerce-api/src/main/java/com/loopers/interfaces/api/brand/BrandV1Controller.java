@@ -14,7 +14,7 @@ import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/api/v1/brand")
+@RequestMapping("/api/v1/brands")
 public class BrandV1Controller {
 	private final BrandFacade brandFacade;
 
