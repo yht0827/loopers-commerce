@@ -10,6 +10,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -72,6 +74,8 @@ public class ProductsInserter {
 				    quantity INT NOT NULL,
 				    name VARCHAR(255) NOT NULL,
 				    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+				    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+				    deleted_at TIMESTAMP NULL,
 				    FOREIGN KEY (brand_id) REFERENCES brands(id)
 				) ENGINE=InnoDB
 				""";
@@ -108,8 +112,9 @@ public class ProductsInserter {
 				double price = (random.nextInt(200) + 1) * 100; // 100-20000
 				int quantity = random.nextInt(100) + 1; // 1-100
 				String productName = PRODUCT_NAMES[random.nextInt(PRODUCT_NAMES.length)] + "_" + i;
+				Timestamp currentTimestamp = Timestamp.valueOf(LocalDateTime.now());
 
-				writer.printf("%d,%d,%.2f,%d,%s%n", brandId, likeCount, price, quantity, productName);
+				writer.printf("%d,%d,%.2f,%d,%s,%s,%s%n", brandId, likeCount, price, quantity, productName, currentTimestamp, currentTimestamp);
 
 				if (i > 0 && i % 100000 == 0) {
 					System.out.printf("  진행률: %.1f%% (%,d건)%n", (i * 100.0) / recordCount, i);
@@ -140,7 +145,7 @@ public class ProductsInserter {
 			INTO TABLE products 
 			FIELDS TERMINATED BY ',' 
 			LINES TERMINATED BY '\\n'
-			(brand_id, like_count, price, quantity, name)
+			(brand_id, like_count, price, quantity, name, created_at, updated_at)
 			""", csvFilePath);
 
 		long startTime = System.currentTimeMillis();
@@ -157,7 +162,7 @@ public class ProductsInserter {
 	}
 
 	private static void batchInsertProducts(Connection conn, int recordCount, List<Long> brandIds) throws SQLException {
-		String sql = "INSERT INTO products (brand_id, like_count, price, quantity, name) VALUES (?, ?, ?, ?, ?)";
+		String sql = "INSERT INTO products (brand_id, like_count, price, quantity, name, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?)";
 		int batchSize = 10000;
 		Random random = new Random();
 
@@ -171,12 +176,15 @@ public class ProductsInserter {
 				double price = (random.nextInt(200) + 1) * 100;
 				int quantity = random.nextInt(100) + 1;
 				String productName = PRODUCT_NAMES[random.nextInt(PRODUCT_NAMES.length)] + "_" + i;
+				Timestamp currentTimestamp = Timestamp.valueOf(LocalDateTime.now());
 
 				pstmt.setLong(1, brandId);
 				pstmt.setInt(2, likeCount);
 				pstmt.setDouble(3, price);
 				pstmt.setInt(4, quantity);
 				pstmt.setString(5, productName);
+				pstmt.setTimestamp(6, currentTimestamp);
+				pstmt.setTimestamp(7, currentTimestamp);
 				pstmt.addBatch();
 
 				if (i > 0 && i % batchSize == 0) {

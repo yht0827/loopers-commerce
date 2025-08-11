@@ -63,7 +63,9 @@ public class BrandsInserter {
 				CREATE TABLE IF NOT EXISTS brands (
 				    id BIGINT AUTO_INCREMENT PRIMARY KEY,
 				    brand_name VARCHAR(255) NOT NULL UNIQUE,
-				    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+				    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+				    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+				    deleted_at TIMESTAMP NULL
 				) ENGINE=InnoDB
 				""";
 
@@ -94,7 +96,8 @@ public class BrandsInserter {
 				} while (usedNames.contains(brandName));
 
 				usedNames.add(brandName);
-				writer.println(brandName);
+				java.sql.Timestamp currentTimestamp = java.sql.Timestamp.valueOf(java.time.LocalDateTime.now());
+				writer.printf("%s,%s,%s%n", brandName, currentTimestamp, currentTimestamp);
 
 				if (i > 0 && i % 100000 == 0) {
 					System.out.printf("  진행률: %.1f%% (%,d건)%n", (i * 100.0) / recordCount, i);
@@ -124,7 +127,7 @@ public class BrandsInserter {
 			INTO TABLE brands 
 			FIELDS TERMINATED BY ',' 
 			LINES TERMINATED BY '\\n'
-			(brand_name)
+			(brand_name, created_at, updated_at)
 			""", csvFilePath);
 
 		long startTime = System.currentTimeMillis();
@@ -141,7 +144,7 @@ public class BrandsInserter {
 	}
 
 	private static void batchInsertBrands(Connection conn, int recordCount) throws SQLException {
-		String sql = "INSERT INTO brands (brand_name) VALUES (?)";
+		String sql = "INSERT INTO brands (brand_name, created_at, updated_at) VALUES (?, ?, ?)";
 		int batchSize = 10000;
 		Random random = new Random();
 
@@ -151,7 +154,10 @@ public class BrandsInserter {
 		try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
 			for (int i = 0; i < recordCount; i++) {
 				String brandName = BRAND_NAMES[random.nextInt(BRAND_NAMES.length)] + "_" + i;
+				java.sql.Timestamp currentTimestamp = java.sql.Timestamp.valueOf(java.time.LocalDateTime.now());
 				pstmt.setString(1, brandName);
+				pstmt.setTimestamp(2, currentTimestamp);
+				pstmt.setTimestamp(3, currentTimestamp);
 				pstmt.addBatch();
 
 				if (i > 0 && i % batchSize == 0) {

@@ -42,34 +42,40 @@ public class ProductRepositoryImpl implements ProductRepository {
 	}
 
 	@Override
-	public Page<Product> getProductList(final BrandId brandId, final Pageable pageable) {
-		JPAQuery<Product> query = jpaQueryFactory.selectFrom(product)
-			.where(product.brandId.eq(brandId));
+	public Page<Product> getProductList(final Long brandId, final Pageable pageable) {
+		JPAQuery<Product> query = jpaQueryFactory.selectFrom(product);
+		JPAQuery<Long> countQuery = jpaQueryFactory.select(product.count()).from(product);
 
-		pageable.getSort().stream().forEach(order -> {
-			String property = order.getProperty();
-			Order direction = order.isAscending() ? Order.ASC : Order.DESC;
+		if (brandId != null) {
+			BrandId brand = new BrandId(brandId);
+			query.where(product.brandId.eq(brand));
+			countQuery.where(product.brandId.eq(brand));
+		}
 
-			OrderSpecifier<?> orderSpecifier = switch (property) {
-				case "createdAt" -> new OrderSpecifier<>(direction, product.createdAt);
-				case "price" -> new OrderSpecifier<>(direction, product.price.price);
-				case "likesCount" -> new OrderSpecifier<>(direction, product.likeCount.likeCount);
-				default -> new OrderSpecifier<>(direction, product.createdAt); // 기본 정렬
-			};
-
-			query.orderBy(orderSpecifier);
-		});
+		applyOrderBy(query, pageable);
 
 		List<Product> products = query
 			.offset(pageable.getOffset())
 			.limit(pageable.getPageSize())
 			.fetch();
 
-		JPAQuery<Long> count = jpaQueryFactory.select(product.count())
-			.from(product)
-			.where(product.brandId.eq(brandId));
+		return PageableExecutionUtils.getPage(products, pageable, countQuery::fetchOne);
+	}
 
-		return PageableExecutionUtils.getPage(products, pageable, count::fetchOne);
+	private void applyOrderBy(JPAQuery<Product> query, Pageable pageable) {
+		pageable.getSort().stream()
+			.map(this::createOrderSpecifier)
+			.forEach(query::orderBy);
+	}
+
+	private OrderSpecifier<?> createOrderSpecifier(org.springframework.data.domain.Sort.Order order) {
+		Order direction = order.isAscending() ? Order.ASC : Order.DESC;
+
+		return switch (order.getProperty()) {
+			case "price" -> new OrderSpecifier<>(direction, product.price.price);
+			case "likesCount" -> new OrderSpecifier<>(direction, product.likeCount.likeCount);
+			default -> new OrderSpecifier<>(direction, product.createdAt);
+		};
 	}
 
 }
