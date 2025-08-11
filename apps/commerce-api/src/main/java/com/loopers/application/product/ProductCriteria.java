@@ -1,24 +1,18 @@
 package com.loopers.application.product;
 
+import org.springframework.data.domain.Pageable;
+
 import com.loopers.domain.product.ProductCommand;
-import com.loopers.domain.product.ProductSortType;
 
 public record ProductCriteria() {
 
 	public record GetProductList(
-		int page,
-		int size,
 		Long brandId,
-		ProductSortType sortType
+		Pageable pageable
 	) {
 
 		public ProductCommand.GetProductList toCommand() {
-			return new ProductCommand.GetProductList(
-				page,
-				size,
-				brandId,
-				sortType != null ? sortType : ProductSortType.LATEST
-			);
+			return new ProductCommand.GetProductList(brandId, pageable);
 		}
 	}
 }

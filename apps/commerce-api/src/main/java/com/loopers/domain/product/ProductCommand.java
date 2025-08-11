@@ -1,13 +1,10 @@
 package com.loopers.domain.product;
 
+import org.springframework.data.domain.Pageable;
+
 public record ProductCommand() {
 
-	public record GetProductList(
-		int page,
-		int size,
-		Long brandId,
-		ProductSortType sortType
-	) {
+	public record GetProductList(Long brandId, Pageable pageable) {
 
 	}
 }

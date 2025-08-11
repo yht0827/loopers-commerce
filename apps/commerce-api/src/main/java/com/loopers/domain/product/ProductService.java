@@ -1,8 +1,6 @@
 package com.loopers.domain.product;
 
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import lombok.RequiredArgsConstructor;
@@ -14,8 +12,7 @@ public class ProductService {
 	private final ProductRepository productRepository;
 
 	public Page<ProductInfo> getProductList(final ProductCommand.GetProductList command) {
-		Pageable pageable = PageRequest.of(command.page(), command.size(), command.sortType().getSort());
-		Page<Product> products = productRepository.getProductList(command.brandId(), pageable);
+		Page<Product> products = productRepository.getProductList(command.brandId(), command.pageable());
 		return products.map(ProductInfo::from);
 	}
 
