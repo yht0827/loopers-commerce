@@ -108,9 +108,9 @@ public class ProductsInserter {
 		try (PrintWriter writer = new PrintWriter(new FileWriter(filePath))) {
 			for (int i = 0; i < recordCount; i++) {
 				Long brandId = brandIds.get(random.nextInt(brandIds.size()));
-				int likeCount = random.nextInt(10000); // 0-9999
-				double price = (random.nextInt(200) + 1) * 100; // 100-20000
-				int quantity = random.nextInt(100) + 1; // 1-100
+				int likeCount = random.nextInt(500) +1;
+				double price = (random.nextInt(5000) + 1) * 100;
+				int quantity = random.nextInt(50) + 1;
 				String productName = PRODUCT_NAMES[random.nextInt(PRODUCT_NAMES.length)] + "_" + i;
 				Timestamp currentTimestamp = Timestamp.valueOf(LocalDateTime.now());
 
@@ -172,9 +172,9 @@ public class ProductsInserter {
 		try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
 			for (int i = 0; i < recordCount; i++) {
 				Long brandId = brandIds.get(random.nextInt(brandIds.size()));
-				int likeCount = random.nextInt(10000);
-				double price = (random.nextInt(200) + 1) * 100;
-				int quantity = random.nextInt(100) + 1;
+				int likeCount = random.nextInt(500) +1;
+				double price = (random.nextInt(5000) + 1) * 100;
+				int quantity = random.nextInt(50) + 1;
 				String productName = PRODUCT_NAMES[random.nextInt(PRODUCT_NAMES.length)] + "_" + i;
 				Timestamp currentTimestamp = Timestamp.valueOf(LocalDateTime.now());
 
