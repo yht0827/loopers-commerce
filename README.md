@@ -30,6 +30,7 @@ Root
 ├── modules ( reusable-configurations )
 │   └── 📦 jpa
 │   └── 📦 redis
+│   └── 📦 cache
 └── supports ( add-ons )
     ├── 📦 monitoring
     └── 📦 logging
