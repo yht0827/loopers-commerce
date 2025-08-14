@@ -12,6 +12,7 @@ import org.springframework.data.redis.connection.RedisStaticMasterReplicaConfigu
 import org.springframework.data.redis.connection.lettuce.LettuceClientConfiguration;
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 
 import io.lettuce.core.ReadFrom;
@@ -54,17 +55,17 @@ public class RedisConfig {
 
 	@Primary
 	@Bean
-	public RedisTemplate<String, String> defaultRedisTemplate(LettuceConnectionFactory lettuceConnectionFactory) {
-		RedisTemplate<String, String> redisTemplate = new RedisTemplate<>();
+	public RedisTemplate<String, Object> defaultRedisTemplate(LettuceConnectionFactory lettuceConnectionFactory) {
+		RedisTemplate<String, Object> redisTemplate = new RedisTemplate<>();
 		return defaultRedisTemplate(redisTemplate, lettuceConnectionFactory);
 	}
 
 	@Qualifier(REDIS_TEMPLATE_MASTER)
 	@Bean
-	public RedisTemplate<String, String> masterRedisTemplate(
+	public RedisTemplate<String, Object> masterRedisTemplate(
 		@Qualifier(CONNECTION_MASTER) LettuceConnectionFactory lettuceConnectionFactory
 	) {
-		RedisTemplate<String, String> redisTemplate = new RedisTemplate<>();
+		RedisTemplate<String, Object> redisTemplate = new RedisTemplate<>();
 		return defaultRedisTemplate(redisTemplate, lettuceConnectionFactory);
 	}
 
@@ -91,11 +92,13 @@ public class RedisConfig {
 		RedisTemplate<K, V> template,
 		LettuceConnectionFactory connectionFactory
 	) {
-		StringRedisSerializer s = new StringRedisSerializer();
-		template.setKeySerializer(s);
-		template.setValueSerializer(s);
-		template.setHashKeySerializer(s);
-		template.setHashValueSerializer(s);
+		StringRedisSerializer keySerializer = new StringRedisSerializer();
+		GenericJackson2JsonRedisSerializer valueSerializer = new GenericJackson2JsonRedisSerializer();
+		
+		template.setKeySerializer(keySerializer);
+		template.setValueSerializer(valueSerializer);
+		template.setHashKeySerializer(keySerializer);
+		template.setHashValueSerializer(valueSerializer);
 		template.setConnectionFactory(connectionFactory);
 		return template;
 	}
