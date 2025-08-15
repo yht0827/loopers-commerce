@@ -43,32 +43,61 @@ public class ProductRepositoryImpl implements ProductRepository {
 
 	@Override
 	public Page<Product> getProductList(final Long brandId, final Pageable pageable) {
-		JPAQuery<Product> query = jpaQueryFactory.selectFrom(product);
+		return getProductListWithCoveringIndex(brandId, pageable);
+	}
+
+	// 커버링 인덱스를 사용한 최적화된 상품 목록 조회
+	private Page<Product> getProductListWithCoveringIndex(final Long brandId, final Pageable pageable) {
+		// 커버링 인덱스로 필요한 컬럼만 조회 (ID + 정렬 필드)
+		JPAQuery<Long> idQuery = jpaQueryFactory
+			.select(product.id)
+			.from(product);
+
 		JPAQuery<Long> countQuery = jpaQueryFactory.select(product.count()).from(product);
 
 		if (brandId != null) {
 			BrandId brand = new BrandId(brandId);
-			query.where(product.brandId.eq(brand));
+			idQuery.where(product.brandId.eq(brand));
 			countQuery.where(product.brandId.eq(brand));
 		}
 
-		applyOrderBy(query, pageable);
+		applyOrderByForIdQuery(idQuery, pageable);
 
-		List<Product> products = query
+		List<Long> productIds = idQuery
 			.offset(pageable.getOffset())
 			.limit(pageable.getPageSize())
 			.fetch();
 
+		// ID 기반으로 전체 데이터 조회 (순서 보장)
+		if (productIds.isEmpty()) {
+			return PageableExecutionUtils.getPage(List.of(), pageable, countQuery::fetchOne);
+		}
+
+		// ID 리스트 순서대로 Map 생성하여 정렬 보장
+		List<Product> allProducts = jpaQueryFactory
+			.selectFrom(product)
+			.where(product.id.in(productIds))
+			.fetch();
+
+		// ID 순서에 맞게 정렬
+		List<Product> products = productIds.stream()
+			.map(id -> allProducts.stream()
+				.filter(p -> p.getId().equals(id))
+				.findFirst()
+				.orElse(null))
+			.filter(java.util.Objects::nonNull)
+			.toList();
+
 		return PageableExecutionUtils.getPage(products, pageable, countQuery::fetchOne);
 	}
 
-	private void applyOrderBy(JPAQuery<Product> query, Pageable pageable) {
+	private void applyOrderByForIdQuery(JPAQuery<Long> query, Pageable pageable) {
 		pageable.getSort().stream()
-			.map(this::createOrderSpecifier)
+			.map(this::createOrderSpecifierForIdQuery)
 			.forEach(query::orderBy);
 	}
 
-	private OrderSpecifier<?> createOrderSpecifier(org.springframework.data.domain.Sort.Order order) {
+	private OrderSpecifier<?> createOrderSpecifierForIdQuery(org.springframework.data.domain.Sort.Order order) {
 		Order direction = order.isAscending() ? Order.ASC : Order.DESC;
 
 		return switch (order.getProperty()) {
