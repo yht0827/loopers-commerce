@@ -35,4 +35,14 @@ public class CacheConfig {
 			.recordStats()
 			.build();
 	}
+
+	@Bean("brandL1Cache")
+	public Cache<String, Object> brandL1Cache() {
+		return Caffeine.newBuilder()
+			.initialCapacity(50)
+			.maximumSize(500)
+			.expireAfterWrite(30, TimeUnit.MINUTES)
+			.recordStats()
+			.build();
+	}
 }
