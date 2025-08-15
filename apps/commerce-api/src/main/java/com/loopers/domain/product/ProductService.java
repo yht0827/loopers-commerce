@@ -7,6 +7,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
 import com.github.benmanes.caffeine.cache.Cache;
+import com.loopers.support.cache.CacheablePage;
 import com.loopers.support.error.CoreException;
 import com.loopers.support.error.ErrorType;
 
@@ -45,8 +46,9 @@ public class ProductService {
 			}
 
 			// L2 캐시 확인
-			Page<ProductInfo> l2Result = (Page<ProductInfo>)productL2Cache.opsForValue().get(cacheKey);
-			if (l2Result != null) {
+			CacheablePage<ProductInfo> l2CacheResult = (CacheablePage<ProductInfo>)productL2Cache.opsForValue().get(cacheKey);
+			if (l2CacheResult != null) {
+				Page<ProductInfo> l2Result = l2CacheResult.toPage(command.pageable());
 				// L1에 다시 저장
 				productL1Cache.put(cacheKey, l2Result);
 				return l2Result;
@@ -58,7 +60,8 @@ public class ProductService {
 			Page<ProductInfo> result = products.map(ProductInfo::from);
 
 			// 캐시 저장 (Write-Through)
-			productL2Cache.opsForValue().set(cacheKey, result, L2_PRODUCT_LIST_TTL);
+			CacheablePage<ProductInfo> cacheableResult = CacheablePage.from(result);
+			productL2Cache.opsForValue().set(cacheKey, cacheableResult, L2_PRODUCT_LIST_TTL);
 			productL1Cache.put(cacheKey, result);
 
 			return result;
