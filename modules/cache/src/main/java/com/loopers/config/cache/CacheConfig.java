@@ -1,6 +1,5 @@
 package com.loopers.config.cache;
 
-import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import org.springframework.cache.CacheManager;
@@ -32,26 +31,6 @@ public class CacheConfig {
 		return Caffeine.newBuilder()
 			.initialCapacity(100)
 			.maximumSize(1000)
-			.expireAfterWrite(10, TimeUnit.MINUTES)
-			.recordStats()
-			.build();
-	}
-
-	@Bean("likeL1Cache")
-	public Cache<String, Object> likeL1Cache() {
-		return Caffeine.newBuilder()
-			.initialCapacity(50)
-			.maximumSize(500)
-			.expireAfterWrite(10, TimeUnit.MINUTES)
-			.recordStats()
-			.build();
-	}
-
-	@Bean("likeListCache")
-	public Cache<String, List<?>> likeListCache() {
-		return Caffeine.newBuilder()
-			.initialCapacity(50)
-			.maximumSize(500)
 			.expireAfterWrite(10, TimeUnit.MINUTES)
 			.recordStats()
 			.build();
