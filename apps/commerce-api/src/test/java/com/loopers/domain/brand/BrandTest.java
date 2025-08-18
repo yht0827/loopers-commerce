@@ -25,7 +25,7 @@ public class BrandTest {
 
 			// assert (검증)
 			assertAll(
-				() -> assertThat(brand.getName().name()).isEqualTo(name)
+				() -> assertThat(brand.getBrandName().brandName()).isEqualTo(name)
 			);
 		}
 

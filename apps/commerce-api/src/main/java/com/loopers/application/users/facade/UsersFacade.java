@@ -17,8 +17,8 @@ public class UsersFacade {
         return UsersInfo.from(user);
     }
 
-    public UsersInfo me(final Long id) {
-        User user = usersService.me(id);
+    public UsersInfo me(final String userId) {
+        User user = usersService.me(userId);
         return UsersInfo.from(user);
     }
 

@@ -17,7 +17,7 @@ import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/api/v1/point")
+@RequestMapping("/api/v1/points")
 public class PointV1Controller implements PointV1ApiSpec {
 
 	private final PointFacade pointFacade;
@@ -31,8 +31,8 @@ public class PointV1Controller implements PointV1ApiSpec {
 
 	@GetMapping
 	@Override
-	public ApiResponse<PointResponse> get(@RequestHeader final Long userId) {
-		PointResponse response = PointResponse.from(pointFacade.get(userId));
+	public ApiResponse<PointResponse> get(@RequestHeader("X-USER-ID") final String userId) {
+		PointResponse response = PointResponse.from(pointFacade.get(Long.valueOf(userId)));
 		return ApiResponse.success(response);
 	}
 }

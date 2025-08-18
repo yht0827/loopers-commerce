@@ -14,10 +14,10 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Brand extends BaseEntity {
 
-	private BrandName name;
+	private BrandName brandName;
 
 	@Builder
-	public Brand(BrandName name) {
-		this.name = name;
+	public Brand(BrandName brandName) {
+		this.brandName = brandName;
 	}
 }

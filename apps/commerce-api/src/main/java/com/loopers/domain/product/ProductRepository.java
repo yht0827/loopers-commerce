@@ -14,6 +14,6 @@ public interface ProductRepository {
 
 	Optional<Product> findByIdWithOptimisticLock(Long id);
 
-	Page<Product> getProductList(final BrandId brandId, final Pageable pageable);
+	Page<Product> getProductList(final Long brandId, final Pageable pageable);
 }
 
