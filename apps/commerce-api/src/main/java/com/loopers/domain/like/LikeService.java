@@ -12,7 +12,9 @@ import com.loopers.support.error.CoreException;
 import com.loopers.support.error.ErrorType;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class LikeService {
@@ -23,7 +25,7 @@ public class LikeService {
 	@Transactional
 	public LikeInfo likeProduct(Long userId, Long productId) {
 		// 상품 존재 여부 확인
-		Product product = productRepository.findByIdWithPessimisticLock(userId)
+		Product product = productRepository.findByIdWithPessimisticLock(productId)
 			.orElseThrow(() -> new CoreException(ErrorType.NOT_FOUND, "상품을 찾을 수 없습니다."));
 
 		// 이미 좋아요를 눌렀는지 확인
@@ -50,7 +52,7 @@ public class LikeService {
 			.orElseThrow(() -> new CoreException(ErrorType.NOT_FOUND, "상품을 찾을 수 없습니다."));
 
 		// 좋아요 정보 조회
-		Like productLike = likeRepository.findById(userId)
+		Like productLike = likeRepository.findByUserIdAndProductId(userId, productId)
 			.orElseThrow(() -> new CoreException(ErrorType.NOT_FOUND, "좋아요 정보를 찾을 수 없습니다."));
 
 		// 상품의 좋아요 수 감소

@@ -17,7 +17,7 @@ import com.loopers.interfaces.api.ApiResponse;
 import lombok.RequiredArgsConstructor;
 
 @RestController
-@RequestMapping("/api/v1/likes")
+@RequestMapping("/api/v1/like")
 @RequiredArgsConstructor
 public class LikeV1Controller {
 	private final LikeFacade likeFacade;

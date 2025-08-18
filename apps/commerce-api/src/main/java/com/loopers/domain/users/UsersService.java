@@ -23,9 +23,9 @@ public class UsersService {
     }
 
     @Transactional(readOnly = true)
-    public User me(final Long id) {
-        return usersRepository.find(id)
-                .orElseThrow(() -> new CoreException(ErrorType.NOT_FOUND, "해당 [id = " + id + "]의 회원을 찾을 수 없습니다."));
+    public User me(final String userId) {
+        return usersRepository.findByUserId(userId)
+                .orElseThrow(() -> new CoreException(ErrorType.NOT_FOUND, "해당 [userId = " + userId + "]의 회원을 찾을 수 없습니다."));
     }
 
     private void validationDuplicateId(final User entity) {

@@ -5,7 +5,7 @@ import java.util.Optional;
 public interface UsersRepository {
 	User save(final User user);
 
-	Optional<User> find(final Long id);
+	Optional<User> findByUserId(final String userId);
 
     boolean existsByUserId(final String userId);
 }

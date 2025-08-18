@@ -2,6 +2,8 @@ package com.loopers.interfaces.api.point;
 
 import static org.assertj.core.api.Assertions.*;
 
+import java.util.function.Function;
+
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -14,6 +16,7 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 
 import com.loopers.domain.common.UserId;
@@ -28,6 +31,7 @@ import com.loopers.utils.DatabaseCleanUp;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class PointV1ApiE2ETest {
 
+	private static final Function<String, String> ENDPOINT = (subRoute) -> "/api/v1/points" + subRoute;
 	private final TestRestTemplate testRestTemplate;
 	private final DatabaseCleanUp databaseCleanUp;
 	private final PointJpaRepository pointJpaRepository;
@@ -50,7 +54,7 @@ public class PointV1ApiE2ETest {
 		databaseCleanUp.truncateAllTables();
 	}
 
-	@DisplayName("GET /api/v1/point")
+	@DisplayName("GET /api/v1/points")
 	@Nested
 	class Get {
 
@@ -71,7 +75,7 @@ public class PointV1ApiE2ETest {
 			ParameterizedTypeReference<ApiResponse<PointResponse>> getResponseType = new ParameterizedTypeReference<>() {
 			};
 
-			ResponseEntity<ApiResponse<PointResponse>> response = testRestTemplate.exchange("/api/v1/point", HttpMethod.GET, request, getResponseType);
+			ResponseEntity<ApiResponse<PointResponse>> response = testRestTemplate.exchange("/api/v1/points", HttpMethod.GET, request, getResponseType);
 
 			// assert
 			PointResponse responseData = response.getBody().data();
@@ -85,15 +89,24 @@ public class PointV1ApiE2ETest {
 		@DisplayName("X-USER-ID 헤더가 없을 경우, 400 Bad Request 응답을 반환한다.")
 		void getPoint_fail_without_header() {
 			// arrange
-			HttpEntity<Object> requestEntity = new HttpEntity<>(new HttpHeaders());
+			String requestUrl = ENDPOINT.apply("");
+
+			HttpHeaders headers = new HttpHeaders();
+			headers.setContentType(MediaType.APPLICATION_JSON);
+
+			HttpEntity<Void> entity = new HttpEntity<>(headers);
 
 			// act
-			ResponseEntity<Object> response = testRestTemplate.exchange(
-				"/api/v1/point",
-				HttpMethod.GET,
-				requestEntity,
-				Object.class
-			);
+			ParameterizedTypeReference<ApiResponse<PointResponse>> responseType = new ParameterizedTypeReference<>() {
+			};
+
+			ResponseEntity<ApiResponse<PointResponse>> response =
+				testRestTemplate.exchange(
+					requestUrl,
+					HttpMethod.GET,
+					entity,
+					responseType
+				);
 
 			// assert
 			assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
@@ -101,7 +114,7 @@ public class PointV1ApiE2ETest {
 
 	}
 
-	@DisplayName("POST /api/v1/charge")
+	@DisplayName("POST /api/v1/points/charge")
 	@Nested
 	class Post {
 
@@ -118,7 +131,7 @@ public class PointV1ApiE2ETest {
 			PointRequest pointRequest = new PointRequest(userId, chargeAmount);
 			HttpEntity<PointRequest> requestEntity = new HttpEntity<>(pointRequest);
 
-			String requestUrl = "/api/v1/point/charge";
+			String requestUrl = "/api/v1/points/charge";
 
 			// act
 			ParameterizedTypeReference<ApiResponse<ChargeResponse>> responseType = new ParameterizedTypeReference<>() {
@@ -144,7 +157,7 @@ public class PointV1ApiE2ETest {
 			PointRequest pointRequest = new PointRequest(nonExistentUserId, chargeAmount);
 			HttpEntity<PointRequest> requestEntity = new HttpEntity<>(pointRequest);
 
-			String requestUrl = "/api/v1/point/charge";
+			String requestUrl = "/api/v1/points/charge";
 
 			// act
 			ParameterizedTypeReference<ApiResponse<ChargeResponse>> responseType = new ParameterizedTypeReference<>() {

@@ -30,7 +30,7 @@ public class UsersV1Controller implements UsersV1ApiSpec {
 
 	@GetMapping("/me")
 	@Override
-	public ApiResponse<UsersResponse> me(@RequestHeader final Long userId) {
+	public ApiResponse<UsersResponse> me(@RequestHeader("X-USER-ID") final String userId) {
 		UsersResponse response = UsersResponse.from(usersFacade.me(userId));
 		return ApiResponse.success(response);
 	}

@@ -20,5 +20,5 @@ public interface UsersV1ApiSpec {
 		summary = "내 정보 조회",
 		description = "내 정보를 조회 합니다."
 	)
-	ApiResponse<UsersResponse> me(final Long userId);
+	ApiResponse<UsersResponse> me(final String userId);
 }
