@@ -31,6 +31,7 @@ Root
 │   └── 📦 jpa
 │   └── 📦 redis
 │   └── 📦 cache
+│   └── 📦 feign
 └── supports ( add-ons )
     ├── 📦 monitoring
     └── 📦 logging

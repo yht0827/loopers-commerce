@@ -1,0 +1,10 @@
+feign:
+  client:
+    config:
+      default:
+        connectTimeout: 10000  # 10 seconds
+        readTimeout: 30000     # 30 seconds
+        retryer: com.loopers.feign.FeignRetryer
+      pgClient:
+        connectTimeout: 5000   # 5 seconds
+        readTimeout: 15000     # 15 seconds
