@@ -99,7 +99,7 @@ public class OrderConcurrencyTest {
 		product = new Product(new BrandId(brand1.getId()), new ProductName("티셔츠"),
 			new Price(1000L), new LikeCount(10L), new Quantity(10L));
 
-		point = new Point(new UserId(1L), 10000L);
+		point = new Point(new UserId("yht0827"), 10000L);
 
 		long daysInPast = ThreadLocalRandom.current().nextLong(1, 31);
 		ZonedDateTime randomIssuedAt = ZonedDateTime.now().minusDays(daysInPast);
@@ -107,7 +107,7 @@ public class OrderConcurrencyTest {
 		long daysInFuture = ThreadLocalRandom.current().nextLong(1, 31);
 		ZonedDateTime randomExpiredAt = ZonedDateTime.now().plusDays(daysInFuture);
 
-		coupon = new Coupon(new UserId(1L), new ProductId(1L), new BrandId(1L),
+		coupon = new Coupon(new UserId("yht0827"), new ProductId(1L), new BrandId(1L),
 			new CouponName("쿠폰1"), new DiscountValue(100L), new MaxDisCountAmount(0L), CouponType.FIXED_AMOUNT,
 			new CouponIssuedAt(randomIssuedAt), new CouponUsedAt(ZonedDateTime.now()),
 			new CouponExpiredAt(randomExpiredAt), CouponStatus.ACTIVE);

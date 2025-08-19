@@ -25,7 +25,7 @@ public class OrderV1Controller {
 	private final OrderFacade orderFacade;
 
 	@PostMapping
-	public ApiResponse<OrderDto.V1.OrderResponse> createOrder(@RequestHeader(value = "X-USER-ID") final Long userId,
+	public ApiResponse<OrderDto.V1.OrderResponse> createOrder(@RequestHeader(value = "X-USER-ID") final String userId,
 		@RequestBody final OrderDto.V1.OrderRequest orderRequest) {
 		OrderCriteria.CreateOrder criteria = orderRequest.toCriteria(userId);
 		OrderResult orderResult = orderFacade.createOrder(criteria);
@@ -35,7 +35,7 @@ public class OrderV1Controller {
 	}
 
 	@GetMapping
-	public ApiResponse<List<OrderDto.V1.OrderResponse>> getOrders(@RequestHeader final Long userId) {
+	public ApiResponse<List<OrderDto.V1.OrderResponse>> getOrders(@RequestHeader(value = "X-USER-ID") final String userId) {
 		OrderCriteria.GetOrders criteria = OrderDto.V1.getOrdersRequest.toCriteria(userId);
 		List<OrderResult> orderResults = orderFacade.getOrders(criteria);
 		List<OrderDto.V1.OrderResponse> responses = orderResults.stream()
@@ -46,7 +46,8 @@ public class OrderV1Controller {
 	}
 
 	@GetMapping("/{orderId}")
-	public ApiResponse<OrderDto.V1.OrderResponse> getOrder(@RequestHeader final Long userId, @PathVariable Long orderId) {
+	public ApiResponse<OrderDto.V1.OrderResponse> getOrder(@RequestHeader(value = "X-USER-ID") final String userId,
+		@PathVariable Long orderId) {
 		OrderCriteria.GetOrder criteria = OrderDto.V1.getOrderRequest.toCriteria(userId, orderId);
 		OrderResult orderDetails = orderFacade.getOrder(criteria);
 		OrderDto.V1.OrderResponse orderResponse = OrderDto.V1.OrderResponse.from(orderDetails);

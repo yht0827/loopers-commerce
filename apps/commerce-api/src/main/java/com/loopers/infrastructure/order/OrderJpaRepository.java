@@ -11,8 +11,8 @@ import com.loopers.domain.order.Order;
 public interface OrderJpaRepository extends JpaRepository<Order, Long> {
 
 	@Query("SELECT o FROM Order o WHERE o.userId = :userId")
-	List<Order> findAllOrdersByUserId(Long userId);
+	List<Order> findAllOrdersByUserId(String userId);
 
 	@Query("SELECT o FROM Order o WHERE o.userId = :userId AND o.id = :orderId")
-	Optional<Order> findByIdAndUserId(Long orderId, Long userId);
+	Optional<Order> findByIdAndUserId(Long orderId, String userId);
 }

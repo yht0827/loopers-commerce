@@ -4,13 +4,15 @@ import java.util.List;
 
 public record OrderCommand() {
 
-	public record CreateOrder(Long userId, List<OrderItem> items, Long couponId) {
+	public record CreateOrder(String userId, List<OrderItem> items, Long couponId) {
 
 		public record OrderItem(Long productId, Long quantity) {
 		}
 	}
 
-	public record GetOrder(Long userId, Long orderId) {}
+	public record GetOrder(String userId, Long orderId) {
+	}
 
-	public record GetOrders(Long userId) {}
+	public record GetOrders(String userId) {
+	}
 }

@@ -62,14 +62,14 @@ public class PointV1ApiE2ETest {
 		@DisplayName("포인트 조회에 성공할 경우, 보유 포인트를 응답으로 반환한다.")
 		void getPoint_success() {
 			// arrange
-			long userId = 1L;
+			String userId = "yht0827";
 			long balance = 1000L;
 
 			pointJpaRepository.save(new Point(new UserId(userId), balance));
 
 			// act
 			HttpHeaders headers = new HttpHeaders();
-			headers.add("X-USER-ID", String.valueOf(userId));
+			headers.add("X-USER-ID", userId);
 			HttpEntity<Object> request = new HttpEntity<>(headers);
 
 			ParameterizedTypeReference<ApiResponse<PointResponse>> getResponseType = new ParameterizedTypeReference<>() {
@@ -122,11 +122,11 @@ public class PointV1ApiE2ETest {
 		@DisplayName("존재하는 유저가 1000원을 충전할 경우, 충전된 보유 총량을 응답으로 반환한다.")
 		void chargePoint_success() {
 			// arrange
-			Long userId = 1L;
+			String userId = "yht0827";
 			Long initialBalance = 500L;
 			Long chargeAmount = 1000L;
 
-			pointJpaRepository.save(new Point(new UserId(userId), initialBalance));
+			pointJpaRepository.save(new Point(new UserId("yht0827"), initialBalance));
 
 			PointRequest pointRequest = new PointRequest(userId, chargeAmount);
 			HttpEntity<PointRequest> requestEntity = new HttpEntity<>(pointRequest);
@@ -151,7 +151,7 @@ public class PointV1ApiE2ETest {
 		@DisplayName("존재하지 않는 유저로 요청할 경우, 404 Not Found 응답을 반환한다.")
 		void chargePoint_fail_when_user_not_found() {
 			// arrange
-			long nonExistentUserId = 999L;
+			String nonExistentUserId = "yht0827111";
 			long chargeAmount = 1000L;
 
 			PointRequest pointRequest = new PointRequest(nonExistentUserId, chargeAmount);

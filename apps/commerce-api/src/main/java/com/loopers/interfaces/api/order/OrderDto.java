@@ -14,7 +14,7 @@ public record OrderDto() {
 	public record V1() {
 
 		public record OrderRequest(List<OrderItemRequest> items, Long couponId) {
-			public OrderCriteria.CreateOrder toCriteria(final Long userId) {
+			public OrderCriteria.CreateOrder toCriteria(final String userId) {
 				final List<OrderCriteria.CreateOrder.OrderItem> items = this.items.stream()
 					.map(OrderItemRequest::toCriteria)
 					.toList();
@@ -23,14 +23,14 @@ public record OrderDto() {
 			}
 		}
 
-		public record getOrdersRequest(Long userId) {
-			public static OrderCriteria.GetOrders toCriteria(final Long userId) {
+		public record getOrdersRequest(String userId) {
+			public static OrderCriteria.GetOrders toCriteria(final String userId) {
 				return new OrderCriteria.GetOrders(userId);
 			}
 		}
 
-		public record getOrderRequest(Long userId, OrderId orderId) {
-			public static OrderCriteria.GetOrder toCriteria(final Long userId, final Long orderId) {
+		public record getOrderRequest(String userId, OrderId orderId) {
+			public static OrderCriteria.GetOrder toCriteria(final String userId, final Long orderId) {
 				return new OrderCriteria.GetOrder(userId, orderId);
 			}
 		}
@@ -41,7 +41,7 @@ public record OrderDto() {
 			}
 		}
 
-		public record OrderResponse(Long orderId, UserId userId, TotalOrderPrice totalPrice, OrderStatus status) {
+		public record OrderResponse(Long orderId, String userId, TotalOrderPrice totalPrice, OrderStatus status) {
 			public static OrderResponse from(OrderResult orderResult) {
 				return new OrderResponse(orderResult.orderId(), orderResult.userId(), orderResult.totalPrice(),
 					orderResult.status());

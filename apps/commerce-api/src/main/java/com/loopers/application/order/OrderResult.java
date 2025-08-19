@@ -7,7 +7,7 @@ import com.loopers.domain.order.TotalOrderPrice;
 
 public record OrderResult(
 	Long orderId,
-	UserId userId,
+	String userId,
 	TotalOrderPrice totalPrice,
 	OrderStatus status
 ) {
