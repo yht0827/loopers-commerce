@@ -1,23 +1,14 @@
 package com.loopers.domain.order;
 
-import static org.assertj.core.api.Assertions.*;
-
 import java.time.ZonedDateTime;
-import java.util.List;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadLocalRandom;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 
-import com.loopers.application.order.OrderCriteria;
 import com.loopers.application.order.OrderFacade;
 import com.loopers.domain.brand.Brand;
 import com.loopers.domain.brand.BrandName;
@@ -46,8 +37,6 @@ import com.loopers.infrastructure.order.OrderItemJpaRepository;
 import com.loopers.infrastructure.order.OrderJpaRepository;
 import com.loopers.infrastructure.point.PointJpaRepository;
 import com.loopers.infrastructure.product.ProductJpaRepository;
-import com.loopers.support.error.CoreException;
-import com.loopers.support.error.ErrorType;
 
 @DisplayName("주문 동시성 통합 테스트")
 @ActiveProfiles("test")

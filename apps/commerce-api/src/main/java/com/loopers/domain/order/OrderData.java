@@ -2,9 +2,9 @@ package com.loopers.domain.order;
 
 import java.util.List;
 
-public record OrderCommand() {
+public record OrderData() {
 
-	public record CreateOrder(String userId, List<OrderItem> items, Long couponId) {
+	public record CreateOrder(String userId, List<CreateOrder.OrderItem> items, Long couponId) {
 
 		public record OrderItem(Long productId, Long quantity) {
 		}

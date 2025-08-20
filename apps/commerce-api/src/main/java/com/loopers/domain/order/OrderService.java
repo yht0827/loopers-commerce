@@ -34,8 +34,7 @@ public class OrderService {
 	private final PointRepository pointRepository;
 	private final CouponRepository couponRepository;
 
-	public List<OrderItem> createOrderItems(List<OrderCommand.CreateOrder.OrderItem> itemCommands) {
-
+	public List<OrderItem> createOrderItems(List<OrderData.CreateOrder.OrderItem> itemCommands) {
 
 		return itemCommands.stream().map(request -> {
 			Product product = productRepository.findByIdWithPessimisticLock(request.productId())
@@ -57,17 +56,17 @@ public class OrderService {
 			.sum();
 	}
 
-	public DiscountInfo applyDiscounts(OrderCommand.CreateOrder command, Long totalOrderPrice) {
-		Point point = pointRepository.findByUserIdWithOptimisticLock(command.userId())
-			.orElseThrow(() -> new CoreException(ErrorType.NOT_FOUND, " 해당 [id = " + command.userId() + "]의 포인트가 존재하지 않습니다."));
+	public DiscountInfo applyDiscounts(OrderData.CreateOrder orderData, Long totalOrderPrice) {
+		Point point = pointRepository.findByUserIdWithOptimisticLock(orderData.userId())
+			.orElseThrow(() -> new CoreException(ErrorType.NOT_FOUND, " 해당 [id = " + orderData.userId() + "]의 포인트가 존재하지 않습니다."));
 
 		Long pointBalance = point.getBalance();
 		Long couponDiscount = 0L;
 
-		if (command.couponId() != null) {
-			Coupon coupon = couponRepository.findByIdWithOptimisticLock(command.couponId())
+		if (orderData.couponId() != null) {
+			Coupon coupon = couponRepository.findByIdWithOptimisticLock(orderData.couponId())
 				.orElseThrow(
-					() -> new CoreException(ErrorType.NOT_FOUND, "해당 [id = " + command.couponId() + "]의 쿠폰이 존재하지 않습니다."));
+					() -> new CoreException(ErrorType.NOT_FOUND, "해당 [id = " + orderData.couponId() + "]의 쿠폰이 존재하지 않습니다."));
 
 			coupon.use();
 			couponDiscount = coupon.calculateDisCount(pointBalance);
@@ -79,7 +78,7 @@ public class OrderService {
 		return new DiscountInfo(couponDiscount, pointsToUse);
 	}
 
-	public OrderInfo saveOrder(OrderCommand.CreateOrder command, List<OrderItem> orderItems, Long totalOrderPrice,
+	public OrderInfo saveOrder(OrderData.CreateOrder command, List<OrderItem> orderItems, Long totalOrderPrice,
 		DiscountInfo discountInfo) {
 		long finalPaymentAmount = totalOrderPrice - discountInfo.couponDiscount() - discountInfo.pointsToUse();
 
@@ -100,7 +99,7 @@ public class OrderService {
 	}
 
 	@Transactional(readOnly = true)
-	public List<OrderInfo> getOrders(final OrderCommand.GetOrders command) {
+	public List<OrderInfo> getOrders(final OrderData.GetOrders command) {
 		List<Order> orderList = orderRepository.findAllOrdersByUserId(command.userId());
 
 		if (orderList.isEmpty()) {
@@ -120,7 +119,7 @@ public class OrderService {
 	}
 
 	@Transactional(readOnly = true)
-	public OrderInfo getOrder(final OrderCommand.GetOrder command) {
+	public OrderInfo getOrder(final OrderData.GetOrder command) {
 		Order order = orderRepository.findByIdAndUserId(command.orderId(), command.userId())
 			.orElseThrow(() -> new CoreException(ErrorType.NOT_FOUND, "주문을 찾을 수 없습니다."));
 
