@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.loopers.application.order.OrderCommand;
 import com.loopers.application.order.OrderFacade;
+import com.loopers.application.order.OrderQuery;
 import com.loopers.application.order.OrderResult;
 import com.loopers.interfaces.api.ApiResponse;
 
@@ -36,7 +37,7 @@ public class OrderV1Controller {
 
 	@GetMapping
 	public ApiResponse<List<OrderDto.V1.OrderResponse>> getOrders(@RequestHeader(value = "X-USER-ID") final String userId) {
-		OrderCommand.GetOrders command = OrderDto.V1.getOrdersRequest.toCommand(userId);
+		OrderQuery.GetOrders command = OrderDto.V1.getOrdersRequest.toCommand(userId);
 		List<OrderResult> orderResults = orderFacade.getOrders(command);
 		List<OrderDto.V1.OrderResponse> responses = orderResults.stream()
 			.map(OrderDto.V1.OrderResponse::from)
@@ -48,7 +49,7 @@ public class OrderV1Controller {
 	@GetMapping("/{orderId}")
 	public ApiResponse<OrderDto.V1.OrderResponse> getOrder(@RequestHeader(value = "X-USER-ID") final String userId,
 		@PathVariable Long orderId) {
-		OrderCommand.GetOrder command = OrderDto.V1.getOrderRequest.toCommand(userId, orderId);
+		OrderQuery.GetOrder command = OrderDto.V1.getOrderRequest.toCommand(userId, orderId);
 		OrderResult orderResult = orderFacade.getOrder(command);
 		OrderDto.V1.OrderResponse orderResponse = OrderDto.V1.OrderResponse.from(orderResult);
 		return ApiResponse.success(orderResponse);

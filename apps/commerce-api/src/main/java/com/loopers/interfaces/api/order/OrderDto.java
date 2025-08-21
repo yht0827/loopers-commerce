@@ -3,6 +3,7 @@ package com.loopers.interfaces.api.order;
 import java.util.List;
 
 import com.loopers.application.order.OrderCommand;
+import com.loopers.application.order.OrderQuery;
 import com.loopers.application.order.OrderResult;
 import com.loopers.domain.common.OrderId;
 import com.loopers.domain.order.OrderStatus;
@@ -14,7 +15,7 @@ public record OrderDto() {
 
 		public record OrderRequest(List<OrderItemRequest> items, Long couponId) {
 			public OrderCommand.CreateOrder toCommand(final String userId) {
-				final List<OrderCommand.CreateOrder.OrderItem> items = this.items.stream()
+				List<OrderCommand.OrderItemCommand> items = this.items.stream()
 					.map(OrderItemRequest::toCommand)
 					.toList();
 
@@ -22,21 +23,21 @@ public record OrderDto() {
 			}
 		}
 
+		public record OrderItemRequest(Long productId, Long quantity, Long price) {
+			public OrderCommand.OrderItemCommand toCommand() {
+				return new OrderCommand.OrderItemCommand(productId, quantity, price);
+			}
+		}
+
 		public record getOrdersRequest(String userId) {
-			public static OrderCommand.GetOrders toCommand(final String userId) {
-				return new OrderCommand.GetOrders(userId);
+			public static OrderQuery.GetOrders toCommand(final String userId) {
+				return new OrderQuery.GetOrders(userId);
 			}
 		}
 
 		public record getOrderRequest(String userId, OrderId orderId) {
-			public static OrderCommand.GetOrder toCommand(final String userId, final Long orderId) {
-				return new OrderCommand.GetOrder(userId, orderId);
-			}
-		}
-
-		public record OrderItemRequest(Long productId, Long quantity) {
-			public OrderCommand.CreateOrder.OrderItem toCommand() {
-				return new OrderCommand.CreateOrder.OrderItem(productId, quantity);
+			public static OrderQuery.GetOrder toCommand(final String userId, final Long orderId) {
+				return new OrderQuery.GetOrder(userId, orderId);
 			}
 		}
 

@@ -2,35 +2,31 @@ package com.loopers.application.order;
 
 import java.util.List;
 
+import com.loopers.domain.common.Price;
+import com.loopers.domain.common.ProductId;
+import com.loopers.domain.common.Quantity;
 import com.loopers.domain.order.OrderData;
+import com.loopers.domain.order.OrderItem;
 
 public record OrderCommand() {
 
-	public record CreateOrder(String userId, List<OrderItem> items, Long couponId) {
+	public record CreateOrder(String userId, List<OrderItemCommand> items, Long couponId) {
 		public OrderData.CreateOrder toData() {
-			final List<OrderData.CreateOrder.OrderItem> items = this.items.stream()
-				.map(orderItem -> new OrderData.CreateOrder.OrderItem(
-					orderItem.productId, orderItem.quantity))
+			List<OrderItem> items = this.items.stream()
+				.map(OrderItemCommand::toData)
 				.toList();
 
 			return new OrderData.CreateOrder(userId, items, couponId);
 		}
-
-		public record OrderItem(Long productId, Long quantity) {
-		}
 	}
 
-	public record GetOrders(String userId) {
-
-		public OrderData.GetOrders toData() {
-			return new OrderData.GetOrders(userId);
-		}
-	}
-
-	public record GetOrder(String userId, Long orderId) {
-
-		public OrderData.GetOrder toData() {
-			return new OrderData.GetOrder(userId, orderId);
+	public record OrderItemCommand(Long productId, Long quantity, Long price) {
+		public OrderItem toData() {
+			return OrderItem.builder()
+				.productId(new ProductId(productId))
+				.quantity(new Quantity(quantity))
+				.price(new Price(price))
+				.build();
 		}
 	}
 

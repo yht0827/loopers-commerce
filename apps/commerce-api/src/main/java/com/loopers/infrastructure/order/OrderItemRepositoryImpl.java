@@ -31,7 +31,7 @@ public class OrderItemRepositoryImpl implements OrderItemRepository {
 	}
 
 	@Override
-	public List<OrderItem> findAllByOrderIdIn(List<Long> orderIds) {
+	public List<OrderItem> findAllByOrderIdIn(final List<Long> orderIds) {
 		return orderItemJpaRepository.findAllByOrderIdIn(orderIds);
 	}
 }

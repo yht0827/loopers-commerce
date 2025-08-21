@@ -10,9 +10,9 @@ import com.loopers.domain.order.Order;
 
 public interface OrderJpaRepository extends JpaRepository<Order, Long> {
 
-	@Query("SELECT o FROM Order o WHERE o.userId = :userId")
+	@Query("SELECT o FROM Order o WHERE o.userId.userId = :userId")
 	List<Order> findAllOrdersByUserId(String userId);
 
-	@Query("SELECT o FROM Order o WHERE o.userId = :userId AND o.id = :orderId")
+	@Query("SELECT o FROM Order o WHERE o.userId.userId = :userId AND o.id = :orderId")
 	Optional<Order> findByIdAndUserId(Long orderId, String userId);
 }

@@ -4,10 +4,7 @@ import java.util.List;
 
 public record OrderData() {
 
-	public record CreateOrder(String userId, List<CreateOrder.OrderItem> items, Long couponId) {
-
-		public record OrderItem(Long productId, Long quantity) {
-		}
+	public record CreateOrder(String userId, List<OrderItem> items, Long couponId) {
 	}
 
 	public record GetOrder(String userId, Long orderId) {

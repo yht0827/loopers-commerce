@@ -5,8 +5,6 @@ import java.util.Optional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
-import com.loopers.domain.common.BrandId;
-
 public interface ProductRepository {
 	Optional<Product> findById(final Long id);
 
@@ -15,5 +13,7 @@ public interface ProductRepository {
 	Optional<Product> findByIdWithOptimisticLock(Long id);
 
 	Page<Product> getProductList(final Long brandId, final Pageable pageable);
+
+	Product save(final Product product);
 }
 

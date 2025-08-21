@@ -8,7 +8,7 @@ import com.loopers.infrastructure.payment.PgClientDto;
 
 public record PaymentData() {
 
-	public record PaymentRequest(String userId, String orderId, CardType cardType, String cardNo, Long amount,
+	public record PaymentRequest(String userId, Long orderId, CardType cardType, String cardNo, Long amount,
 								 String callbackUrl) {
 
 		public Payment toEntity() {
@@ -34,7 +34,7 @@ public record PaymentData() {
 
 	}
 
-	public record PaymentResponse(String transactionKey, String orderId, CardType cardType, String cardNo, Long amount,
+	public record PaymentResponse(String transactionKey, Long orderId, CardType cardType, String cardNo, Long amount,
 								  TransactionStatus status, String reason) {
 		public PaymentInfo toInfo() {
 			return new PaymentInfo(transactionKey, orderId, cardType, cardNo, amount, status, reason);

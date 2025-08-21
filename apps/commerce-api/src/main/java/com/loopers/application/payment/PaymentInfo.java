@@ -5,7 +5,7 @@ import com.loopers.domain.payment.TransactionStatus;
 
 public record PaymentInfo(
 	String transactionKey,
-	String orderId,
+	Long orderId,
 	CardType cardType,
 	String cardNo,
 	Long amount,

@@ -8,7 +8,7 @@ public record PgClientDto() {
 
 	public record PgPaymentRequest(
 		String userId,
-		String orderId,
+		Long orderId,
 		CardType cardType,
 		String cardNo,
 		Long amount,
@@ -29,7 +29,7 @@ public record PgClientDto() {
 
 	public record PgPaymentResponse(
 		String transactionKey,
-		String orderId,
+		Long orderId,
 		CardType cardType,
 		String cardNo,
 		Long amount,

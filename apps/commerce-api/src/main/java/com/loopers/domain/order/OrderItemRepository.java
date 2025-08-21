@@ -8,7 +8,7 @@ public interface OrderItemRepository {
 
 	List<OrderItem> saveAll(List<OrderItem> orderItem);
 
-	List<OrderItem> findAllByOrderId(Long orderId);
+	List<OrderItem> findAllByOrderId(final Long orderId);
 
-	List<OrderItem> findAllByOrderIdIn(List<Long> orderIds);
+	List<OrderItem> findAllByOrderIdIn(final List<Long> orderIds);
 }

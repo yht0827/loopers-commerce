@@ -45,7 +45,7 @@ public class Product extends BaseEntity {
 		this.likeCount = likeCount;
 	}
 
-	public void decreaseStock(Quantity quantity) {
-		this.quantity = this.quantity.subtract(quantity);
+	public void deduct(Quantity amount) {
+		this.quantity = this.quantity.subtractWithValidation(amount);
 	}
 }

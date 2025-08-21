@@ -14,4 +14,12 @@ public record MaxDisCountAmount(Long maxDisCountAmount) implements Serializable 
             throw new CoreException(ErrorType.BAD_REQUEST, "최대 할인 금액은 0 이상이어야 합니다.");
         }
     }
+
+    public Long applyMaxDiscountLimit(Long calculatedDiscount) {
+        return Math.min(calculatedDiscount, maxDisCountAmount);
+    }
+
+    public boolean hasLimit() {
+        return maxDisCountAmount != null;
+    }
 }

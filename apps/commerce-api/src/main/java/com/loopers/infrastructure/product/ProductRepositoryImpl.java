@@ -46,6 +46,11 @@ public class ProductRepositoryImpl implements ProductRepository {
 		return getProductListWithCoveringIndex(brandId, pageable);
 	}
 
+	@Override
+	public Product save(final Product product) {
+		return productJpaRepository.save(product);
+	}
+
 	// 커버링 인덱스를 사용한 최적화된 상품 목록 조회
 	private Page<Product> getProductListWithCoveringIndex(final Long brandId, final Pageable pageable) {
 		// 커버링 인덱스로 필요한 컬럼만 조회 (ID + 정렬 필드)
