@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.loopers.application.payment.PaymentCommand;
 import com.loopers.application.payment.PaymentFacade;
-import com.loopers.application.payment.PaymentInfo;
+import com.loopers.application.payment.PaymentResult;
 import com.loopers.interfaces.api.ApiResponse;
 
 import lombok.RequiredArgsConstructor;
@@ -25,10 +25,11 @@ public class PaymentV1Controller {
 		@RequestHeader(value = "X-USER-ID") final String userId,
 		@RequestBody final PaymentDto.V1.PaymentRequest paymentRequest) {
 
-		PaymentCommand.CreatePayment criteria = paymentRequest.toCriteria(userId);
-		PaymentInfo paymentInfo = paymentFacade.createPayment(criteria);
-		PaymentDto.V1.PaymentResponse paymentResponse = PaymentDto.V1.PaymentResponse.from(paymentInfo);
+		PaymentCommand.CreatePayment command = paymentRequest.toCriteria(userId);
+		PaymentResult paymentResult = paymentFacade.createPayment(command);
+		PaymentDto.V1.PaymentResponse paymentResponse = PaymentDto.V1.PaymentResponse.from(paymentResult);
 
 		return ApiResponse.success(paymentResponse);
 	}
+
 }
