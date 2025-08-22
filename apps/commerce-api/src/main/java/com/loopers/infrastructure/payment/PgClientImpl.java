@@ -39,9 +39,13 @@ public class PgClientImpl implements PgClient {
 		return PaymentInfo.order.toData(data);
 	}
 
+	@CircuitBreaker(name = "pgClient", fallbackMethod = "findTransactionFallback")
+	@Retry(name = "pgClient")
 	@Override
-	public PaymentInfo.transaction findTransaction(PgClientDto.PgPaymentTransaction request) {
-		return null;
+	public PaymentInfo.transaction findTransaction(final String transactionKey) {
+		ApiResponse<PgClientDto.PgPaymentTransaction> response = pgFeignClient.findTransaction(transactionKey);
+		PgClientDto.PgPaymentTransaction data = response.data();
+		return PaymentInfo.transaction.toData(data);
 	}
 
 	public PaymentInfo.transaction requestFallback(PgClientDto.PgPaymentRequest request, Exception e) {
@@ -53,14 +57,26 @@ public class PgClientImpl implements PgClient {
 			request.cardNo(),
 			request.cardType(),
 			TransactionStatus.FAILED,
-			"PG 통신 실패",
-			request.callbackUrl()
+			"PG 통신 실패"
 		);
 	}
 
 	public PaymentInfo.order findOrderFallback(String orderId, Exception e) {
 		log.warn("PG 주문 조회 실패, fallback 실행. 주문 ID: {}, error: {}", orderId, e.getMessage());
 		return new PaymentInfo.order(orderId, List.of());
+	}
+
+	public PaymentInfo.transaction findTransactionFallback(String transactionKey, Exception e) {
+		log.warn("PG 트랜잭션 조회 실패, fallback 실행. transactionKey: {}, error: {}", transactionKey, e.getMessage());
+		return new PaymentInfo.transaction(
+			transactionKey,
+			null,
+			null,
+			null,
+			null,
+			TransactionStatus.PENDING, // 실패시 PENDING 유지
+			"PG 통신 실패"
+		);
 	}
 
 }

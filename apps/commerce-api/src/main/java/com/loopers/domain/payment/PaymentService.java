@@ -13,6 +13,7 @@ import lombok.RequiredArgsConstructor;
 public class PaymentService {
 
 	private final PaymentRepository paymentRepository;
+	private final PaymentGatewayService paymentGatewayService;
 
 	public void createPayment(final PaymentData.PaymentRequest data) {
 		Payment payment = data.toEntity();
@@ -35,12 +36,6 @@ public class PaymentService {
 		Payment payment = paymentRepository.findByTransactionKey(command.transactionKey())
 			.orElseThrow(() -> new CoreException(ErrorType.NOT_FOUND, "결제 정보를 찾을 수 없습니다."));
 
-		switch (command.status()) {
-			case SUCCESS -> payment.processPaymentSuccess();
-			case FAILED -> payment.processPaymentFailed();
-			case PENDING -> payment.processPaymentPending();
-		}
-
-		return PaymentInfo.from(payment);
+		return paymentGatewayService.processCallbackWithVerification(payment, command);
 	}
 }

@@ -33,8 +33,7 @@ public record PaymentInfo(
 		String cardNo,
 		CardType cardType,
 		TransactionStatus status,
-		String reason,
-		String callbackUrl
+		String reason
 	) {
 
 		public static PaymentInfo.transaction toData(PgClientDto.PgPaymentTransaction pgPaymentTransaction) {
@@ -45,8 +44,8 @@ public record PaymentInfo(
 				pgPaymentTransaction.cardNo(),
 				pgPaymentTransaction.cardType(),
 				pgPaymentTransaction.status(),
-				pgPaymentTransaction.reason(),
-				pgPaymentTransaction.callbackUrl());
+				pgPaymentTransaction.reason()
+			);
 		}
 
 	}

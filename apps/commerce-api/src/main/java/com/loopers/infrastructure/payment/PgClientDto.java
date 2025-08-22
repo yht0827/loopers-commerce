@@ -17,15 +17,6 @@ public record PgClientDto() {
 		}
 	}
 
-	public record PgPaymentOrder(
-		String orderId,
-		Long amount,
-		String cardNo,
-		CardType cardType,
-		String callbackUrl
-	) {
-	}
-
 	public record PgPaymentOrderResponse(
 		String orderId,
 		List<TransactionResponse> transactions
@@ -46,8 +37,7 @@ public record PgClientDto() {
 		String cardNo,
 		CardType cardType,
 		TransactionStatus status,
-		String reason,
-		String callbackUrl
+		String reason
 	) {
 	}
 
