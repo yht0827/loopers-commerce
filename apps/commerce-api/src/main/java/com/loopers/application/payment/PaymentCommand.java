@@ -7,7 +7,7 @@ public record PaymentCommand() {
 
 	public record CreatePayment(
 		String userId,
-		Long orderId,
+		String orderId,
 		CardType cardType,
 		String cardNo,
 		Long amount,
