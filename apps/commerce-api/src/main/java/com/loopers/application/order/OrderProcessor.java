@@ -23,7 +23,7 @@ public class OrderProcessor {
 	private final ProductService productService;
 	private final CouponService couponService;
 
-	public OrderInfo executeOrderProcessing(OrderCommand.CreateOrder command) {
+	public OrderInfo process(OrderCommand.CreateOrder command) {
 		OrderData.CreateOrder data = command.toData();
 
 		List<OrderItem> items = data.items();

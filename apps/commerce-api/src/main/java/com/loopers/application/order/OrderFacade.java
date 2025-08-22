@@ -20,7 +20,7 @@ public class OrderFacade {
 
 	@Transactional
 	public OrderResult createOrder(final OrderCommand.CreateOrder command) {
-		OrderInfo orderInfo = orderProcessor.executeOrderProcessing(command);
+		OrderInfo orderInfo = orderProcessor.process(command);
 		return OrderResult.from(orderInfo);
 	}
 

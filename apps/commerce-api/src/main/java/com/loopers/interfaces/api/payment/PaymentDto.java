@@ -1,7 +1,7 @@
 package com.loopers.interfaces.api.payment;
 
 import com.loopers.application.payment.PaymentCommand;
-import com.loopers.application.payment.PaymentInfo;
+import com.loopers.application.payment.PaymentResult;
 import com.loopers.domain.payment.CardType;
 import com.loopers.domain.payment.TransactionStatus;
 
@@ -9,7 +9,7 @@ public record PaymentDto() {
 
 	public record V1() {
 
-		public record PaymentRequest(String userId, Long orderId, CardTypeDto cardType, String cardNo, Long amount,
+		public record PaymentRequest(String userId, String orderId, CardTypeDto cardType, String cardNo, Long amount,
 									 String callbackUrl) {
 
 			public PaymentCommand.CreatePayment toCriteria(final String userId) {
@@ -17,12 +17,12 @@ public record PaymentDto() {
 			}
 		}
 
-		public record PaymentResponse(String transactionKey, Long orderId, CardType cardType, String cardNo, Long amount,
+		public record PaymentResponse(String transactionKey, String orderId, CardType cardType, String cardNo, Long amount,
 									  TransactionStatus status, String reason) {
 
-			public static PaymentResponse from(PaymentInfo paymentInfo) {
-				return new PaymentResponse(paymentInfo.transactionKey(), paymentInfo.orderId(), paymentInfo.cardType(),
-					paymentInfo.cardNo(), paymentInfo.amount(), paymentInfo.status(), paymentInfo.reason());
+			public static PaymentResponse from(PaymentResult paymentResult) {
+				return new PaymentResponse(paymentResult.transactionKey(), paymentResult.orderId(), paymentResult.cardType(),
+					paymentResult.cardNo(), paymentResult.amount(), paymentResult.status(), paymentResult.reason());
 			}
 		}
 	}
