@@ -25,6 +25,32 @@ public record PaymentDto() {
 					paymentResult.cardNo(), paymentResult.amount(), paymentResult.status(), paymentResult.reason());
 			}
 		}
+
+		public record CallbackRequest(
+			String transactionKey,
+			String orderId,
+			CardType cardType,
+			String cardNo,
+			Long amount,
+			TransactionStatus status,
+			String reason) {
+
+			public PaymentCommand.ProcessCallback toCommand() {
+				return new PaymentCommand.ProcessCallback(transactionKey, status, orderId);
+			}
+		}
+
+		public record CallbackResponse(String transactionKey, String orderId, TransactionStatus status, String message) {
+
+			public static CallbackResponse from(PaymentResult paymentResult) {
+				return new CallbackResponse(
+					paymentResult.transactionKey(),
+					paymentResult.orderId(),
+					paymentResult.status(),
+					"결제 콜백 처리 완료"
+				);
+			}
+		}
 	}
 
 	public enum CardTypeDto {

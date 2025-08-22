@@ -55,24 +55,31 @@ public class Payment extends BaseEntity {
 	}
 
 	public void updateTransactionKey(final String orderId) {
-		this.transactionKey = new TransactionKey(orderId);
-	}
-
-	public void updateStatus() {
-		this.status = TransactionStatus.PENDING;
-	}
-
-	public void processPaymentSuccess(final String orderId) {
 		if (orderId == null || orderId.isBlank()) {
 			throw new CoreException(ErrorType.BAD_REQUEST, "주문 ID는 비어있을 수 없습니다.");
 		}
 
+		this.transactionKey = new TransactionKey(orderId);
+	}
+
+	public void updatePaymentStatus(TransactionStatus newStatus) {
 		if (status == TransactionStatus.SUCCESS) {
-			throw new CoreException(ErrorType.BAD_REQUEST, "주문 상태가 올바르지 않습니다.");
+			throw new CoreException(ErrorType.BAD_REQUEST, "이미 완료된 결제는 변경할 수 없습니다.");
 		}
 
-		updateTransactionKey(orderId);
-		updateStatus();
+		this.status = newStatus;
+	}
+
+	public void processPaymentSuccess() {
+		updatePaymentStatus(TransactionStatus.SUCCESS);
+	}
+
+	public void processPaymentPending() {
+		updatePaymentStatus(TransactionStatus.PENDING);
+	}
+
+	public void processPaymentFailed() {
+		updatePaymentStatus(TransactionStatus.FAILED);
 	}
 
 }

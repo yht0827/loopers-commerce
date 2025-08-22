@@ -7,7 +7,6 @@ import com.loopers.domain.payment.PaymentGatewayService;
 import com.loopers.domain.payment.PaymentInfo;
 import com.loopers.domain.payment.PaymentService;
 
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 
 @Component
@@ -16,9 +15,7 @@ public class PaymentProcessor {
 	private final PaymentService paymentService;
 	private final PaymentGatewayService paymentGatewayService;
 
-	@Transactional
 	public PaymentInfo process(PaymentCommand.CreatePayment command) {
-
 		PaymentData.PaymentRequest data = command.toData();
 
 		// 결제 생성

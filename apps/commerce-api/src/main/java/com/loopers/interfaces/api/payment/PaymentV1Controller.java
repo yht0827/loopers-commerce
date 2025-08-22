@@ -21,8 +21,7 @@ public class PaymentV1Controller {
 	private final PaymentFacade paymentFacade;
 
 	@PostMapping
-	public ApiResponse<PaymentDto.V1.PaymentResponse> createPayment(
-		@RequestHeader(value = "X-USER-ID") final String userId,
+	public ApiResponse<PaymentDto.V1.PaymentResponse> createPayment(@RequestHeader(value = "X-USER-ID") final String userId,
 		@RequestBody final PaymentDto.V1.PaymentRequest paymentRequest) {
 
 		PaymentCommand.CreatePayment command = paymentRequest.toCriteria(userId);
@@ -32,4 +31,13 @@ public class PaymentV1Controller {
 		return ApiResponse.success(paymentResponse);
 	}
 
+	@PostMapping("/callback")
+	public ApiResponse<PaymentDto.V1.CallbackResponse> handleCallback(
+		@RequestBody final PaymentDto.V1.CallbackRequest request) {
+		PaymentCommand.ProcessCallback command = request.toCommand();
+		PaymentResult callbackResult = paymentFacade.processCallback(command);
+		PaymentDto.V1.CallbackResponse callbackResponse = PaymentDto.V1.CallbackResponse.from(callbackResult);
+
+		return ApiResponse.success(callbackResponse);
+	}
 }
