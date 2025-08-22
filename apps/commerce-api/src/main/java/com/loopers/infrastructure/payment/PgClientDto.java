@@ -2,13 +2,12 @@ package com.loopers.infrastructure.payment;
 
 import com.loopers.domain.payment.CardType;
 import com.loopers.domain.payment.PaymentData;
-import com.loopers.domain.payment.TransactionStatus;
 
 public record PgClientDto() {
 
 	public record PgPaymentRequest(
 		String userId,
-		Long orderId,
+		String orderId,
 		CardType cardType,
 		String cardNo,
 		Long amount,
@@ -27,26 +26,25 @@ public record PgClientDto() {
 		}
 	}
 
-	public record PgPaymentResponse(
-		String transactionKey,
-		Long orderId,
-		CardType cardType,
-		String cardNo,
+	public record PgPaymentOrder(
+		String orderId,
 		Long amount,
-		TransactionStatus status,
-		String reason
+		String cardNo,
+		String cardType,
+		String callbackUrl
 	) {
 
-		public PaymentData.PaymentResponse toPaymentResponse() {
-			return new PaymentData.PaymentResponse(
-				transactionKey,
-				orderId,
-				cardType,
-				cardNo,
-				amount,
-				status,
-				reason
-			);
-		}
+	}
+
+	public record PgPaymentTransaction(
+		String transactionKey,
+		String orderId,
+		Long amount,
+		String cardNo,
+		String cardType,
+		String status,
+		String reason,
+		String callbackUrl
+	) {
 	}
 }
