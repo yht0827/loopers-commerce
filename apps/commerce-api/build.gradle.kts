@@ -4,6 +4,7 @@ dependencies {
     implementation(project(":modules:redis"))
     implementation(project(":modules:cache"))
     implementation(project(":modules:feign"))
+    implementation(project(":modules:resilience"))
     implementation(project(":supports:jackson"))
     implementation(project(":supports:logging"))
     implementation(project(":supports:monitoring"))

@@ -1,0 +1,42 @@
+resilience4j:
+  circuitbreaker:
+    configs:
+      default:
+        registerHealthIndicator: true
+        slidingWindowSize: 10
+        minimumNumberOfCalls: 5
+        permittedNumberOfCallsInHalfOpenState: 3
+        automaticTransitionFromOpenToHalfOpenEnabled: true
+        waitDurationInOpenState: 5000
+        failureRateThreshold: 50
+        eventConsumerBufferSize: 10
+        recordExceptions:
+          - org.springframework.web.client.HttpServerErrorException
+          - java.util.concurrent.TimeoutException
+          - java.io.IOException
+        ignoreExceptions:
+          - com.loopers.support.error.CoreException
+      shared:
+        slidingWindowSize: 100
+        permittedNumberOfCallsInHalfOpenState: 30
+        waitDurationInOpenState: 1000
+        failureRateThreshold: 50
+        eventConsumerBufferSize: 10
+        ignoreExceptions:
+          - com.loopers.support.error.CoreException
+
+  retry:
+    instances:
+      pgClient:
+        maxAttempts: 3
+        waitDuration: 300ms
+        retryExceptions:
+          - java.net.ConnectException
+          - java.net.SocketTimeoutException
+          - org.springframework.web.client.HttpServerErrorException
+          - org.springframework.web.client.ResourceAccessException
+        ignoreExceptions:
+          - org.springframework.web.client.HttpClientErrorException
+        enableExponentialBackoff: true
+        exponentialBackoffMultiplier: 2.0
+    retry-aspect-order: 0

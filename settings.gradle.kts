@@ -7,6 +7,7 @@ include(
     ":modules:redis",
     ":modules:cache",
     ":modules:feign",
+    ":modules:resilience",
     ":supports:jackson",
     ":supports:logging",
     ":supports:monitoring",
