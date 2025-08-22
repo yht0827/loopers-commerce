@@ -1,5 +1,7 @@
 package com.loopers.domain.payment;
 
+import java.util.List;
+
 import com.loopers.infrastructure.payment.PgClientDto;
 
 public record PaymentInfo(
@@ -51,21 +53,28 @@ public record PaymentInfo(
 
 	public record order(
 		String orderId,
-		Long amount,
-		String cardNo,
-		CardType cardType,
-		String callbackUrl
+		List<TransactionResponse> transactions
 	) {
-		public static PaymentInfo.order toData(PgClientDto.PgPaymentOrder pgPaymentOrder) {
+		public static PaymentInfo.order toData(PgClientDto.PgPaymentOrderResponse pgPaymentOrderResponse) {
+			List<TransactionResponse> list = pgPaymentOrderResponse.transactions().stream()
+				.map(transactionResponse -> new TransactionResponse(
+					transactionResponse.transactionKey(),
+					transactionResponse.status(),
+					transactionResponse.reason()
+				)).toList();
+
 			return new PaymentInfo.order(
-				pgPaymentOrder.orderId(),
-				pgPaymentOrder.amount(),
-				pgPaymentOrder.cardNo(),
-				pgPaymentOrder.cardType(),
-				pgPaymentOrder.callbackUrl()
+				pgPaymentOrderResponse.orderId(),
+				list
 			);
 		}
+	}
 
+	public record TransactionResponse(
+		String transactionKey,
+		TransactionStatus status,
+		String reason
+	) {
 	}
 
 }

@@ -8,7 +8,7 @@ public interface PgClient {
 
 	PaymentInfo.transaction request(@RequestBody PgClientDto.PgPaymentRequest request);
 
-	PaymentInfo.order findOrder(@RequestBody PgClientDto.PgPaymentOrder request);
+	PaymentInfo.order findOrder(final String orderId);
 
 	PaymentInfo.transaction findTransaction(@RequestBody PgClientDto.PgPaymentTransaction request);
 }

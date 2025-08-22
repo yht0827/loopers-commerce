@@ -4,7 +4,6 @@ import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import com.loopers.interfaces.api.ApiResponse;
@@ -16,14 +15,8 @@ public interface PgFeignClient {
 	ApiResponse<PgClientDto.PgPaymentTransaction> request(PgClientDto.PgPaymentRequest request);
 
 	@GetMapping
-	ApiResponse<PgClientDto.PgPaymentOrder> findOrder(
-		@RequestParam(name = "orderId") String orderKey,
-		@RequestHeader("X-USER-ID") String userId
-	);
+	ApiResponse<PgClientDto.PgPaymentOrderResponse> findOrder(@RequestParam(name = "transactionKey") String transactionKey);
 
 	@GetMapping("/{transactionKey}")
-	ApiResponse<PgClientDto.PgPaymentTransaction> findTransaction(
-		@PathVariable(name = "transactionKey") String transactionKey,
-		@RequestHeader("X-USER-ID") String userId
-	);
+	ApiResponse<PgClientDto.PgPaymentTransaction> findTransaction(@PathVariable(name = "transactionKey") String transactionKey);
 }

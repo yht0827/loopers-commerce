@@ -28,6 +28,25 @@ public class PgClientImpl implements PgClient {
 		return PaymentInfo.transaction.toData(data);
 	}
 
+	@CircuitBreaker(name = "pgClient", fallbackMethod = "findOrderFallback")
+	@Retry(name = "pgClient")
+	@Override
+	public PaymentInfo.order findOrder(final String transactionKey) {
+		ApiResponse<PgClientDto.PgPaymentOrderResponse> response = pgFeignClient.findOrder(transactionKey);
+		PgClientDto.PgPaymentOrderResponse data = response.data();
+		return PaymentInfo.order.toData(data);
+	}
+
+	public PaymentInfo.order findOrderFallback(String transactionKey, Exception e) {
+		log.warn("PG 주문 조회 실패, fallback 실행. transactionKey: {}, error: {}", transactionKey, e.getMessage());
+		return new PaymentInfo.order(null, null);
+	}
+
+	@Override
+	public PaymentInfo.transaction findTransaction(PgClientDto.PgPaymentTransaction request) {
+		return null;
+	}
+
 	public PaymentInfo.transaction requestFallback(PgClientDto.PgPaymentRequest request, Exception e) {
 		log.warn("PG 결제 요청 실패, fallback 실행. orderId: {}, error: {}", request.orderId(), e.getMessage());
 		return new PaymentInfo.transaction(
@@ -40,16 +59,6 @@ public class PgClientImpl implements PgClient {
 			"PG 통신 실패",
 			request.callbackUrl()
 		);
-	}
-
-	@Override
-	public PaymentInfo.order findOrder(PgClientDto.PgPaymentOrder request) {
-		return null;
-	}
-
-	@Override
-	public PaymentInfo.transaction findTransaction(PgClientDto.PgPaymentTransaction request) {
-		return null;
 	}
 
 }
