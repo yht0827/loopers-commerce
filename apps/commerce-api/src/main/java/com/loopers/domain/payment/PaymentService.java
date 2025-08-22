@@ -15,12 +15,15 @@ public class PaymentService {
 		paymentRepository.save(payment);
 	}
 
-	public PaymentInfo updatePaymentStatus(PaymentData.PaymentRequest data) {
+	public PaymentInfo updatePaymentStatus(PaymentData.PaymentRequest data, PaymentInfo.transaction pgResponse) {
 		Payment payment = data.toEntity();
 
-		payment.processPaymentSuccess(data.orderId());
+		if (pgResponse.status().equals(TransactionStatus.SUCCESS)) {
+			payment.processPaymentSuccess(data.orderId());
+		}
 
 		Payment savedPayment = paymentRepository.save(payment);
 		return PaymentInfo.from(savedPayment);
 	}
+
 }

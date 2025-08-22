@@ -2,6 +2,7 @@ package com.loopers.infrastructure.payment;
 
 import com.loopers.domain.payment.CardType;
 import com.loopers.domain.payment.PaymentData;
+import com.loopers.domain.payment.TransactionStatus;
 
 public record PgClientDto() {
 
@@ -30,7 +31,7 @@ public record PgClientDto() {
 		String orderId,
 		Long amount,
 		String cardNo,
-		String cardType,
+		CardType cardType,
 		String callbackUrl
 	) {
 
@@ -41,8 +42,8 @@ public record PgClientDto() {
 		String orderId,
 		Long amount,
 		String cardNo,
-		String cardType,
-		String status,
+		CardType cardType,
+		TransactionStatus status,
 		String reason,
 		String callbackUrl
 	) {

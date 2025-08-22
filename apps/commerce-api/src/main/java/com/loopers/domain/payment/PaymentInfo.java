@@ -25,19 +25,25 @@ public record PaymentInfo(
 	}
 
 	public record transaction(
+		String transactionKey,
 		String orderId,
 		Long amount,
 		String cardNo,
-		String cardType,
+		CardType cardType,
+		TransactionStatus status,
+		String reason,
 		String callbackUrl
 	) {
 
 		public static PaymentInfo.transaction toData(PgClientDto.PgPaymentTransaction pgPaymentTransaction) {
 			return new PaymentInfo.transaction(
+				pgPaymentTransaction.transactionKey(),
 				pgPaymentTransaction.orderId(),
 				pgPaymentTransaction.amount(),
 				pgPaymentTransaction.cardNo(),
 				pgPaymentTransaction.cardType(),
+				pgPaymentTransaction.status(),
+				pgPaymentTransaction.reason(),
 				pgPaymentTransaction.callbackUrl());
 		}
 
@@ -47,7 +53,7 @@ public record PaymentInfo(
 		String orderId,
 		Long amount,
 		String cardNo,
-		String cardType,
+		CardType cardType,
 		String callbackUrl
 	) {
 		public static PaymentInfo.order toData(PgClientDto.PgPaymentOrder pgPaymentOrder) {
