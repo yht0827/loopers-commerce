@@ -15,7 +15,7 @@ public interface PgFeignClient {
 	ApiResponse<PgClientDto.PgPaymentTransaction> request(PgClientDto.PgPaymentRequest request);
 
 	@GetMapping
-	ApiResponse<PgClientDto.PgPaymentOrderResponse> findOrder(@RequestParam(name = "transactionKey") String transactionKey);
+	ApiResponse<PgClientDto.PgPaymentOrderResponse> findOrder(final String orderId);
 
 	@GetMapping("/{transactionKey}")
 	ApiResponse<PgClientDto.PgPaymentTransaction> findTransaction(@PathVariable(name = "transactionKey") String transactionKey);

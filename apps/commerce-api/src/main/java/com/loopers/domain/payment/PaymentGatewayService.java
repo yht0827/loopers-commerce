@@ -26,7 +26,7 @@ public class PaymentGatewayService {
 
 		for (Payment payment : pendingPayments) {
 			try {
-				PaymentInfo.order pgOrder = pgClient.findOrder(payment.getTransactionKey().transactionKey());
+				PaymentInfo.order pgOrder = pgClient.findOrder(payment.getOrderId().orderId());
 
 				// PG 상태에 따라 동기화
 				if (pgOrder == null || pgOrder.transactions() == null || pgOrder.transactions().isEmpty()) {

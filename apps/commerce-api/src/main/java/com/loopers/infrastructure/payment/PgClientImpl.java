@@ -1,5 +1,7 @@
 package com.loopers.infrastructure.payment;
 
+import java.util.List;
+
 import org.springframework.stereotype.Component;
 
 import com.loopers.domain.payment.PaymentInfo;
@@ -31,15 +33,10 @@ public class PgClientImpl implements PgClient {
 	@CircuitBreaker(name = "pgClient", fallbackMethod = "findOrderFallback")
 	@Retry(name = "pgClient")
 	@Override
-	public PaymentInfo.order findOrder(final String transactionKey) {
-		ApiResponse<PgClientDto.PgPaymentOrderResponse> response = pgFeignClient.findOrder(transactionKey);
+	public PaymentInfo.order findOrder(final String orderId) {
+		ApiResponse<PgClientDto.PgPaymentOrderResponse> response = pgFeignClient.findOrder(orderId);
 		PgClientDto.PgPaymentOrderResponse data = response.data();
 		return PaymentInfo.order.toData(data);
-	}
-
-	public PaymentInfo.order findOrderFallback(String transactionKey, Exception e) {
-		log.warn("PG 주문 조회 실패, fallback 실행. transactionKey: {}, error: {}", transactionKey, e.getMessage());
-		return new PaymentInfo.order(null, null);
 	}
 
 	@Override
@@ -48,7 +45,7 @@ public class PgClientImpl implements PgClient {
 	}
 
 	public PaymentInfo.transaction requestFallback(PgClientDto.PgPaymentRequest request, Exception e) {
-		log.warn("PG 결제 요청 실패, fallback 실행. orderId: {}, error: {}", request.orderId(), e.getMessage());
+		log.warn("PG 결제 요청 실패, fallback 실행. 주문 ID: {}, error: {}", request.orderId(), e.getMessage());
 		return new PaymentInfo.transaction(
 			null,
 			request.orderId(),
@@ -59,6 +56,11 @@ public class PgClientImpl implements PgClient {
 			"PG 통신 실패",
 			request.callbackUrl()
 		);
+	}
+
+	public PaymentInfo.order findOrderFallback(String orderId, Exception e) {
+		log.warn("PG 주문 조회 실패, fallback 실행. 주문 ID: {}, error: {}", orderId, e.getMessage());
+		return new PaymentInfo.order(orderId, List.of());
 	}
 
 }
