@@ -17,12 +17,12 @@ public class OrderRepositoryImpl implements OrderRepository {
 	private final OrderJpaRepository orderJpaRepository;
 
 	@Override
-	public List<Order> findAllOrdersByUserId(Long userId) {
+	public List<Order> findAllOrdersByUserId(String userId) {
 		return orderJpaRepository.findAllOrdersByUserId(userId);
 	}
 
 	@Override
-	public Optional<Order> findByIdAndUserId(Long orderId, Long userId) {
+	public Optional<Order> findByIdAndUserId(Long orderId, String userId) {
 		return orderJpaRepository.findByIdAndUserId(orderId, userId);
 	}
 

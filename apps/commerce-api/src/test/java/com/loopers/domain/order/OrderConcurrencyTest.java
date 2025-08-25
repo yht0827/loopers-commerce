@@ -1,23 +1,14 @@
 package com.loopers.domain.order;
 
-import static org.assertj.core.api.Assertions.*;
-
 import java.time.ZonedDateTime;
-import java.util.List;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadLocalRandom;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 
-import com.loopers.application.order.OrderCriteria;
 import com.loopers.application.order.OrderFacade;
 import com.loopers.domain.brand.Brand;
 import com.loopers.domain.brand.BrandName;
@@ -46,8 +37,6 @@ import com.loopers.infrastructure.order.OrderItemJpaRepository;
 import com.loopers.infrastructure.order.OrderJpaRepository;
 import com.loopers.infrastructure.point.PointJpaRepository;
 import com.loopers.infrastructure.product.ProductJpaRepository;
-import com.loopers.support.error.CoreException;
-import com.loopers.support.error.ErrorType;
 
 @DisplayName("주문 동시성 통합 테스트")
 @ActiveProfiles("test")
@@ -99,7 +88,7 @@ public class OrderConcurrencyTest {
 		product = new Product(new BrandId(brand1.getId()), new ProductName("티셔츠"),
 			new Price(1000L), new LikeCount(10L), new Quantity(10L));
 
-		point = new Point(new UserId(1L), 10000L);
+		point = new Point(new UserId("yht0827"), 10000L);
 
 		long daysInPast = ThreadLocalRandom.current().nextLong(1, 31);
 		ZonedDateTime randomIssuedAt = ZonedDateTime.now().minusDays(daysInPast);
@@ -107,7 +96,7 @@ public class OrderConcurrencyTest {
 		long daysInFuture = ThreadLocalRandom.current().nextLong(1, 31);
 		ZonedDateTime randomExpiredAt = ZonedDateTime.now().plusDays(daysInFuture);
 
-		coupon = new Coupon(new UserId(1L), new ProductId(1L), new BrandId(1L),
+		coupon = new Coupon(new UserId("yht0827"), new ProductId(1L), new BrandId(1L),
 			new CouponName("쿠폰1"), new DiscountValue(100L), new MaxDisCountAmount(0L), CouponType.FIXED_AMOUNT,
 			new CouponIssuedAt(randomIssuedAt), new CouponUsedAt(ZonedDateTime.now()),
 			new CouponExpiredAt(randomExpiredAt), CouponStatus.ACTIVE);

@@ -3,7 +3,7 @@ package com.loopers.interfaces.api.point.port.in;
 import com.loopers.application.point.port.in.PointCommand;
 
 public record PointRequest(
-        Long userId,
+        String userId,
         Long balance
 ) {
     public PointCommand toCommand() {

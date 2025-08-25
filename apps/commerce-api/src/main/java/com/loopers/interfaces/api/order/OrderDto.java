@@ -2,10 +2,9 @@ package com.loopers.interfaces.api.order;
 
 import java.util.List;
 
-import com.loopers.application.order.OrderCriteria;
+import com.loopers.application.order.OrderCommand;
+import com.loopers.application.order.OrderQuery;
 import com.loopers.application.order.OrderResult;
-import com.loopers.domain.common.OrderId;
-import com.loopers.domain.common.UserId;
 import com.loopers.domain.order.OrderStatus;
 import com.loopers.domain.order.TotalOrderPrice;
 
@@ -14,34 +13,34 @@ public record OrderDto() {
 	public record V1() {
 
 		public record OrderRequest(List<OrderItemRequest> items, Long couponId) {
-			public OrderCriteria.CreateOrder toCriteria(final Long userId) {
-				final List<OrderCriteria.CreateOrder.OrderItem> items = this.items.stream()
-					.map(OrderItemRequest::toCriteria)
+			public OrderCommand.CreateOrder toCommand(final String userId) {
+				List<OrderCommand.OrderItemCommand> items = this.items.stream()
+					.map(OrderItemRequest::toCommand)
 					.toList();
 
-				return new OrderCriteria.CreateOrder(userId, items, couponId);
+				return new OrderCommand.CreateOrder(userId, items, couponId);
 			}
 		}
 
-		public record getOrdersRequest(Long userId) {
-			public static OrderCriteria.GetOrders toCriteria(final Long userId) {
-				return new OrderCriteria.GetOrders(userId);
+		public record OrderItemRequest(Long productId, Long quantity, Long price) {
+			public OrderCommand.OrderItemCommand toCommand() {
+				return new OrderCommand.OrderItemCommand(productId, quantity, price);
 			}
 		}
 
-		public record getOrderRequest(Long userId, OrderId orderId) {
-			public static OrderCriteria.GetOrder toCriteria(final Long userId, final Long orderId) {
-				return new OrderCriteria.GetOrder(userId, orderId);
+		public record getOrdersRequest(String userId) {
+			public static OrderQuery.GetOrders toCommand(final String userId) {
+				return new OrderQuery.GetOrders(userId);
 			}
 		}
 
-		public record OrderItemRequest(Long productId, Long quantity) {
-			public OrderCriteria.CreateOrder.OrderItem toCriteria() {
-				return new OrderCriteria.CreateOrder.OrderItem(productId, quantity);
+		public record getOrderRequest(String userId, Long orderId) {
+			public static OrderQuery.GetOrder toCommand(final String userId, final Long orderId) {
+				return new OrderQuery.GetOrder(userId, orderId);
 			}
 		}
 
-		public record OrderResponse(Long orderId, UserId userId, TotalOrderPrice totalPrice, OrderStatus status) {
+		public record OrderResponse(Long orderId, String userId, TotalOrderPrice totalPrice, OrderStatus status) {
 			public static OrderResponse from(OrderResult orderResult) {
 				return new OrderResponse(orderResult.orderId(), orderResult.userId(), orderResult.totalPrice(),
 					orderResult.status());

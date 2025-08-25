@@ -15,4 +15,10 @@ public record FinalPaymentAmount(Long finalPaymentAmount) implements Serializabl
 			throw new CoreException(ErrorType.BAD_REQUEST, "최종 결제 금액은 0 이상이어야 합니다.");
 		}
 	}
+
+	public static FinalPaymentAmount of(final Long totalOrderPrice, final Long couponDiscountAmount) {
+
+		return new FinalPaymentAmount(totalOrderPrice - couponDiscountAmount);
+	}
+
 }

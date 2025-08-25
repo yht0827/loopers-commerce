@@ -21,6 +21,7 @@ spring:
     import:
       - jpa.yml
       - redis.yml
+      - feign.yml
       - logging.yml
       - monitoring.yml
 

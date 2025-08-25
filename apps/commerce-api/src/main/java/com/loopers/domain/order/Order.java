@@ -20,7 +20,6 @@ public class Order extends BaseEntity {
 
 	private UserId userId;
 	private TotalOrderPrice totalOrderPrice;
-	private PointUsedAmount pointUsedAmount;
 	private CouponDiscountAmount couponDiscountAmount;
 	private FinalPaymentAmount finalPaymentAmount;
 	private OrderNumber orderNumber;
@@ -29,15 +28,29 @@ public class Order extends BaseEntity {
 	private OrderStatus status;
 
 	@Builder
-	public Order(UserId userId, TotalOrderPrice totalOrderPrice, PointUsedAmount pointUsedAmount,
-		CouponDiscountAmount couponDiscountAmount, FinalPaymentAmount finalPaymentAmount, OrderNumber orderNumber,
-		OrderStatus status) {
+	public Order(UserId userId, TotalOrderPrice totalOrderPrice, CouponDiscountAmount couponDiscountAmount,
+		FinalPaymentAmount finalPaymentAmount, OrderNumber orderNumber, OrderStatus status) {
 		this.userId = userId;
 		this.totalOrderPrice = totalOrderPrice;
-		this.pointUsedAmount = pointUsedAmount;
 		this.couponDiscountAmount = couponDiscountAmount;
 		this.finalPaymentAmount = finalPaymentAmount;
 		this.orderNumber = orderNumber;
 		this.status = status;
+	}
+
+	public static Order create(OrderData.CreateOrder data, TotalOrderPrice totalOrderPrice,
+		CouponDiscountAmount couponDiscountAmount) {
+
+		Long totalPrice = totalOrderPrice.totalPrice();
+		Long discountAmount = couponDiscountAmount.couponDiscountAmount();
+		FinalPaymentAmount finalPaymentAmount = FinalPaymentAmount.of(totalPrice, discountAmount);
+
+		return Order.builder()
+			.userId(new UserId(data.userId()))
+			.totalOrderPrice(totalOrderPrice)
+			.couponDiscountAmount(couponDiscountAmount)
+			.finalPaymentAmount(finalPaymentAmount)
+			.status(OrderStatus.PENDING)
+			.build();
 	}
 }

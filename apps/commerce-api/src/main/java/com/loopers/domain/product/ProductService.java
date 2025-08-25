@@ -1,12 +1,14 @@
 package com.loopers.domain.product;
 
 import java.time.Duration;
+import java.util.List;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
 import com.github.benmanes.caffeine.cache.Cache;
+import com.loopers.domain.order.OrderItem;
 import com.loopers.support.cache.CacheablePage;
 import com.loopers.support.error.CoreException;
 import com.loopers.support.error.ErrorType;
@@ -103,4 +105,16 @@ public class ProductService {
 
 		return result;
 	}
+
+	public void deductStock(List<OrderItem> orderItems) {
+		for (OrderItem items : orderItems) {
+			Product product = productRepository.findByIdWithPessimisticLock(items.getId())
+				.orElseThrow(() -> new CoreException(ErrorType.NOT_FOUND, "상품을 찾을 수 없습니다."));
+
+			product.deduct(items.getQuantity());
+
+			productRepository.save(product);
+		}
+	}
+
 }
