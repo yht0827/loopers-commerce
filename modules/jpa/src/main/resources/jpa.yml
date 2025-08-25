@@ -4,9 +4,11 @@ spring:
     generate-ddl: false
     show-sql: false
     hibernate:
-      ddl-auto: none
+      ddl-auto: validate
     properties:
       hibernate:
+        format_sql: true
+        highlight_sql: true
         default_batch_fetch_size: 100
         timezone.default_storage: NORMALIZE_UTC
         jdbc.time_zone: UTC

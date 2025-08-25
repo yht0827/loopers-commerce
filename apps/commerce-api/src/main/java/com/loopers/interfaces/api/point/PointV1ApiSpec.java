@@ -17,11 +17,11 @@ public interface PointV1ApiSpec {
             summary = "포인트 충전",
             description = "사용자의 포인트를 충전합니다."
     )
-    ApiResponse<ChargeResponse> charge(final PointRequest pointRequest);
+    ApiResponse<ChargeResponse> chargePoint(final PointRequest pointRequest);
 
     @Operation(
             summary = "포인트 조회",
             description = "사용자의 포인트를 조회합니다."
     )
-    ApiResponse<PointResponse> get(final String userId);
+    ApiResponse<PointResponse> getPoint(final String userId);
 }

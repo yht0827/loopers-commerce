@@ -4,6 +4,8 @@ import com.loopers.domain.BaseEntity;
 import com.loopers.domain.common.BrandId;
 import com.loopers.domain.common.ProductId;
 import com.loopers.domain.common.UserId;
+import com.loopers.domain.order.CouponDiscountAmount;
+import com.loopers.domain.order.TotalOrderPrice;
 import com.loopers.support.error.CoreException;
 import com.loopers.support.error.ErrorType;
 
@@ -25,9 +27,7 @@ public class Coupon extends BaseEntity {
 	private ProductId productId;
 	private BrandId brandId;
 	private CouponName couponName;
-	private DiscountValue discountValue;
-	private MaxDisCountAmount maxDiscountAmount;
-	private CouponType couponType;
+	private DiscountPolicy discountPolicy;
 	private CouponIssuedAt couponIssuedAt;
 	private CouponUsedAt couponUsedAt;
 	private CouponExpiredAt couponExpiredAt;
@@ -44,39 +44,29 @@ public class Coupon extends BaseEntity {
 		this.productId = productId;
 		this.brandId = brandId;
 		this.couponName = couponName;
-		this.discountValue = discountValue;
-		this.maxDiscountAmount = maxDiscountAmount;
-		this.couponType = couponType;
+		this.discountPolicy = new DiscountPolicy(discountValue, maxDiscountAmount, couponType);
 		this.couponIssuedAt = couponIssuedAt;
 		this.couponUsedAt = couponUsedAt;
 		this.couponExpiredAt = couponExpiredAt;
 		this.couponStatus = couponStatus;
 	}
 
-	public void use() {
-		if (couponStatus == CouponStatus.USED) {
-			throw new CoreException(ErrorType.BAD_REQUEST, "이미 사용된 쿠폰입니다.");
-		}
-
+	public void markAsUsed() {
 		this.couponUsedAt.update();
 		this.couponStatus = CouponStatus.USED;
 	}
 
 	public Long calculateDisCount(final Long amount) {
-		if (couponType == CouponType.FIXED_AMOUNT) {
-			return Math.min(this.discountValue.discountValue(), amount);
+		return discountPolicy.calculate(amount);
+	}
+
+	public CouponDiscountAmount applyDiscount(TotalOrderPrice totalOrderPrice) {
+		if (couponStatus == CouponStatus.USED) {
+			throw new CoreException(ErrorType.BAD_REQUEST, "이미 사용된 쿠폰입니다.");
 		}
-
-		// 정률 할인
-		long calculatedDiscount = (long)(amount * (this.discountValue.discountValue() / 100.0));
-
-		// 최대 할인 금액이 설정된 경우, 이를 적용합니다.
-		if (maxDiscountAmount != null && maxDiscountAmount.maxDisCountAmount() != null) {
-			return Math.min(calculatedDiscount, maxDiscountAmount.maxDisCountAmount());
-		}
-
-		return calculatedDiscount;
-
+		Long discountAmount = calculateDisCount(totalOrderPrice.totalPrice());
+		markAsUsed();
+		return new CouponDiscountAmount(discountAmount);
 	}
 
 }

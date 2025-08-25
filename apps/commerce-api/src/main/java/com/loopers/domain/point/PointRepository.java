@@ -4,11 +4,11 @@ import java.util.Optional;
 
 public interface PointRepository {
 
-	Optional<Point> findByUsersId(final Long usersId);
+	Optional<Point> findByUsersId(final String usersId);
 
-	Optional<Point> findByUserIdWithPessimisticLock(Long userId);
+	Optional<Point> findByUserIdWithPessimisticLock(final String userId);
 
-	Optional<Point> findByUserIdWithOptimisticLock(Long userId);
+	Optional<Point> findByUserIdWithOptimisticLock(final String userId);
 
 	Point save(final Point point);
 }

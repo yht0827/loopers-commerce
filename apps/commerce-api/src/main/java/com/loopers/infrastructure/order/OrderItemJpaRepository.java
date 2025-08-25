@@ -9,9 +9,9 @@ import com.loopers.domain.order.OrderItem;
 
 public interface OrderItemJpaRepository extends JpaRepository<OrderItem, Long> {
 
-	@Query("SELECT oi FROM OrderItem oi WHERE oi.orderId = :orderId")
-	List<OrderItem> findAllByOrderId(Long orderId);
+	@Query("SELECT oi FROM OrderItem oi WHERE oi.orderId.orderId = :orderId")
+	List<OrderItem> findAllByOrderId(final Long orderId);
 
-	@Query("SELECT oi FROM OrderItem oi WHERE oi.orderId IN :orderIds")
-	List<OrderItem> findAllByOrderIdIn(List<Long> orderIds);
+	@Query("SELECT oi FROM OrderItem oi WHERE oi.orderId.orderId IN :orderIds")
+	List<OrderItem> findAllByOrderIdIn(final List<Long> orderIds);
 }

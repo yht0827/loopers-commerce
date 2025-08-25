@@ -24,15 +24,15 @@ public class PointV1Controller implements PointV1ApiSpec {
 
 	@PostMapping("/charge")
 	@Override
-	public ApiResponse<ChargeResponse> charge(@RequestBody final PointRequest pointRequest) {
+	public ApiResponse<ChargeResponse> chargePoint(@RequestBody final PointRequest pointRequest) {
 		ChargeResponse response = ChargeResponse.from(pointFacade.charge(pointRequest.toCommand()));
 		return ApiResponse.success(response);
 	}
 
 	@GetMapping
 	@Override
-	public ApiResponse<PointResponse> get(@RequestHeader("X-USER-ID") final String userId) {
-		PointResponse response = PointResponse.from(pointFacade.get(Long.valueOf(userId)));
+	public ApiResponse<PointResponse> getPoint(@RequestHeader("X-USER-ID") final String userId) {
+		PointResponse response = PointResponse.from(pointFacade.get(userId));
 		return ApiResponse.success(response);
 	}
 }

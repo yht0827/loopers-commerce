@@ -3,6 +3,8 @@ dependencies {
     implementation(project(":modules:jpa"))
     implementation(project(":modules:redis"))
     implementation(project(":modules:cache"))
+    implementation(project(":modules:feign"))
+    implementation(project(":modules:resilience"))
     implementation(project(":supports:jackson"))
     implementation(project(":supports:logging"))
     implementation(project(":supports:monitoring"))
@@ -11,6 +13,7 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("org.springframework.boot:spring-boot-starter-actuator")
     implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:${project.properties["springDocOpenApiVersion"]}")
+
 
     // querydsl
     annotationProcessor("com.querydsl:querydsl-apt::jakarta")

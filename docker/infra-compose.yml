@@ -14,6 +14,21 @@ services:
     volumes:
       - mysql-8-data:/var/lib/mysql
 
+  pg-simulator:
+    image: mysql:8.0
+    ports:
+      - "3307:3306"
+    environment:
+      - MYSQL_ROOT_PASSWORD=root
+      - MYSQL_USER=application
+      - MYSQL_PASSWORD=application
+      - MYSQL_DATABASE=paymentgateway
+      - MYSQL_CHARACTER_SET=utf8mb4
+      - MYSQL_COLLATE=utf8mb4_general_ci
+    volumes:
+      - pg-simulator-data:/var/lib/mysql
+
+
   redis-master:
     image: redis:7.0
     container_name: redis-master
@@ -61,6 +76,7 @@ services:
 
 volumes:
   mysql-8-data:
+  pg-simulator-data:
   redis_master_data:
   redis_readonly_data:
 

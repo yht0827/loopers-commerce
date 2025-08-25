@@ -65,12 +65,12 @@ public class ProductTest {
 
 		@DisplayName("재고 감소 시, 재고가 충분하면, 수량이 정상적으로 감소한다.")
 		@Test
-		void decreaseStock_whenSufficient() {
+		void deduct_whenSufficient() {
 			// arrange
 			long decreaseAmount = 3L;
 
 			// act
-			product.decreaseStock(new Quantity(decreaseAmount));
+			product.deduct(new Quantity(decreaseAmount));
 
 			// assert
 			Long quantity = product.getQuantity().quantity();
@@ -93,12 +93,12 @@ public class ProductTest {
 
 		@DisplayName("재고 감소 시, 재고가 부족하면, 예외가 발생한다.")
 		@Test
-		void decreaseStock_whenInsufficient_throwsException() {
+		void deduct_whenInsufficient_throwsException() {
 			// arrange
 			long orderQuantity = 15L; // 재고(10)보다 많은 수량
 
 			// act and assert
-			assertThatThrownBy(() -> product.decreaseStock(new Quantity(orderQuantity)))
+			assertThatThrownBy(() -> product.deduct(new Quantity(orderQuantity)))
 				.isInstanceOf(CoreException.class)
 				.hasMessage("재고가 충분하지 않습니다.");
 		}

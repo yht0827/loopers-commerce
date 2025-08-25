@@ -21,7 +21,7 @@ public class PointTest {
 		@Test
 		void failWhenChargingWithZeroOrNegativeAmount() {
 			// arrange
-			Long userId = 0L;
+			String userId = "yht0827";
 			Long balance = -1L;
 
 			// act

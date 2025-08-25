@@ -9,16 +9,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.loopers.domain.BaseEntity;
-import com.loopers.domain.common.Price;
-import com.loopers.domain.common.ProductId;
-import com.loopers.domain.common.Quantity;
-import com.loopers.domain.common.UserId;
-import com.loopers.domain.coupon.Coupon;
-import com.loopers.domain.coupon.CouponRepository;
-import com.loopers.domain.point.Point;
-import com.loopers.domain.point.PointRepository;
-import com.loopers.domain.product.Product;
-import com.loopers.domain.product.ProductRepository;
 import com.loopers.support.error.CoreException;
 import com.loopers.support.error.ErrorType;
 
@@ -30,78 +20,24 @@ public class OrderService {
 
 	private final OrderRepository orderRepository;
 	private final OrderItemRepository orderItemRepository;
-	private final ProductRepository productRepository;
-	private final PointRepository pointRepository;
-	private final CouponRepository couponRepository;
 
-	public List<OrderItem> createOrderItems(List<OrderCommand.CreateOrder.OrderItem> itemCommands) {
-
-
-		return itemCommands.stream().map(request -> {
-			Product product = productRepository.findByIdWithPessimisticLock(request.productId())
-				.orElseThrow(() -> new CoreException(ErrorType.NOT_FOUND, "상품을 찾을 수 없습니다."));
-
-			product.decreaseStock(new Quantity(request.quantity()));
-
-			return OrderItem.builder()
-				.productId(new ProductId(product.getId()))
-				.quantity(new Quantity(request.quantity()))
-				.price(new Price(product.getPrice().price()))
-				.build();
-		}).toList();
+	public TotalOrderPrice calculateTotalOrderPrice(List<OrderItem> orderItems) {
+		return TotalOrderPrice.of(orderItems);
 	}
 
-	public Long calculateTotalOrderPrice(List<OrderItem> orderItems) {
-		return orderItems.stream()
-			.mapToLong(item -> item.getPrice().price() * item.getQuantity().quantity())
-			.sum();
-	}
+	public OrderInfo saveOrder(OrderData.CreateOrder data, List<OrderItem> orderItems, TotalOrderPrice totalOrderPrice,
+		CouponDiscountAmount couponDiscountAmount) {
 
-	public DiscountInfo applyDiscounts(OrderCommand.CreateOrder command, Long totalOrderPrice) {
-		Point point = pointRepository.findByUserIdWithOptimisticLock(command.userId())
-			.orElseThrow(() -> new CoreException(ErrorType.NOT_FOUND, " 해당 [id = " + command.userId() + "]의 포인트가 존재하지 않습니다."));
-
-		Long pointBalance = point.getBalance();
-		Long couponDiscount = 0L;
-
-		if (command.couponId() != null) {
-			Coupon coupon = couponRepository.findByIdWithOptimisticLock(command.couponId())
-				.orElseThrow(
-					() -> new CoreException(ErrorType.NOT_FOUND, "해당 [id = " + command.couponId() + "]의 쿠폰이 존재하지 않습니다."));
-
-			coupon.use();
-			couponDiscount = coupon.calculateDisCount(pointBalance);
-		}
-
-		long amountAfterCouponDiscount = totalOrderPrice - couponDiscount;
-		long pointsToUse = Math.min(pointBalance, amountAfterCouponDiscount);
-		point.use(pointsToUse);
-		return new DiscountInfo(couponDiscount, pointsToUse);
-	}
-
-	public OrderInfo saveOrder(OrderCommand.CreateOrder command, List<OrderItem> orderItems, Long totalOrderPrice,
-		DiscountInfo discountInfo) {
-		long finalPaymentAmount = totalOrderPrice - discountInfo.couponDiscount() - discountInfo.pointsToUse();
-
-		Order newOrder = Order.builder()
-			.userId(new UserId(command.userId()))
-			.totalOrderPrice(new TotalOrderPrice(totalOrderPrice))
-			.pointUsedAmount(new PointUsedAmount(discountInfo.pointsToUse()))
-			.couponDiscountAmount(new CouponDiscountAmount(discountInfo.couponDiscount()))
-			.finalPaymentAmount(new FinalPaymentAmount(finalPaymentAmount))
-			.status(OrderStatus.PENDING)
-			.build();
-
-		Order order = orderRepository.save(newOrder);
-
+		Order order = Order.create(data, totalOrderPrice, couponDiscountAmount);
+		Order savedOrder = orderRepository.save(order);
 		List<OrderItem> orderItemList = orderItemRepository.saveAll(orderItems);
 
-		return OrderInfo.from(order, orderItemList);
+		return OrderInfo.from(savedOrder, orderItemList);
 	}
 
 	@Transactional(readOnly = true)
-	public List<OrderInfo> getOrders(final OrderCommand.GetOrders command) {
-		List<Order> orderList = orderRepository.findAllOrdersByUserId(command.userId());
+	public List<OrderInfo> getOrders(final OrderData.GetOrders data) {
+		List<Order> orderList = orderRepository.findAllOrdersByUserId(data.userId());
 
 		if (orderList.isEmpty()) {
 			return Collections.emptyList();
@@ -120,11 +56,11 @@ public class OrderService {
 	}
 
 	@Transactional(readOnly = true)
-	public OrderInfo getOrder(final OrderCommand.GetOrder command) {
-		Order order = orderRepository.findByIdAndUserId(command.orderId(), command.userId())
+	public OrderInfo getOrder(final OrderData.GetOrder data) {
+		Order order = orderRepository.findByIdAndUserId(data.orderId(), data.userId())
 			.orElseThrow(() -> new CoreException(ErrorType.NOT_FOUND, "주문을 찾을 수 없습니다."));
 
-		List<OrderItem> orderItems = orderItemRepository.findAllByOrderId(command.orderId());
+		List<OrderItem> orderItems = orderItemRepository.findAllByOrderId(data.orderId());
 
 		return OrderInfo.from(order, orderItems);
 	}

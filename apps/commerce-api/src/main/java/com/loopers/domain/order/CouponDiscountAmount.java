@@ -14,4 +14,9 @@ public record CouponDiscountAmount(Long couponDiscountAmount) implements Seriali
 			throw new CoreException(ErrorType.BAD_REQUEST, "쿠폰 할인 금액은 0 이상이어야 합니다.");
 		}
 	}
+
+	public static CouponDiscountAmount of(final Long amount) {
+		return new CouponDiscountAmount(amount);
+	}
+
 }

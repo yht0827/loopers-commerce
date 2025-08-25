@@ -10,8 +10,9 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.loopers.application.order.OrderCriteria;
+import com.loopers.application.order.OrderCommand;
 import com.loopers.application.order.OrderFacade;
+import com.loopers.application.order.OrderQuery;
 import com.loopers.application.order.OrderResult;
 import com.loopers.interfaces.api.ApiResponse;
 
@@ -25,19 +26,19 @@ public class OrderV1Controller {
 	private final OrderFacade orderFacade;
 
 	@PostMapping
-	public ApiResponse<OrderDto.V1.OrderResponse> createOrder(@RequestHeader(value = "X-USER-ID") final Long userId,
+	public ApiResponse<OrderDto.V1.OrderResponse> createOrder(@RequestHeader(value = "X-USER-ID") final String userId,
 		@RequestBody final OrderDto.V1.OrderRequest orderRequest) {
-		OrderCriteria.CreateOrder criteria = orderRequest.toCriteria(userId);
-		OrderResult orderResult = orderFacade.createOrder(criteria);
+		OrderCommand.CreateOrder command = orderRequest.toCommand(userId);
+		OrderResult orderResult = orderFacade.createOrder(command);
 		OrderDto.V1.OrderResponse orderResponse = OrderDto.V1.OrderResponse.from(orderResult);
 
 		return ApiResponse.success(orderResponse);
 	}
 
 	@GetMapping
-	public ApiResponse<List<OrderDto.V1.OrderResponse>> getOrders(@RequestHeader final Long userId) {
-		OrderCriteria.GetOrders criteria = OrderDto.V1.getOrdersRequest.toCriteria(userId);
-		List<OrderResult> orderResults = orderFacade.getOrders(criteria);
+	public ApiResponse<List<OrderDto.V1.OrderResponse>> getOrders(@RequestHeader(value = "X-USER-ID") final String userId) {
+		OrderQuery.GetOrders command = OrderDto.V1.getOrdersRequest.toCommand(userId);
+		List<OrderResult> orderResults = orderFacade.getOrders(command);
 		List<OrderDto.V1.OrderResponse> responses = orderResults.stream()
 			.map(OrderDto.V1.OrderResponse::from)
 			.toList();
@@ -46,10 +47,11 @@ public class OrderV1Controller {
 	}
 
 	@GetMapping("/{orderId}")
-	public ApiResponse<OrderDto.V1.OrderResponse> getOrder(@RequestHeader final Long userId, @PathVariable Long orderId) {
-		OrderCriteria.GetOrder criteria = OrderDto.V1.getOrderRequest.toCriteria(userId, orderId);
-		OrderResult orderDetails = orderFacade.getOrder(criteria);
-		OrderDto.V1.OrderResponse orderResponse = OrderDto.V1.OrderResponse.from(orderDetails);
+	public ApiResponse<OrderDto.V1.OrderResponse> getOrder(@RequestHeader(value = "X-USER-ID") final String userId,
+		@PathVariable Long orderId) {
+		OrderQuery.GetOrder command = OrderDto.V1.getOrderRequest.toCommand(userId, orderId);
+		OrderResult orderResult = orderFacade.getOrder(command);
+		OrderDto.V1.OrderResponse orderResponse = OrderDto.V1.OrderResponse.from(orderResult);
 		return ApiResponse.success(orderResponse);
 	}
 

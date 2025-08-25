@@ -19,7 +19,7 @@ public record Quantity(Long quantity) implements Serializable {
 		return this.quantity >= amount.quantity();
 	}
 
-	public Quantity subtract(Quantity amount) {
+	public Quantity subtractWithValidation(Quantity amount) {
 		if (!isSufficient(amount)) {
 			throw new CoreException(ErrorType.BAD_REQUEST, "재고가 충분하지 않습니다.");
 		}

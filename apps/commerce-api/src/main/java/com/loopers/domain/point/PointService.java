@@ -26,7 +26,7 @@ public class PointService {
     }
 
     @Transactional(readOnly = true)
-    public Point getPoint(final Long usersId) {
+    public Point getPoint(final String usersId) {
         return pointRepository.findByUsersId(usersId)
                 .orElseThrow(() -> new CoreException(ErrorType.NOT_FOUND, " 해당 [id = " + usersId + "]의 포인트가 존재하지 않습니다."));
     }
