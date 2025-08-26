@@ -2,7 +2,6 @@ package com.loopers.interfaces.api.user;
 
 import com.loopers.application.user.UserCommand;
 import com.loopers.application.user.UserInfo;
-import com.loopers.application.user.UserQuery;
 
 public record UserDto() {
 
@@ -16,12 +15,6 @@ public record UserDto() {
 		) {
 			public UserCommand.CreateUser toCommand() {
 				return new UserCommand.CreateUser(userId, name, email, birthday, gender);
-			}
-		}
-
-		public record GetProfile(String userId) {
-			public UserQuery.GetUser toQuery(final String userId) {
-				return new UserQuery.GetUser(userId);
 			}
 		}
 

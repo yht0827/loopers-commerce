@@ -33,9 +33,8 @@ public class UserV1Controller implements UserV1ApiSpec {
 
 	@GetMapping("/me")
 	@Override
-	public ApiResponse<UserDto.V1.UserResponse> getUser(@RequestHeader("X-USER-ID") final String userId, final
-	UserDto.V1.GetProfile request) {
-		UserQuery.GetUser query = request.toQuery(userId);
+	public ApiResponse<UserDto.V1.UserResponse> getUser(@RequestHeader("X-USER-ID") final String userId) {
+		UserQuery.GetUser query = UserQuery.GetUser.of(userId);
 		UserInfo userInfo = userApplicationService.getUser(query);
 		UserDto.V1.UserResponse response = UserDto.V1.UserResponse.from(userInfo);
 		return ApiResponse.success(response);

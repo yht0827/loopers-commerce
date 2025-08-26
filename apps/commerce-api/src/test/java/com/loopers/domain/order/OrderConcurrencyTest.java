@@ -1,5 +1,6 @@
 package com.loopers.domain.order;
 
+import java.math.BigDecimal;
 import java.time.ZonedDateTime;
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -26,6 +27,7 @@ import com.loopers.domain.coupon.CouponType;
 import com.loopers.domain.coupon.CouponUsedAt;
 import com.loopers.domain.coupon.DiscountValue;
 import com.loopers.domain.coupon.MaxDisCountAmount;
+import com.loopers.domain.point.Balance;
 import com.loopers.domain.point.Point;
 import com.loopers.domain.product.LikeCount;
 import com.loopers.domain.product.Product;
@@ -88,7 +90,7 @@ public class OrderConcurrencyTest {
 		product = new Product(new BrandId(brand1.getId()), new ProductName("티셔츠"),
 			new Price(1000L), new LikeCount(10L), new Quantity(10L));
 
-		point = new Point(new UserId("yht0827"), 10000L);
+		point = new Point(new UserId("yht0827"), new Balance(BigDecimal.valueOf(10000L)));
 
 		long daysInPast = ThreadLocalRandom.current().nextLong(1, 31);
 		ZonedDateTime randomIssuedAt = ZonedDateTime.now().minusDays(daysInPast);

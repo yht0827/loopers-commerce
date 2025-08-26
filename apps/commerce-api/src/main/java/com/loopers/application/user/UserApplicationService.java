@@ -9,23 +9,22 @@ import com.loopers.domain.user.UserQueryService;
 
 import lombok.RequiredArgsConstructor;
 
-@RequiredArgsConstructor
 @Service
+@RequiredArgsConstructor
 public class UserApplicationService {
 	private final UserCommandService userCommandService;
 	private final UserQueryService userQueryService;
 
 	@Transactional
 	public UserInfo createUser(final UserCommand.CreateUser userCommand) {
-		User user = userCommand.toEntity();
+		final User user = userCommand.toEntity();
 		User savedUser = userCommandService.createUser(user);
 		return UserInfo.from(savedUser);
 	}
 
 	@Transactional(readOnly = true)
 	public UserInfo getUser(final UserQuery.GetUser query) {
-		final String userId = query.userId();
-		User user = userQueryService.getUser(userId);
+		User user = userQueryService.getUser(query.userId());
 		return UserInfo.from(user);
 	}
 

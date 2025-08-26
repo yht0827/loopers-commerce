@@ -33,7 +33,8 @@ public class Product extends BaseEntity {
 	private Long version;
 
 	@Builder
-	public Product(BrandId brandId, ProductName name, Price price, LikeCount likeCount, Quantity quantity) {
+	public Product(final BrandId brandId, final ProductName name, final Price price, final LikeCount likeCount,
+		final Quantity quantity) {
 		this.brandId = brandId;
 		this.name = name;
 		this.price = price;
@@ -41,11 +42,11 @@ public class Product extends BaseEntity {
 		this.quantity = quantity;
 	}
 
-	public void updateLikeCount(LikeCount likeCount) {
+	public void updateLikeCount(final LikeCount likeCount) {
 		this.likeCount = likeCount;
 	}
 
-	public void deduct(Quantity amount) {
+	public void deduct(final Quantity amount) {
 		this.quantity = this.quantity.subtractWithValidation(amount);
 	}
 }

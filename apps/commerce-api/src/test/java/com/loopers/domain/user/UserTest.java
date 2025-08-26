@@ -13,7 +13,7 @@ import com.loopers.support.error.CoreException;
 import com.loopers.support.error.ErrorType;
 
 public class UserTest {
-	@DisplayName("회원 모델을 생성할 때, ")
+	@DisplayName("회원을 생성할 때, ")
 	@Nested
 	class Create {
 		@DisplayName("필드 값들이 모두 주어지면, 정상적으로 생성된다.")

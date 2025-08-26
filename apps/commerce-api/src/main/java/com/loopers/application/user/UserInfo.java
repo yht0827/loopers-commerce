@@ -3,14 +3,14 @@ package com.loopers.application.user;
 import com.loopers.domain.user.User;
 
 public record UserInfo(Long id, String userId, String name, String email, String birthday, String gender) {
-	public static UserInfo from(final User model) {
+	public static UserInfo from(final User user) {
 		return new UserInfo(
-			model.getId(),
-			model.getUserId().userId(),
-			model.getName().name(),
-			model.getEmail().email(),
-			model.getBirthday().birthday(),
-			model.getGender().name()
+			user.getId(),
+			user.getUserId().userId(),
+			user.getName().name(),
+			user.getEmail().email(),
+			user.getBirthday().birthday(),
+			user.getGender().name()
 		);
 	}
 }

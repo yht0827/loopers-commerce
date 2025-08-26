@@ -23,17 +23,17 @@ import com.loopers.utils.DatabaseCleanUp;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class UserV1ApiE2ETest {
 
-	private final TestRestTemplate testRestTemplate;
-	private final DatabaseCleanUp databaseCleanUp;
+	@Autowired
+	private TestRestTemplate testRestTemplate;
 
 	@Autowired
-	public UserV1ApiE2ETest(
-		TestRestTemplate testRestTemplate,
-		DatabaseCleanUp databaseCleanUp
-	) {
-		this.testRestTemplate = testRestTemplate;
-		this.databaseCleanUp = databaseCleanUp;
-	}
+	private DatabaseCleanUp databaseCleanUp;
+
+	private static final String TEST_USER_ID = "yht0827";
+	private static final String TEST_NAME = "양희태";
+	private static final String TEST_EMAIL = "yht0827@naver.com";
+	private static final String TEST_BIRTHDAY = "1999-01-01";
+	private static final String TEST_GENDER = "M";
 
 	@AfterEach
 	void tearDown() {
@@ -47,22 +47,11 @@ public class UserV1ApiE2ETest {
 		@Test
 		void returnsExampleInfo_whenValidIdIsProvided() {
 			// arrange
-			String userId = "yht0827";
-			String name = "양희태";
-			String email = "yht0827@naver.com";
-			String birthday = "1999-01-01";
-			String gender = "M";
-
-			UserDto.V1.UserRequest request = new UserDto.V1.UserRequest(userId, name, email, birthday, gender);
+			UserDto.V1.UserRequest request = createUserRequest();
 			HttpEntity<UserDto.V1.UserRequest> requestEntity = new HttpEntity<>(request);
 
-			String requestUrl = "/api/v1/users";
-
 			// act
-			ParameterizedTypeReference<ApiResponse<UserDto.V1.UserResponse>> responseType = new ParameterizedTypeReference<>() {
-			};
-			ResponseEntity<ApiResponse<UserDto.V1.UserResponse>> response =
-				testRestTemplate.exchange(requestUrl, HttpMethod.POST, requestEntity, responseType);
+			ResponseEntity<ApiResponse<UserDto.V1.UserResponse>> response = createUser(requestEntity);
 
 			// assert
 			UserDto.V1.UserResponse responseData = response.getBody().data();
@@ -70,11 +59,11 @@ public class UserV1ApiE2ETest {
 			assertAll(
 				() -> assertTrue(response.getStatusCode().is2xxSuccessful()),
 				() -> assertThat(responseData.id()).isNotNull(),
-				() -> assertThat(responseData.userId()).isEqualTo(userId),
-				() -> assertThat(responseData.name()).isEqualTo(name),
-				() -> assertThat(responseData.email()).isEqualTo(email),
-				() -> assertThat(responseData.birthday()).isEqualTo(birthday),
-				() -> assertThat(responseData.gender()).isEqualTo(gender)
+				() -> assertThat(responseData.userId()).isEqualTo(TEST_USER_ID),
+				() -> assertThat(responseData.name()).isEqualTo(TEST_NAME),
+				() -> assertThat(responseData.email()).isEqualTo(TEST_EMAIL),
+				() -> assertThat(responseData.birthday()).isEqualTo(TEST_BIRTHDAY),
+				() -> assertThat(responseData.gender()).isEqualTo(TEST_GENDER)
 			);
 		}
 
@@ -82,19 +71,12 @@ public class UserV1ApiE2ETest {
 		@Test
 		void returnsBadRequest_whenGenderIsNull() {
 			// arrange
-			String userId = "yht0827";
-			String name = "양희태";
-			String email = "yht0827@naver.com";
-			String birthday = "1999-01-01";
-
-			UserDto.V1.UserRequest request = new UserDto.V1.UserRequest(userId, name, email, birthday, null);
+			UserDto.V1.UserRequest request = new UserDto.V1.UserRequest(TEST_USER_ID, TEST_NAME, TEST_EMAIL, TEST_BIRTHDAY, null);
 			HttpEntity<UserDto.V1.UserRequest> requestEntity = new HttpEntity<>(request);
-
-			String requestUrl = "/api/v1/users";
 
 			// act
 			ResponseEntity<Object> response =
-				testRestTemplate.exchange(requestUrl, HttpMethod.POST, requestEntity, Object.class);
+				testRestTemplate.exchange("/api/v1/users", HttpMethod.POST, requestEntity, Object.class);
 
 			// assert
 			assertTrue(response.getStatusCode().is4xxClientError());
@@ -108,40 +90,23 @@ public class UserV1ApiE2ETest {
 		@Test
 		void returnsUserInfo_whenIdExists() {
 			// arrange
-			String userId = "yht0827";
-			String name = "양희태";
-			String email = "yht0827@naver.com";
-			String birthday = "1999-01-01";
-			String gender = "M";
-			UserDto.V1.UserRequest postRequest = new UserDto.V1.UserRequest(userId, name, email, birthday, gender);
+			UserDto.V1.UserRequest postRequest = createUserRequest();
 			HttpEntity<UserDto.V1.UserRequest> postRequestEntity = new HttpEntity<>(postRequest);
-			String postRequestUrl = "/api/v1/users";
-
-			ParameterizedTypeReference<ApiResponse<UserDto.V1.UserResponse>> postResponseType = new ParameterizedTypeReference<>() {
-			};
-			ResponseEntity<ApiResponse<UserDto.V1.UserResponse>> postResponse =
-				testRestTemplate.exchange(postRequestUrl, HttpMethod.POST, postRequestEntity, postResponseType);
+			ResponseEntity<ApiResponse<UserDto.V1.UserResponse>> postResponse = createUser(postRequestEntity);
 			String createdUserId = postResponse.getBody().data().userId();
 
 			// act
-			HttpHeaders headers = new HttpHeaders();
-			headers.add("X-USER-ID", createdUserId);
-			HttpEntity<Object> getRequestEntity = new HttpEntity<>(headers);
-
-			ParameterizedTypeReference<ApiResponse<UserDto.V1.UserResponse>> getResponseType = new ParameterizedTypeReference<>() {
-			};
-			ResponseEntity<ApiResponse<UserDto.V1.UserResponse>> getResponse =
-				testRestTemplate.exchange("/api/v1/users/me", HttpMethod.GET, getRequestEntity, getResponseType);
+			ResponseEntity<ApiResponse<UserDto.V1.UserResponse>> getResponse = getUserInfo(createdUserId);
 
 			// assert
 			UserDto.V1.UserResponse responseData = getResponse.getBody().data();
 			assertAll(
 				() -> assertThat(getResponse.getStatusCode()).isEqualTo(HttpStatus.OK),
-				() -> assertThat(responseData.userId()).isEqualTo(userId),
-				() -> assertThat(responseData.name()).isEqualTo(name),
-				() -> assertThat(responseData.email()).isEqualTo(email),
-				() -> assertThat(responseData.birthday()).isEqualTo(birthday),
-				() -> assertThat(responseData.gender()).isEqualTo(gender)
+				() -> assertThat(responseData.userId()).isEqualTo(TEST_USER_ID),
+				() -> assertThat(responseData.name()).isEqualTo(TEST_NAME),
+				() -> assertThat(responseData.email()).isEqualTo(TEST_EMAIL),
+				() -> assertThat(responseData.birthday()).isEqualTo(TEST_BIRTHDAY),
+				() -> assertThat(responseData.gender()).isEqualTo(TEST_GENDER)
 			);
 		}
 
@@ -159,5 +124,23 @@ public class UserV1ApiE2ETest {
 			// assert
 			assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
 		}
+	}
+
+	private UserDto.V1.UserRequest createUserRequest() {
+		return new UserDto.V1.UserRequest(TEST_USER_ID, TEST_NAME, TEST_EMAIL, TEST_BIRTHDAY, TEST_GENDER);
+	}
+
+	private ResponseEntity<ApiResponse<UserDto.V1.UserResponse>> createUser(HttpEntity<UserDto.V1.UserRequest> requestEntity) {
+		ParameterizedTypeReference<ApiResponse<UserDto.V1.UserResponse>> responseType = new ParameterizedTypeReference<>() {};
+		return testRestTemplate.exchange("/api/v1/users", HttpMethod.POST, requestEntity, responseType);
+	}
+
+	private ResponseEntity<ApiResponse<UserDto.V1.UserResponse>> getUserInfo(String userId) {
+		HttpHeaders headers = new HttpHeaders();
+		headers.add("X-USER-ID", userId);
+		HttpEntity<Object> requestEntity = new HttpEntity<>(headers);
+
+		ParameterizedTypeReference<ApiResponse<UserDto.V1.UserResponse>> responseType = new ParameterizedTypeReference<>() {};
+		return testRestTemplate.exchange("/api/v1/users/me", HttpMethod.GET, requestEntity, responseType);
 	}
 }
