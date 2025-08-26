@@ -1,4 +1,4 @@
-package com.loopers.interfaces.api.users;
+package com.loopers.interfaces.api.user;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.*;
@@ -18,8 +18,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
 import com.loopers.interfaces.api.ApiResponse;
-import com.loopers.interfaces.api.users.port.in.UsersRequest;
-import com.loopers.interfaces.api.users.port.out.UsersResponse;
 import com.loopers.utils.DatabaseCleanUp;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -55,19 +53,19 @@ public class UserV1ApiE2ETest {
 			String birthday = "1999-01-01";
 			String gender = "M";
 
-			UsersRequest request = new UsersRequest(userId, name, email, birthday, gender);
-			HttpEntity<UsersRequest> requestEntity = new HttpEntity<>(request);
+			UserDto.V1.UserRequest request = new UserDto.V1.UserRequest(userId, name, email, birthday, gender);
+			HttpEntity<UserDto.V1.UserRequest> requestEntity = new HttpEntity<>(request);
 
 			String requestUrl = "/api/v1/users";
 
 			// act
-			ParameterizedTypeReference<ApiResponse<UsersResponse>> responseType = new ParameterizedTypeReference<>() {
+			ParameterizedTypeReference<ApiResponse<UserDto.V1.UserResponse>> responseType = new ParameterizedTypeReference<>() {
 			};
-			ResponseEntity<ApiResponse<UsersResponse>> response =
+			ResponseEntity<ApiResponse<UserDto.V1.UserResponse>> response =
 				testRestTemplate.exchange(requestUrl, HttpMethod.POST, requestEntity, responseType);
 
 			// assert
-			UsersResponse responseData = response.getBody().data();
+			UserDto.V1.UserResponse responseData = response.getBody().data();
 
 			assertAll(
 				() -> assertTrue(response.getStatusCode().is2xxSuccessful()),
@@ -88,10 +86,9 @@ public class UserV1ApiE2ETest {
 			String name = "양희태";
 			String email = "yht0827@naver.com";
 			String birthday = "1999-01-01";
-			String gender = null;
 
-			UsersRequest request = new UsersRequest(userId, name, email, birthday, gender);
-			HttpEntity<UsersRequest> requestEntity = new HttpEntity<>(request);
+			UserDto.V1.UserRequest request = new UserDto.V1.UserRequest(userId, name, email, birthday, null);
+			HttpEntity<UserDto.V1.UserRequest> requestEntity = new HttpEntity<>(request);
 
 			String requestUrl = "/api/v1/users";
 
@@ -116,13 +113,13 @@ public class UserV1ApiE2ETest {
 			String email = "yht0827@naver.com";
 			String birthday = "1999-01-01";
 			String gender = "M";
-			UsersRequest postRequest = new UsersRequest(userId, name, email, birthday, gender);
-			HttpEntity<UsersRequest> postRequestEntity = new HttpEntity<>(postRequest);
+			UserDto.V1.UserRequest postRequest = new UserDto.V1.UserRequest(userId, name, email, birthday, gender);
+			HttpEntity<UserDto.V1.UserRequest> postRequestEntity = new HttpEntity<>(postRequest);
 			String postRequestUrl = "/api/v1/users";
 
-			ParameterizedTypeReference<ApiResponse<UsersResponse>> postResponseType = new ParameterizedTypeReference<>() {
+			ParameterizedTypeReference<ApiResponse<UserDto.V1.UserResponse>> postResponseType = new ParameterizedTypeReference<>() {
 			};
-			ResponseEntity<ApiResponse<UsersResponse>> postResponse =
+			ResponseEntity<ApiResponse<UserDto.V1.UserResponse>> postResponse =
 				testRestTemplate.exchange(postRequestUrl, HttpMethod.POST, postRequestEntity, postResponseType);
 			String createdUserId = postResponse.getBody().data().userId();
 
@@ -131,13 +128,13 @@ public class UserV1ApiE2ETest {
 			headers.add("X-USER-ID", createdUserId);
 			HttpEntity<Object> getRequestEntity = new HttpEntity<>(headers);
 
-			ParameterizedTypeReference<ApiResponse<UsersResponse>> getResponseType = new ParameterizedTypeReference<>() {
+			ParameterizedTypeReference<ApiResponse<UserDto.V1.UserResponse>> getResponseType = new ParameterizedTypeReference<>() {
 			};
-			ResponseEntity<ApiResponse<UsersResponse>> getResponse =
+			ResponseEntity<ApiResponse<UserDto.V1.UserResponse>> getResponse =
 				testRestTemplate.exchange("/api/v1/users/me", HttpMethod.GET, getRequestEntity, getResponseType);
 
 			// assert
-			UsersResponse responseData = getResponse.getBody().data();
+			UserDto.V1.UserResponse responseData = getResponse.getBody().data();
 			assertAll(
 				() -> assertThat(getResponse.getStatusCode()).isEqualTo(HttpStatus.OK),
 				() -> assertThat(responseData.userId()).isEqualTo(userId),

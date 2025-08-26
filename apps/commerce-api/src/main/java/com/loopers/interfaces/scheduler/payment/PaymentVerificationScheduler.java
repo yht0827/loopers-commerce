@@ -1,4 +1,4 @@
-package com.loopers.infrastructure.scheduler;
+package com.loopers.interfaces.scheduler.payment;
 
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
