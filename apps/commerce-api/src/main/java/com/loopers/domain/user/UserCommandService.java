@@ -1,27 +1,17 @@
 package com.loopers.domain.user;
 
-import static com.loopers.support.error.ErrorMessage.*;
-import static com.loopers.support.error.ErrorType.*;
-
-import org.springframework.stereotype.Component;
-
-import com.loopers.support.error.CoreException;
+import org.springframework.stereotype.Service;
 
 import lombok.RequiredArgsConstructor;
 
-@Component
+@Service
 @RequiredArgsConstructor
 public class UserCommandService {
+	private final UserValidator userValidator;
 	private final UserRepository userRepository;
 
 	public User createUser(final User user) {
-		final String userId = user.getUserId().userId();
-
-		boolean isExisted = userRepository.existsByUserId(userId);
-		if (isExisted) {
-			throw new CoreException(BAD_REQUEST, USER_ID_ALREADY_EXISTS.getMessage());
-		}
-
+		userValidator.validateUniqueUserId(user.getUserId());
 		return userRepository.save(user);
 	}
 }

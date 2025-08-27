@@ -1,27 +1,14 @@
 package com.loopers.domain.point;
 
-import static com.loopers.support.error.ErrorMessage.*;
-import static com.loopers.support.error.ErrorType.*;
-
-import org.springframework.stereotype.Component;
-
-import com.loopers.support.error.CoreException;
+import org.springframework.stereotype.Service;
 
 import lombok.RequiredArgsConstructor;
 
-@Component
+@Service
 @RequiredArgsConstructor
 public class PointCommandService {
-	private final PointRepository pointRepository;
 
-	public Point chargePoint(final Point sourcePoint) {
-		final String userId = sourcePoint.getUserId().userId();
-
-		Point existingPoint = pointRepository.findByUsersId(userId)
-			.orElseThrow(() -> new CoreException(NOT_FOUND, POINT_NOT_FOUND.format(userId)));
-
-		existingPoint.charge(sourcePoint.getBalance());
-
-		return pointRepository.save(existingPoint);
+	public void chargePoint(final Point point, final Balance chargeAmount) {
+		point.chargeBalance(chargeAmount);
 	}
 }

@@ -25,4 +25,7 @@ public record Balance(BigDecimal balance) {
 		return new Balance(this.balance.add(amount.balance()));
 	}
 
+	public static Balance of(final BigDecimal amount) {
+		return new Balance(amount);
+	}
 }

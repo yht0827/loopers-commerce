@@ -61,7 +61,7 @@ public class PointV1ApiE2ETest {
 			pointJpaRepository.save(new Point(new UserId(TEST_USER_ID), balance));
 
 			// act
-			ResponseEntity<ApiResponse<PointDto.V1.BalanceResponse>> response = getPointBalance(TEST_USER_ID);
+			ResponseEntity<ApiResponse<PointDto.V1.BalanceResponse>> response = getPointBalance();
 
 			// assert
 			PointDto.V1.BalanceResponse responseData = response.getBody().data();
@@ -80,7 +80,8 @@ public class PointV1ApiE2ETest {
 			HttpEntity<Void> entity = new HttpEntity<>(headers);
 
 			// act
-			ParameterizedTypeReference<ApiResponse<PointDto.V1.BalanceResponse>> responseType = new ParameterizedTypeReference<>() {};
+			ParameterizedTypeReference<ApiResponse<PointDto.V1.BalanceResponse>> responseType = new ParameterizedTypeReference<>() {
+			};
 			ResponseEntity<ApiResponse<PointDto.V1.BalanceResponse>> response =
 				testRestTemplate.exchange("/api/v1/points", HttpMethod.GET, entity, responseType);
 
@@ -102,7 +103,7 @@ public class PointV1ApiE2ETest {
 			pointJpaRepository.save(new Point(new UserId(TEST_USER_ID), initialBalance));
 
 			// act
-			ResponseEntity<ApiResponse<PointDto.V1.BalanceResponse>> response = chargePoint(TEST_USER_ID, CHARGE_AMOUNT);
+			ResponseEntity<ApiResponse<PointDto.V1.BalanceResponse>> response = chargeBalancePoint(TEST_USER_ID);
 
 			// assert
 			assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
@@ -114,7 +115,7 @@ public class PointV1ApiE2ETest {
 		@DisplayName("존재하지 않는 유저로 요청할 경우, 404 Not Found 응답을 반환한다.")
 		void chargePoint_fail_when_user_not_found() {
 			// act
-			ResponseEntity<ApiResponse<PointDto.V1.BalanceResponse>> response = chargePoint(NON_EXISTENT_USER_ID, CHARGE_AMOUNT);
+			ResponseEntity<ApiResponse<PointDto.V1.BalanceResponse>> response = chargeBalancePoint(NON_EXISTENT_USER_ID);
 
 			// assert
 			assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
@@ -122,20 +123,22 @@ public class PointV1ApiE2ETest {
 
 	}
 
-	private ResponseEntity<ApiResponse<PointDto.V1.BalanceResponse>> getPointBalance(String userId) {
+	private ResponseEntity<ApiResponse<PointDto.V1.BalanceResponse>> getPointBalance() {
 		HttpHeaders headers = new HttpHeaders();
-		headers.add("X-USER-ID", userId);
+		headers.add("X-USER-ID", PointV1ApiE2ETest.TEST_USER_ID);
 		HttpEntity<Object> request = new HttpEntity<>(headers);
 
-		ParameterizedTypeReference<ApiResponse<PointDto.V1.BalanceResponse>> responseType = new ParameterizedTypeReference<>() {};
+		ParameterizedTypeReference<ApiResponse<PointDto.V1.BalanceResponse>> responseType = new ParameterizedTypeReference<>() {
+		};
 		return testRestTemplate.exchange("/api/v1/points", HttpMethod.GET, request, responseType);
 	}
 
-	private ResponseEntity<ApiResponse<PointDto.V1.BalanceResponse>> chargePoint(String userId, BigDecimal amount) {
-		PointDto.V1.ChargePointRequest pointRequest = new PointDto.V1.ChargePointRequest(userId, amount);
+	private ResponseEntity<ApiResponse<PointDto.V1.BalanceResponse>> chargeBalancePoint(String userId) {
+		PointDto.V1.ChargePointRequest pointRequest = new PointDto.V1.ChargePointRequest(userId, PointV1ApiE2ETest.CHARGE_AMOUNT);
 		HttpEntity<PointDto.V1.ChargePointRequest> requestEntity = new HttpEntity<>(pointRequest);
 
-		ParameterizedTypeReference<ApiResponse<PointDto.V1.BalanceResponse>> responseType = new ParameterizedTypeReference<>() {};
+		ParameterizedTypeReference<ApiResponse<PointDto.V1.BalanceResponse>> responseType = new ParameterizedTypeReference<>() {
+		};
 		return testRestTemplate.exchange("/api/v1/points/charge", HttpMethod.POST, requestEntity, responseType);
 	}
 }

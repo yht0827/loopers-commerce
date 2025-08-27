@@ -10,12 +10,12 @@ import com.loopers.domain.user.UserQueryService;
 import lombok.RequiredArgsConstructor;
 
 @Service
+@Transactional
 @RequiredArgsConstructor
 public class UserApplicationService {
 	private final UserCommandService userCommandService;
 	private final UserQueryService userQueryService;
 
-	@Transactional
 	public UserInfo createUser(final UserCommand.CreateUser userCommand) {
 		final User user = userCommand.toEntity();
 		User savedUser = userCommandService.createUser(user);

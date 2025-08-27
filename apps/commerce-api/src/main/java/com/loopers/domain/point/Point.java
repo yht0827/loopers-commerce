@@ -25,7 +25,7 @@ public class Point extends BaseEntity {
 		this.balance = balance;
 	}
 
-	public void charge(final Balance balance) {
+	public void chargeBalance(final Balance balance) {
 		this.balance = this.balance.charge(balance);
 	}
 }

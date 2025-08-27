@@ -1,4 +1,4 @@
-package com.loopers.domain.user;
+package com.loopers.application.user;
 
 import static org.assertj.core.api.AssertionsForClassTypes.*;
 import static org.junit.jupiter.api.Assertions.*;
@@ -14,6 +14,13 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
 
 import com.loopers.domain.common.UserId;
+import com.loopers.domain.user.Birthday;
+import com.loopers.domain.user.Email;
+import com.loopers.domain.user.Gender;
+import com.loopers.domain.user.User;
+import com.loopers.domain.user.UserCommandService;
+import com.loopers.domain.user.UserName;
+import com.loopers.domain.user.UserQueryService;
 import com.loopers.infrastructure.user.UserJpaRepository;
 import com.loopers.support.error.CoreException;
 import com.loopers.utils.DatabaseCleanUp;
