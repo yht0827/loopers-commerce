@@ -8,6 +8,8 @@ import org.springframework.transaction.annotation.Transactional;
 import com.loopers.domain.order.OrderData;
 import com.loopers.domain.order.OrderInfo;
 import com.loopers.domain.order.OrderService;
+import com.loopers.domain.order.event.OrderCreatedEvent;
+import com.loopers.support.event.EventPublisher;
 
 import lombok.RequiredArgsConstructor;
 
@@ -17,10 +19,21 @@ public class OrderFacade {
 
 	private final OrderService orderService;
 	private final OrderProcessor orderProcessor;
+	private final EventPublisher eventPublisher;
 
 	@Transactional
 	public OrderResult createOrder(final OrderCommand.CreateOrder command) {
 		OrderInfo orderInfo = orderProcessor.process(command);
+
+		OrderCreatedEvent.PaymentMetadata paymentMetadata = OrderCreatedEvent.PaymentMetadata.of(
+			command.cardType(),
+			command.cardNo(),
+			command.callbackUrl()
+		);
+
+		OrderCreatedEvent orderCreatedEvent = OrderCreatedEvent.from(orderInfo, paymentMetadata);
+		eventPublisher.publish(orderCreatedEvent);
+
 		return OrderResult.from(orderInfo);
 	}
 
