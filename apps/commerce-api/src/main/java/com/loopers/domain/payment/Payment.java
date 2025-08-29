@@ -1,6 +1,7 @@
 package com.loopers.domain.payment;
 
 import com.loopers.domain.BaseEntity;
+import com.loopers.domain.common.OrderId;
 import com.loopers.domain.common.Price;
 import com.loopers.domain.common.UserId;
 import com.loopers.support.error.CoreException;

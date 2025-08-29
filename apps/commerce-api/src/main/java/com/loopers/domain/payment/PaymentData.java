@@ -1,5 +1,6 @@
 package com.loopers.domain.payment;
 
+import com.loopers.domain.common.OrderId;
 import com.loopers.domain.common.Price;
 
 public record PaymentData(

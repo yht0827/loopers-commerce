@@ -40,9 +40,9 @@ public record OrderDto() {
 			}
 		}
 
-		public record OrderResponse(Long orderId, String userId, TotalOrderPrice totalPrice, OrderStatus status) {
+		public record OrderResponse(String orderNumber, String userId, TotalOrderPrice totalPrice, OrderStatus status) {
 			public static OrderResponse from(OrderResult orderResult) {
-				return new OrderResponse(orderResult.orderId(), orderResult.userId(), orderResult.totalPrice(),
+				return new OrderResponse(orderResult.orderNumber(), orderResult.userId(), orderResult.totalPrice(),
 					orderResult.status());
 			}
 		}

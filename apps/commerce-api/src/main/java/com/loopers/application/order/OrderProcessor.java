@@ -34,7 +34,7 @@ public class OrderProcessor {
 
 		CouponDiscountAmount couponDiscountAmount = couponService.applyDiscounts(data.couponId(), totalOrderPrice);
 
-		return orderService.saveOrder(data, items, totalOrderPrice, couponDiscountAmount);
+		return orderService.createOrder(data, items, totalOrderPrice, couponDiscountAmount);
 	}
 
 }

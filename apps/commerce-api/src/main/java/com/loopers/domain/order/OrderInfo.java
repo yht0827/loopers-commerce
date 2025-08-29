@@ -3,7 +3,7 @@ package com.loopers.domain.order;
 import java.util.List;
 
 public record OrderInfo(
-	Long orderId,
+	String orderNumber,
 	String userId,
 	TotalOrderPrice totalPrice,
 	OrderStatus status,
@@ -11,7 +11,7 @@ public record OrderInfo(
 ) {
 	public static OrderInfo from(Order order, List<OrderItem> items) {
 		return new OrderInfo(
-			order.getId(),
+			order.getOrderNumber().orderNumber(),
 			order.getUserId().userId(),
 			order.getTotalOrderPrice(),
 			order.getStatus(),

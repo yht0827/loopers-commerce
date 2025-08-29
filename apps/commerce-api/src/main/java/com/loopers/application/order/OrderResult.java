@@ -1,18 +1,17 @@
 package com.loopers.application.order;
 
-import com.loopers.domain.common.UserId;
 import com.loopers.domain.order.OrderInfo;
 import com.loopers.domain.order.OrderStatus;
 import com.loopers.domain.order.TotalOrderPrice;
 
 public record OrderResult(
-	Long orderId,
+	String orderNumber,
 	String userId,
 	TotalOrderPrice totalPrice,
 	OrderStatus status
 ) {
 
 	public static OrderResult from(OrderInfo info) {
-		return new OrderResult(info.orderId(), info.userId(), info.totalPrice(), info.status());
+		return new OrderResult(info.orderNumber(), info.userId(), info.totalPrice(), info.status());
 	}
 }
