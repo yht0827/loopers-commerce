@@ -6,12 +6,13 @@ import com.loopers.application.order.OrderCommand;
 import com.loopers.application.order.OrderQuery;
 import com.loopers.application.order.OrderResult;
 import com.loopers.domain.order.OrderStatus;
+import com.loopers.domain.payment.CardType;
 
 public record OrderDto() {
 
 	public record V1() {
 
-		public record OrderRequest(List<OrderItemRequest> items, Long couponId, String cardType, String cardNo,
+		public record OrderRequest(List<OrderItemRequest> items, Long couponId, CardType cardType, String cardNo,
 								   String callbackUrl) {
 			public OrderCommand.CreateOrder toCommand(final String userId) {
 				List<OrderCommand.OrderItemCommand> items = this.items.stream()
