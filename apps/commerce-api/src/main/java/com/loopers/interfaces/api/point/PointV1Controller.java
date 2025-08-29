@@ -7,11 +7,11 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.loopers.application.point.facade.PointFacade;
+import com.loopers.application.point.PointApplicationService;
+import com.loopers.application.point.PointCommand;
+import com.loopers.application.point.PointInfo;
+import com.loopers.application.point.PointQuery;
 import com.loopers.interfaces.api.ApiResponse;
-import com.loopers.interfaces.api.point.port.in.PointRequest;
-import com.loopers.interfaces.api.point.port.out.ChargeResponse;
-import com.loopers.interfaces.api.point.port.out.PointResponse;
 
 import lombok.RequiredArgsConstructor;
 
@@ -20,19 +20,23 @@ import lombok.RequiredArgsConstructor;
 @RequestMapping("/api/v1/points")
 public class PointV1Controller implements PointV1ApiSpec {
 
-	private final PointFacade pointFacade;
+	private final PointApplicationService pointApplicationService;
 
 	@PostMapping("/charge")
 	@Override
-	public ApiResponse<ChargeResponse> chargePoint(@RequestBody final PointRequest pointRequest) {
-		ChargeResponse response = ChargeResponse.from(pointFacade.charge(pointRequest.toCommand()));
+	public ApiResponse<PointDto.V1.BalanceResponse> chargePoint(@RequestBody final PointDto.V1.ChargePointRequest request) {
+		PointCommand.ChargePoint command = request.toCommand();
+		PointInfo pointInfo = pointApplicationService.chargePoint(command);
+		PointDto.V1.BalanceResponse response = PointDto.V1.BalanceResponse.from(pointInfo);
 		return ApiResponse.success(response);
 	}
 
 	@GetMapping
 	@Override
-	public ApiResponse<PointResponse> getPoint(@RequestHeader("X-USER-ID") final String userId) {
-		PointResponse response = PointResponse.from(pointFacade.get(userId));
+	public ApiResponse<PointDto.V1.BalanceResponse> getPoint(@RequestHeader("X-USER-ID") final String userId) {
+		PointQuery.GetPoint query = PointQuery.GetPoint.of(userId);
+		PointInfo pointInfo = pointApplicationService.getPoint(query);
+		PointDto.V1.BalanceResponse response = PointDto.V1.BalanceResponse.from(pointInfo);
 		return ApiResponse.success(response);
 	}
 }

@@ -117,4 +117,13 @@ public class ProductService {
 		}
 	}
 
+	public void evictProductCache(Long productId) {
+		productL1Cache.invalidate(CACHE_KEY_PREFIX_PRODUCT_DETAIL + ":" + productId);
+		productL2Cache.delete(CACHE_KEY_PREFIX_PRODUCT_DETAIL + ":" + productId);
+	}
+
+	public void evictProductListCache() {
+		productL1Cache.invalidateAll();
+		productL2Cache.delete(CACHE_KEY_PREFIX_PRODUCT_LIST + ":*");
+	}
 }

@@ -6,6 +6,9 @@ import org.springframework.stereotype.Component;
 
 import com.loopers.domain.like.LikeInfo;
 import com.loopers.domain.like.LikeService;
+import com.loopers.domain.like.event.ProductLikedEvent;
+import com.loopers.domain.like.event.ProductUnLikedEvent;
+import com.loopers.support.event.EventPublisher;
 
 import lombok.RequiredArgsConstructor;
 
@@ -14,14 +17,22 @@ import lombok.RequiredArgsConstructor;
 public class LikeFacade {
 
 	private final LikeService likeService;
+	private final EventPublisher eventPublisher;
 
 	public LikeResult likeProduct(Long userId, Long productId) {
 		LikeInfo likeInfo = likeService.likeProduct(userId, productId);
+
+		ProductLikedEvent event = ProductLikedEvent.create(userId.toString(), productId);
+		eventPublisher.publish(event);
+
 		return LikeResult.from(likeInfo);
 	}
 
 	public void unlikeProduct(Long userId, Long productId) {
 		likeService.unlikeProduct(userId, productId);
+
+		ProductUnLikedEvent event = ProductUnLikedEvent.create(userId.toString(), productId);
+		eventPublisher.publish(event);
 	}
 
 	public List<LikeResult> getLikedProductList(Long userId) {

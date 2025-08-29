@@ -11,14 +11,7 @@ import lombok.RequiredArgsConstructor;
 @Component
 @RequiredArgsConstructor
 public class PaymentFacade {
-	private final PaymentProcessor paymentProcessor;
 	private final PaymentService paymentService;
-
-	@Transactional
-	public PaymentResult createPayment(final PaymentCommand.CreatePayment command) {
-		PaymentInfo paymentInfo = paymentProcessor.process(command);
-		return PaymentResult.from(paymentInfo);
-	}
 
 	@Transactional
 	public PaymentResult processCallback(final PaymentCommand.ProcessCallback command) {
