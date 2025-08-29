@@ -3,9 +3,9 @@ package com.loopers.domain.order;
 import java.util.List;
 
 public record OrderInfo(
-	String orderNumber,
+	String orderId,
 	String userId,
-	TotalOrderPrice totalPrice,
+	Long totalPrice,
 	OrderStatus status,
 	List<OrderItem> items
 ) {
@@ -13,7 +13,7 @@ public record OrderInfo(
 		return new OrderInfo(
 			order.getOrderNumber().orderNumber(),
 			order.getUserId().userId(),
-			order.getTotalOrderPrice(),
+			order.getTotalOrderPrice().totalPrice(),
 			order.getStatus(),
 			items
 		);

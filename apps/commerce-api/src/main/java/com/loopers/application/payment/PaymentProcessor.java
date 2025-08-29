@@ -18,13 +18,10 @@ public class PaymentProcessor {
 	public PaymentInfo process(PaymentCommand.CreatePayment command) {
 		PaymentData.PaymentRequest data = command.toData();
 
-		// 결제 생성
 		paymentService.createPayment(data);
 
-		// PG 결제 요청 (fallback 포함)
 		PaymentInfo.transaction pgResponse = paymentGatewayService.requestPaymentGateWay(data);
 
-		// PG 응답 기반으로 결제 정보 업데이트
 		return paymentService.updatePaymentStatus(data, pgResponse);
 	}
 }

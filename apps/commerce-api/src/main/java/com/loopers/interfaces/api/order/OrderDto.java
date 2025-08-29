@@ -6,19 +6,19 @@ import com.loopers.application.order.OrderCommand;
 import com.loopers.application.order.OrderQuery;
 import com.loopers.application.order.OrderResult;
 import com.loopers.domain.order.OrderStatus;
-import com.loopers.domain.order.TotalOrderPrice;
 
 public record OrderDto() {
 
 	public record V1() {
 
-		public record OrderRequest(List<OrderItemRequest> items, Long couponId) {
+		public record OrderRequest(List<OrderItemRequest> items, Long couponId, String cardType, String cardNo,
+								   String callbackUrl) {
 			public OrderCommand.CreateOrder toCommand(final String userId) {
 				List<OrderCommand.OrderItemCommand> items = this.items.stream()
 					.map(OrderItemRequest::toCommand)
 					.toList();
 
-				return new OrderCommand.CreateOrder(userId, items, couponId);
+				return new OrderCommand.CreateOrder(userId, items, couponId, cardType, cardNo, callbackUrl);
 			}
 		}
 
@@ -40,9 +40,9 @@ public record OrderDto() {
 			}
 		}
 
-		public record OrderResponse(String orderNumber, String userId, TotalOrderPrice totalPrice, OrderStatus status) {
+		public record OrderResponse(String orderId, String userId, Long totalPrice, OrderStatus status) {
 			public static OrderResponse from(OrderResult orderResult) {
-				return new OrderResponse(orderResult.orderNumber(), orderResult.userId(), orderResult.totalPrice(),
+				return new OrderResponse(orderResult.orderId(), orderResult.userId(), orderResult.totalPrice(),
 					orderResult.status());
 			}
 		}
