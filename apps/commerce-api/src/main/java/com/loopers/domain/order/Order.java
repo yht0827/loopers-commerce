@@ -2,6 +2,8 @@ package com.loopers.domain.order;
 
 import com.loopers.domain.BaseEntity;
 import com.loopers.domain.common.UserId;
+import com.loopers.support.error.CoreException;
+import com.loopers.support.error.ErrorType;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -53,4 +55,21 @@ public class Order extends BaseEntity {
 			.status(OrderStatus.PENDING)
 			.build();
 	}
+
+	public void updateOrderStatus(OrderStatus newStatus) {
+		if (status == OrderStatus.CONFIRMED) {
+			throw new CoreException(ErrorType.BAD_REQUEST, "이미 완료된 주문은 변경할 수 없습니다.");
+		}
+
+		this.status = newStatus;
+	}
+
+	public void processPaymentSuccess() {
+		updateOrderStatus(OrderStatus.CONFIRMED);
+	}
+
+	public void processPaymentFailed() {
+		updateOrderStatus(OrderStatus.CANCELLED);
+	}
+
 }

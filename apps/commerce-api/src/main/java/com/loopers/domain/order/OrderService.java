@@ -66,4 +66,17 @@ public class OrderService {
 
 		return OrderInfo.from(order, orderItems);
 	}
+
+	@Transactional
+	public void updateOrderStatus(final String orderId, final OrderStatus status) {
+		Order order = orderRepository.findByOrderNumber(orderId)
+			.orElseThrow(() -> new CoreException(ErrorType.NOT_FOUND, "주문을 찾을 수 없습니다."));
+
+		switch (status) {
+			case CONFIRMED -> order.processPaymentSuccess();
+			case CANCELLED -> order.processPaymentFailed();
+		}
+
+	}
+
 }
