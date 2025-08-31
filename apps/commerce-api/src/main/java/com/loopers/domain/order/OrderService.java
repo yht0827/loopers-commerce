@@ -25,7 +25,7 @@ public class OrderService {
 		return TotalOrderPrice.of(orderItems);
 	}
 
-	public OrderInfo saveOrder(OrderData.CreateOrder data, List<OrderItem> orderItems, TotalOrderPrice totalOrderPrice,
+	public OrderInfo createOrder(OrderData.CreateOrder data, List<OrderItem> orderItems, TotalOrderPrice totalOrderPrice,
 		CouponDiscountAmount couponDiscountAmount) {
 
 		Order order = Order.create(data, totalOrderPrice, couponDiscountAmount);
@@ -43,7 +43,9 @@ public class OrderService {
 			return Collections.emptyList();
 		}
 
-		List<Long> orderIds = orderList.stream().map(Order::getId).collect(Collectors.toList());
+		List<String> orderIds = orderList.stream()
+			.map(order -> order.getId().toString())
+			.toList();
 
 		List<OrderItem> allOrderItems = orderItemRepository.findAllByOrderIdIn(orderIds);
 
@@ -60,8 +62,21 @@ public class OrderService {
 		Order order = orderRepository.findByIdAndUserId(data.orderId(), data.userId())
 			.orElseThrow(() -> new CoreException(ErrorType.NOT_FOUND, "주문을 찾을 수 없습니다."));
 
-		List<OrderItem> orderItems = orderItemRepository.findAllByOrderId(data.orderId());
+		List<OrderItem> orderItems = orderItemRepository.findAllByOrderId(order.getOrderNumber().orderNumber());
 
 		return OrderInfo.from(order, orderItems);
 	}
+
+	@Transactional
+	public void updateOrderStatus(final String orderId, final OrderStatus status) {
+		Order order = orderRepository.findByOrderNumber(orderId)
+			.orElseThrow(() -> new CoreException(ErrorType.NOT_FOUND, "주문을 찾을 수 없습니다."));
+
+		switch (status) {
+			case CONFIRMED -> order.processPaymentSuccess();
+			case CANCELLED -> order.processPaymentFailed();
+		}
+
+	}
+
 }

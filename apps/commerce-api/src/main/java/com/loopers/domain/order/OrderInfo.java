@@ -3,17 +3,17 @@ package com.loopers.domain.order;
 import java.util.List;
 
 public record OrderInfo(
-	Long orderId,
+	String orderId,
 	String userId,
-	TotalOrderPrice totalPrice,
+	Long totalPrice,
 	OrderStatus status,
 	List<OrderItem> items
 ) {
 	public static OrderInfo from(Order order, List<OrderItem> items) {
 		return new OrderInfo(
-			order.getId(),
+			order.getOrderNumber().orderNumber(),
 			order.getUserId().userId(),
-			order.getTotalOrderPrice(),
+			order.getTotalOrderPrice().totalPrice(),
 			order.getStatus(),
 			items
 		);
