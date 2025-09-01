@@ -20,12 +20,9 @@ public class DataPlatformEventHandler {
 	private final DataPlatformService dataPlatformService;
 
 	@EventListener
-	public void handleDataPlatformSync(DomainApplicationEvent event) {
-		if (!event.isPayloadOfType(DataPlatformEvent.class)) {
-			return;
-		}
+	public void handleDataPlatformSync(DomainApplicationEvent<DataPlatformEvent> event) {
 
-		DataPlatformEvent dataPlatformEvent = event.getPayload(DataPlatformEvent.class);
+		DataPlatformEvent dataPlatformEvent = event.getPayload();
 		processDataPlatformSync(dataPlatformEvent);
 	}
 

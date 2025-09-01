@@ -25,12 +25,8 @@ public class OrderEventHandler {
 	private final ObjectMapper objectMapper;
 
 	@EventListener
-	public void handleOrderCreated(DomainApplicationEvent event) {
-		if (event.isPayloadOfType(OrderCreatedEvent.class)) {
-			return;
-		}
-
-		OrderCreatedEvent orderCreatedEvent = event.getPayload(OrderCreatedEvent.class);
+	public void handleOrderCreated(DomainApplicationEvent<OrderCreatedEvent> event) {
+		OrderCreatedEvent orderCreatedEvent = event.getPayload();
 		processOrderCreated(orderCreatedEvent);
 	}
 

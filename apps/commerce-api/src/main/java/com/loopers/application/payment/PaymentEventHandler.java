@@ -29,12 +29,9 @@ public class PaymentEventHandler {
 	private final ObjectMapper objectMapper;
 
 	@EventListener
-	public void handlePaymentRequest(DomainApplicationEvent event) {
-		if (event.isPayloadOfType(PaymentRequestEvent.class)) {
-			return;
-		}
+	public void handlePaymentRequest(DomainApplicationEvent<PaymentRequestEvent> event) {
 
-		PaymentRequestEvent paymentRequestEvent = event.getPayload(PaymentRequestEvent.class);
+		PaymentRequestEvent paymentRequestEvent = event.getPayload();
 		processPaymentRequest(paymentRequestEvent);
 	}
 

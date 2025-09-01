@@ -22,22 +22,16 @@ public class OrderStatusUpdateHandler {
 	private final OrderService orderService;
 
 	@EventListener
-	public void handlePaymentCompleted(DomainApplicationEvent event) {
-		if (!event.isPayloadOfType(PaymentCompletedEvent.class)) {
-			return;
-		}
+	public void handlePaymentCompleted(DomainApplicationEvent<PaymentCompletedEvent> event) {
 
-		PaymentCompletedEvent paymentCompletedEvent = event.getPayload(PaymentCompletedEvent.class);
+		PaymentCompletedEvent paymentCompletedEvent = event.getPayload();
 		processPaymentCompleted(paymentCompletedEvent);
 	}
 
 	@EventListener
-	public void handlePaymentFailed(DomainApplicationEvent event) {
-		if (!event.isPayloadOfType(PaymentFailedEvent.class)) {
-			return;
-		}
+	public void handlePaymentFailed(DomainApplicationEvent<PaymentFailedEvent> event) {
 
-		PaymentFailedEvent paymentFailedEvent = event.getPayload(PaymentFailedEvent.class);
+		PaymentFailedEvent paymentFailedEvent = event.getPayload();
 		processPaymentFailed(paymentFailedEvent);
 	}
 
