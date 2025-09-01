@@ -7,11 +7,7 @@ import org.springframework.data.domain.PageRequest;
 import com.loopers.application.product.ProductCriteria;
 import com.loopers.application.product.ProductDetailResult;
 import com.loopers.application.product.ProductListResult;
-import com.loopers.domain.common.Price;
-import com.loopers.domain.common.Quantity;
-import com.loopers.domain.product.LikeCount;
 import com.loopers.domain.product.ProductInfo;
-import com.loopers.domain.product.ProductName;
 import com.loopers.domain.product.ProductSortType;
 
 import jakarta.validation.constraints.Positive;
@@ -39,11 +35,12 @@ public record ProductDto() {
 			}
 		}
 
-		public record ProductDetailResponse(Long productId, ProductName productName, Price price, LikeCount likeCount,
-											Quantity quantity) {
+		public record ProductDetailResponse(Long productId, String productName, Long price, Long quantity, String bradName,
+											Long likeCount) {
 			public static ProductDetailResponse from(final ProductDetailResult productDetailResult) {
-				return new ProductDetailResponse(productDetailResult.productId(), productDetailResult.productName(),
-					productDetailResult.price(), productDetailResult.likeCount(), productDetailResult.quantity());
+				return new ProductDetailResponse(
+					productDetailResult.productId(), productDetailResult.productName(), productDetailResult.price(),
+					productDetailResult.quantity(), productDetailResult.bradName(), productDetailResult.likeCount());
 			}
 		}
 

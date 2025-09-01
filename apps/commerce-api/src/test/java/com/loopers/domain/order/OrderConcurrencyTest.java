@@ -1,37 +1,14 @@
 package com.loopers.domain.order;
 
-import java.math.BigDecimal;
-import java.time.ZonedDateTime;
-import java.util.concurrent.ThreadLocalRandom;
-
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 
 import com.loopers.application.order.OrderFacade;
-import com.loopers.domain.brand.Brand;
-import com.loopers.domain.brand.BrandName;
-import com.loopers.domain.common.BrandId;
-import com.loopers.domain.common.Price;
-import com.loopers.domain.common.ProductId;
-import com.loopers.domain.common.Quantity;
-import com.loopers.domain.common.UserId;
 import com.loopers.domain.coupon.Coupon;
-import com.loopers.domain.coupon.CouponExpiredAt;
-import com.loopers.domain.coupon.CouponIssuedAt;
-import com.loopers.domain.coupon.CouponName;
-import com.loopers.domain.coupon.CouponStatus;
-import com.loopers.domain.coupon.CouponType;
-import com.loopers.domain.coupon.CouponUsedAt;
-import com.loopers.domain.coupon.DiscountValue;
-import com.loopers.domain.coupon.MaxDisCountAmount;
-import com.loopers.domain.point.Balance;
 import com.loopers.domain.point.Point;
-import com.loopers.domain.product.LikeCount;
 import com.loopers.domain.product.Product;
-import com.loopers.domain.product.ProductName;
 import com.loopers.domain.product.ProductRepository;
 import com.loopers.infrastructure.brand.BrandJpaRepository;
 import com.loopers.infrastructure.coupon.CouponJpaRepository;
@@ -75,7 +52,7 @@ public class OrderConcurrencyTest {
 	private Product product;
 	private Point point;
 	private Coupon coupon;
-
+/*
 	@BeforeEach
 	void setUp() {
 		productJpaRepository.deleteAll();
@@ -88,7 +65,7 @@ public class OrderConcurrencyTest {
 		Brand brand1 = brandRepository.save(brand);
 
 		product = new Product(new BrandId(brand1.getId()), new ProductName("티셔츠"),
-			new Price(1000L), new LikeCount(10L), new Quantity(10L));
+			new Price(1000L), new Quantity(10L));
 
 		point = new Point(new UserId("yht0827"), new Balance(BigDecimal.valueOf(10000L)));
 
@@ -107,7 +84,7 @@ public class OrderConcurrencyTest {
 		pointJpaRepository.save(point);
 		productJpaRepository.save(product);
 	}
-/*
+
 	@Test
 	@DisplayName("동일한 상품에 대해 여러 주문이 동시에 요청되어도, 재고가 정상적으로 차감되어야 한다")
 	void createLike_concurrency_with_lock() throws InterruptedException {

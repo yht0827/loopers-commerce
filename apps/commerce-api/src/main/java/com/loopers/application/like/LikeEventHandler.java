@@ -1,17 +1,15 @@
 package com.loopers.application.like;
 
+import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.event.TransactionPhase;
-import org.springframework.transaction.event.TransactionalEventListener;
 
+import com.loopers.domain.common.ProductId;
 import com.loopers.domain.like.event.ProductLikedEvent;
 import com.loopers.domain.like.event.ProductUnLikedEvent;
 import com.loopers.domain.product.LikeCount;
-import com.loopers.domain.product.Product;
-import com.loopers.domain.product.ProductRepository;
+import com.loopers.domain.product.ProductAggregate;
+import com.loopers.domain.product.ProductAggregateRepository;
 import com.loopers.domain.product.ProductService;
-import com.loopers.support.error.CoreException;
-import com.loopers.support.error.ErrorType;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -22,35 +20,43 @@ import lombok.extern.slf4j.Slf4j;
 public class LikeEventHandler {
 
 	private final ProductService productService;
-	private final ProductRepository productRepository;
+	private final ProductAggregateRepository productAggregateRepository;
 
-	@TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
+	@EventListener
 	public void handleProductLiked(ProductLikedEvent event) {
+		// Update Query로 원자적 처리
+		boolean success = productAggregateRepository.tryIncrementLikeCount(event.productId());
 
-		Product product = productRepository.findById(event.productId())
-			.orElseThrow(() -> new CoreException(ErrorType.NOT_FOUND, "상품을 찾을 수 없습니다."));
-
-		LikeCount likeCount = product.getLikeCount().increase();
-		product.updateLikeCount(likeCount);
+		if (!success) {
+			// 집계 테이블에 없으면 생성 후 재시도
+			createNewProductAggregate(event.productId());
+			productAggregateRepository.tryIncrementLikeCount(event.productId());
+			log.info("새로운 ProductAggregate 생성 및 좋아요 증가: {}", event.productId());
+		} else {
+			log.debug("좋아요 수 증가 완료: {}", event.productId());
+		}
 
 		// 캐시 무효화
 		productService.evictProductCache(event.productId());
 		productService.evictProductListCache();
 	}
 
-	@TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
+	@EventListener
 	public void handleProductUnliked(ProductUnLikedEvent event) {
-
-		Product product = productRepository.findById(event.productId())
-			.orElseThrow(() -> new CoreException(ErrorType.NOT_FOUND, "상품을 찾을 수 없습니다."));
-
-		// 상품의 좋아요 수 감소
-		LikeCount likeCount = product.getLikeCount().decrease();
-		product.updateLikeCount(likeCount);
+		productAggregateRepository.tryDecrementLikeCount(event.productId());
 
 		// 캐시 무효화
 		productService.evictProductCache(event.productId());
 		productService.evictProductListCache();
+	}
+
+	private void createNewProductAggregate(Long productId) {
+		ProductAggregate newAggregate = ProductAggregate.builder()
+			.productId(new ProductId(productId))
+			.likeCount(LikeCount.Zero())
+			.build();
+
+		productAggregateRepository.save(newAggregate);
 	}
 
 }
