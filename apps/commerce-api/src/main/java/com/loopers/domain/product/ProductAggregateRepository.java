@@ -11,12 +11,12 @@ public interface ProductAggregateRepository {
 	Optional<ProductAggregate> findByProductIdWithPessimisticLock(final Long productId);
 
 	Optional<ProductAggregate> findById(final Long id);
-	
-	ProductAggregate save(final ProductAggregate productAggregate);
-	
-	// Update Query 메서드들 (도메인 친화적)
-	boolean tryIncrementLikeCount(final Long productId);
-	
-	boolean tryDecrementLikeCount(final Long productId);
 
+	ProductAggregate save(final ProductAggregate productAggregate);
+
+	boolean incrementLikeCount(final Long productId);
+
+	boolean decrementLikeCount(final Long productId);
+
+	boolean existsByProductId(final Long productId);
 }

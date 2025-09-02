@@ -1,4 +1,4 @@
-package com.loopers.domain.like.event;
+package com.loopers.domain.product.event;
 
 import com.loopers.support.event.Event;
 

@@ -34,22 +34,25 @@ public class ProductAggregateRepositoryImpl implements ProductAggregateRepositor
 	public Optional<ProductAggregate> findById(final Long id) {
 		return productAggregateJpaRepository.findById(id);
 	}
-	
+
 	@Override
 	public ProductAggregate save(final ProductAggregate productAggregate) {
 		return productAggregateJpaRepository.save(productAggregate);
 	}
-	
+
 	@Override
-	public boolean tryIncrementLikeCount(final Long productId) {
-		int updatedRows = productAggregateJpaRepository.incrementLikeCount(productId);
-		return updatedRows > 0;
+	public boolean incrementLikeCount(final Long productId) {
+		return productAggregateJpaRepository.incrementLikeCount(productId);
 	}
-	
+
 	@Override
-	public boolean tryDecrementLikeCount(final Long productId) {
-		int updatedRows = productAggregateJpaRepository.decrementLikeCount(productId);
-		return updatedRows > 0;
+	public boolean decrementLikeCount(final Long productId) {
+		return productAggregateJpaRepository.decrementLikeCount(productId);
+	}
+
+	@Override
+	public boolean existsByProductId(final Long productId) {
+		return productAggregateJpaRepository.existsByProductId(productId);
 	}
 
 }

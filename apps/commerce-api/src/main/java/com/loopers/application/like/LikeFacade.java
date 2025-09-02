@@ -7,8 +7,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.loopers.domain.like.LikeInfo;
 import com.loopers.domain.like.LikeService;
-import com.loopers.domain.like.event.ProductLikedEvent;
-import com.loopers.domain.like.event.ProductUnLikedEvent;
+import com.loopers.domain.product.event.ProductLikedEvent;
+import com.loopers.domain.product.event.ProductUnLikedEvent;
 import com.loopers.support.event.EventPublisher;
 
 import lombok.RequiredArgsConstructor;

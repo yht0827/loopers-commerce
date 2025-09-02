@@ -25,12 +25,14 @@ public interface ProductAggregateJpaRepository extends JpaRepository<ProductAggr
 	@Query("SELECT pa FROM ProductAggregate pa WHERE pa.productId.productId = :productId")
 	Optional<ProductAggregate> findByProductId(final Long productId);
 
-	// Update Query 메서드들
 	@Modifying
 	@Query("UPDATE ProductAggregate pa SET pa.likeCount.likeCount = pa.likeCount.likeCount + 1 WHERE pa.productId.productId = :productId")
-	int incrementLikeCount(@Param("productId") Long productId);
+	boolean incrementLikeCount(@Param("productId") Long productId);
 
 	@Modifying
 	@Query("UPDATE ProductAggregate pa SET pa.likeCount.likeCount = CASE WHEN pa.likeCount.likeCount > 0 THEN pa.likeCount.likeCount - 1 ELSE 0 END WHERE pa.productId.productId = :productId")
-	int decrementLikeCount(@Param("productId") Long productId);
+	boolean decrementLikeCount(@Param("productId") Long productId);
+
+	@Query("SELECT COUNT(pa) > 0 FROM ProductAggregate pa WHERE pa.productId.productId = :productId")
+	boolean existsByProductId(Long productId);
 }
