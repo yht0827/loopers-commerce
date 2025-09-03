@@ -3,6 +3,7 @@ dependencies {
     implementation(project(":modules:jpa"))
     implementation(project(":modules:redis"))
     implementation(project(":modules:cache"))
+    implementation(project(":modules:kafka"))
     implementation(project(":modules:feign"))
     implementation(project(":modules:resilience"))
     implementation(project(":supports:jackson"))

@@ -60,9 +60,9 @@ public class KafkaConfig {
 		KafkaProperties kafkaProperties, ByteArrayJsonMessageConverter converter) {
 
 		Map<String, Object> consumerConfig = new HashMap<>(kafkaProperties.buildConsumerProperties());
-		consumerConfig.put(ConsumerConfig.MAX_POLL_RECORDS_CONFIG, MAX_POLLING_SIZE);
-		consumerConfig.put(ConsumerConfig.FETCH_MIN_BYTES_CONFIG, FETCH_MIN_BYTES);
-		consumerConfig.put(ConsumerConfig.FETCH_MAX_WAIT_MS_CONFIG, FETCH_MAX_WAIT_MS);
+		consumerConfig.put(ConsumerConfig.MAX_POLL_RECORDS_CONFIG, MAX_POLLING_SIZE);  // 한 번에 가져올 레코드 수
+		consumerConfig.put(ConsumerConfig.FETCH_MIN_BYTES_CONFIG, FETCH_MIN_BYTES); // 최소 fetch 크기
+		consumerConfig.put(ConsumerConfig.FETCH_MAX_WAIT_MS_CONFIG, FETCH_MAX_WAIT_MS); // 최대 대기 시간
 		consumerConfig.put(ConsumerConfig.SESSION_TIMEOUT_MS_CONFIG, SESSION_TIMEOUT_MS);
 		consumerConfig.put(ConsumerConfig.HEARTBEAT_INTERVAL_MS_CONFIG, HEARTBEAT_INTERVAL_MS);
 		consumerConfig.put(ConsumerConfig.MAX_POLL_INTERVAL_MS_CONFIG, MAX_POLL_INTERVAL_MS);
@@ -71,8 +71,8 @@ public class KafkaConfig {
 		factory.setConsumerFactory(new DefaultKafkaConsumerFactory<>(consumerConfig));
 		factory.getContainerProperties().setAckMode(ContainerProperties.AckMode.MANUAL); // 수동 커밋
 		factory.setBatchMessageConverter(new BatchMessagingMessageConverter(converter));
-		factory.setConcurrency(3);
-		factory.setBatchListener(true);
+		factory.setConcurrency(3); // 병렬 처리
+		factory.setBatchListener(true);   // 배치 활성화
 
 		return factory;
 	}
