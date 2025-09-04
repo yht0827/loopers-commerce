@@ -27,11 +27,11 @@ public interface ProductAggregateJpaRepository extends JpaRepository<ProductAggr
 
 	@Modifying
 	@Query("UPDATE ProductAggregate pa SET pa.likeCount.likeCount = pa.likeCount.likeCount + 1 WHERE pa.productId.productId = :productId")
-	boolean incrementLikeCount(@Param("productId") Long productId);
+	int incrementLikeCount(@Param("productId") Long productId);
 
 	@Modifying
 	@Query("UPDATE ProductAggregate pa SET pa.likeCount.likeCount = CASE WHEN pa.likeCount.likeCount > 0 THEN pa.likeCount.likeCount - 1 ELSE 0 END WHERE pa.productId.productId = :productId")
-	boolean decrementLikeCount(@Param("productId") Long productId);
+	int decrementLikeCount(@Param("productId") Long productId);
 
 	@Query("SELECT COUNT(pa) > 0 FROM ProductAggregate pa WHERE pa.productId.productId = :productId")
 	boolean existsByProductId(Long productId);

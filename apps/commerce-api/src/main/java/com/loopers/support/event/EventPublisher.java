@@ -12,18 +12,13 @@ import lombok.extern.slf4j.Slf4j;
 public class EventPublisher {
 	private final ApplicationEventPublisher springEventPublisher;
 
-	public void publish(Event event) {
-		publish(this, event);
-	}
-
-	public void publish(Object source, Event event) {
-		EventEnvelope<Event> envelope = EventEnvelope.of(event);
-		DomainApplicationEvent domainApplicationEvent = new DomainApplicationEvent(source, envelope);
-
+	public <T extends Event> void publish(T event) {
 		try {
-			springEventPublisher.publishEvent(domainApplicationEvent);
+			Envelope<T> envelope = Envelope.of(event);
+			springEventPublisher.publishEvent(envelope);
+			log.debug("이벤트 발행 성공: {}", event.getClass().getSimpleName());
 		} catch (Exception e) {
-			log.error("이벤트 발행 실패: {} [{}]", envelope.getEventType(), envelope.getEventId(), e);
+			log.error("이벤트 발행 실패: {}", event.getClass().getSimpleName(), e);
 			throw e;
 		}
 	}

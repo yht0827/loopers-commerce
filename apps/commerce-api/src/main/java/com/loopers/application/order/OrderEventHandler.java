@@ -1,16 +1,17 @@
 package com.loopers.application.order;
 
-import org.springframework.context.event.EventListener;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.event.TransactionPhase;
 import org.springframework.transaction.event.TransactionalEventListener;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.loopers.domain.order.OrderService;
+import com.loopers.domain.order.OrderStatus;
 import com.loopers.domain.order.event.OrderCreatedEvent;
-import com.loopers.domain.payment.event.PaymentRequestEvent;
+import com.loopers.domain.payment.event.PaymentCompletedEvent;
+import com.loopers.domain.payment.event.PaymentFailedEvent;
 import com.loopers.domain.platform.event.DataPlatformEvent;
-import com.loopers.support.event.DomainApplicationEvent;
+import com.loopers.support.event.Envelope;
 import com.loopers.support.event.EventPublisher;
 
 import lombok.RequiredArgsConstructor;
@@ -21,51 +22,52 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class OrderEventHandler {
 
+	private final OrderService orderService;
 	private final EventPublisher eventPublisher;
-	private final ObjectMapper objectMapper;
 
-	@EventListener
-	public void handleOrderCreated(DomainApplicationEvent<OrderCreatedEvent> event) {
-		OrderCreatedEvent orderCreatedEvent = event.getPayload();
-		processOrderCreated(orderCreatedEvent);
-	}
-
+	@Async
 	@TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
-	public void processOrderCreated(OrderCreatedEvent event) {
-
-		sendOrderDataToPlatform(event);
-
-		if (event.paymentMetadata() != null) {
-			PaymentRequestEvent paymentRequestEvent = PaymentRequestEvent.create(
-				event.orderId(),
-				event.userId(),
-				event.totalAmount(),
-				event.paymentMetadata().cardType(),
-				event.paymentMetadata().cardNo(),
-				event.paymentMetadata().callbackUrl()
-			);
-
-			eventPublisher.publish(paymentRequestEvent);
+	public void processPaymentCompleted(Envelope<PaymentCompletedEvent> event) {
+		if (!PaymentCompletedEvent.EVENT_TYPE.equals(event.getEventType())) {
+			return;
 		}
-
-		log.info("주문 생성 후 처리 완료: {}", event.orderId());
+		PaymentCompletedEvent paymentCompletedEvent = event.getPayload();
+		try {
+			orderService.updateOrderStatus(paymentCompletedEvent.getOrderId(), OrderStatus.CONFIRMED);
+			log.info("주문 상태 업데이트 완료: {} -> CONFIRMED", paymentCompletedEvent.orderId());
+		} catch (Exception e) {
+			log.error("결제 완료 후 주문 상태 업데이트 실패: 주문 ID {}", paymentCompletedEvent.orderId(), e);
+		}
 	}
 
-	public void sendOrderDataToPlatform(OrderCreatedEvent event) {
+	@Async
+	@TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
+	public void processPaymentFailed(Envelope<PaymentFailedEvent> event) {
+		if (!PaymentFailedEvent.EVENT_TYPE.equals(event.getEventType())) {
+			return;
+		}
+		PaymentFailedEvent paymentFailedEvent = event.getPayload();
 		try {
+			orderService.updateOrderStatus(paymentFailedEvent.getOrderId(), OrderStatus.CANCELLED);
+			log.info("주문 상태 업데이트 완료: {} -> CANCELLED", paymentFailedEvent.getOrderId());
+		} catch (Exception e) {
+			log.error("결제 실패 후 주문 상태 업데이트 실패: 주문 ID {}", paymentFailedEvent.getOrderId(), e);
+		}
+	}
 
-			String orderData = objectMapper.writeValueAsString(event);
-
-			DataPlatformEvent dataPlatformEvent = DataPlatformEvent.fromOrder(
-				event.orderId(),
-				orderData
-			);
-
+	@Async
+	@TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
+	public void handleOrderCreatedForDataPlatform(Envelope<OrderCreatedEvent> event) {
+		if (!OrderCreatedEvent.EVENT_TYPE.equals(event.getEventType())) {
+			return;
+		}
+		OrderCreatedEvent orderEvent = event.getPayload();
+		try {
+			DataPlatformEvent dataPlatformEvent = DataPlatformEvent.create(orderEvent.getEventType(), orderEvent.getOrderId());
 			eventPublisher.publish(dataPlatformEvent);
-			log.info("주문 데이터 플랫폼 전송 이벤트 발행: {}", event.orderId());
-
-		} catch (JsonProcessingException e) {
-			log.error("주문 데이터 JSON 변환 실패: {}", event.orderId(), e);
+			log.info("주문 생성 이벤트를 데이터 플랫폼 이벤트로 발행: {}", orderEvent.getOrderId());
+		} catch (Exception e) {
+			log.error("데이터 플랫폼 이벤트 발행 실패: 주문 ID {}", orderEvent.getOrderId(), e);
 		}
 	}
 }

@@ -30,6 +30,11 @@ public record ProductLikedEvent(
 	}
 
 	@Override
+	public String getCorrelationId() {
+		return "";
+	}
+
+	@Override
 	public String getUserId() {
 		return userId;
 	}

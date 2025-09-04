@@ -1,19 +1,17 @@
 package com.loopers.application.payment;
 
-import org.springframework.context.event.EventListener;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.event.TransactionPhase;
 import org.springframework.transaction.event.TransactionalEventListener;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.loopers.domain.payment.PaymentInfo;
+import com.loopers.domain.order.event.OrderCreatedEvent;
 import com.loopers.domain.payment.event.PaymentCompletedEvent;
-import com.loopers.domain.payment.event.PaymentEvent;
 import com.loopers.domain.payment.event.PaymentFailedEvent;
-import com.loopers.domain.payment.event.PaymentRequestEvent;
 import com.loopers.domain.platform.event.DataPlatformEvent;
-import com.loopers.support.event.DomainApplicationEvent;
+import com.loopers.support.error.CoreException;
+import com.loopers.support.error.ErrorType;
+import com.loopers.support.event.Envelope;
 import com.loopers.support.event.EventPublisher;
 
 import lombok.RequiredArgsConstructor;
@@ -26,61 +24,47 @@ public class PaymentEventHandler {
 
 	private final PaymentProcessor paymentProcessor;
 	private final EventPublisher eventPublisher;
-	private final ObjectMapper objectMapper;
 
-	@EventListener
-	public void handlePaymentRequest(DomainApplicationEvent<PaymentRequestEvent> event) {
-
-		PaymentRequestEvent paymentRequestEvent = event.getPayload();
-		processPaymentRequest(paymentRequestEvent);
-	}
-
+	@Async
 	@TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
-	public void processPaymentRequest(PaymentRequestEvent event) {
-		try {
+	public void processOrderCreated(Envelope<OrderCreatedEvent> event) {
+		if (!OrderCreatedEvent.EVENT_TYPE.equals(event.getEventType())) {
+			return;
+		}
 
-			PaymentCommand.CreatePayment paymentCommand = new PaymentCommand.CreatePayment(event.userId(), event.orderId(),
-				event.cardType(), event.cardNo(), event.amount(), event.callbackUrl());
+		OrderCreatedEvent orderEvent = event.getPayload();
+		PaymentResult result = paymentProcessor.processOrderPayment(orderEvent);
 
-			PaymentInfo paymentInfo = paymentProcessor.process(paymentCommand);
+		handlePaymentResult(result);
+	}
 
-			PaymentCompletedEvent paymentCompletedEvent = PaymentCompletedEvent.create(event.orderId(), event.userId(),
-				paymentInfo.transactionKey());
-			eventPublisher.publish(paymentCompletedEvent);
-
-			sendPaymentDataToPlatform(paymentCompletedEvent);
-
-		} catch (Exception e) {
-			log.error("결제 처리 실패: 주문 ID {}", event.orderId(), e);
-
-			PaymentFailedEvent paymentFailedEvent = PaymentFailedEvent.create(event.orderId(), event.userId(), null,
-				event.amount(), e);
-			eventPublisher.publish(paymentFailedEvent);
-
-			sendPaymentDataToPlatform(paymentFailedEvent);
+	void handlePaymentResult(PaymentResult result) {
+		switch (result) {
+			case PaymentResult.Success success -> handleSuccess(success);
+			case PaymentResult.Failure failure -> handleFailure(failure);
+			default -> throw new CoreException(ErrorType.NOT_FOUND, "예상하지 못한 오류가 발생 하였습니다.");
 		}
 	}
 
-	public void sendPaymentDataToPlatform(PaymentCompletedEvent event) {
-		sendPaymentDataToPlatform(event, event.transactionKey(), "결제 성공");
+	void handleSuccess(PaymentResult.Success success) {
+		PaymentCompletedEvent completedEvent = PaymentCompletedEvent.create(success.paymentInfo().orderId(),
+			success.paymentInfo().transactionKey());
+		eventPublisher.publish(completedEvent);
+		log.info("결제 처리 성공 - 주문ID: {}, 결제ID: {}", success.paymentInfo().orderId(), success.paymentInfo().transactionKey());
+
+		DataPlatformEvent dataPlatformEvent = DataPlatformEvent.create(completedEvent.getEventType(), completedEvent.orderId());
+		eventPublisher.publish(dataPlatformEvent);
+		log.info("결제 성공 이벤트를 데이터 플랫폼 이벤트로 발행: {}", success.paymentInfo().orderId());
 	}
 
-	public void sendPaymentDataToPlatform(PaymentFailedEvent event) {
-		String aggregateId = event.transactionKey() != null ? event.transactionKey() : event.orderId();
-		sendPaymentDataToPlatform(event, aggregateId, "결제 실패");
-	}
+	void handleFailure(PaymentResult.Failure failure) {
+		PaymentFailedEvent failedEvent = PaymentFailedEvent.create(failure.orderEvent().orderId(), failure.orderEvent().userId(),
+			"FAILED_" + failure.orderEvent().orderId(), failure.orderEvent().totalAmount(), failure.exception());
+		eventPublisher.publish(failedEvent);
+		log.error("결제 처리 실패 - 주문ID: {}", failure.orderEvent().orderId(), failure.exception());
 
-	public void sendPaymentDataToPlatform(PaymentEvent paymentEvent, String aggregateId, String eventType) {
-		try {
-			String paymentData = objectMapper.writeValueAsString(paymentEvent);
-
-			DataPlatformEvent dataPlatformEvent = DataPlatformEvent.fromPayment(aggregateId, paymentData);
-
-			eventPublisher.publish(dataPlatformEvent);
-			log.info("{} 데이터 플랫폼 전송 이벤트 발행: {}", eventType, paymentEvent.getOrderId());
-
-		} catch (JsonProcessingException e) {
-			log.error("{} 데이터 JSON 변환 실패: {}", eventType, paymentEvent.getOrderId(), e);
-		}
+		DataPlatformEvent dataPlatformEvent = DataPlatformEvent.create(failedEvent.getEventType(), failedEvent.orderId());
+		eventPublisher.publish(dataPlatformEvent);
+		log.info("결제 실패 이벤트를 데이터 플랫폼 이벤트로 발행: {}", failure.orderEvent().orderId());
 	}
 }

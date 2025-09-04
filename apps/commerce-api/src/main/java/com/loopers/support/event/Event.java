@@ -8,4 +8,6 @@ public interface Event {
 	LocalDateTime getOccurredAt();
 
 	String getEventType();
+
+	String getCorrelationId();
 }

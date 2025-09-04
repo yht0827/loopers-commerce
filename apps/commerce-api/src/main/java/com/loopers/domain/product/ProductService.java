@@ -111,12 +111,38 @@ public class ProductService {
 	}
 
 	public void evictProductCache(Long productId) {
-		productL1Cache.invalidate(CACHE_KEY_PREFIX_PRODUCT_DETAIL + ":" + productId);
-		productL2Cache.delete(CACHE_KEY_PREFIX_PRODUCT_DETAIL + ":" + productId);
+		String cacheKey = CACHE_KEY_PREFIX_PRODUCT_DETAIL + ":" + productId;
+
+		try {
+			productL1Cache.invalidate(cacheKey);
+			productL2Cache.delete(cacheKey);
+			log.debug("상품 캐시 제거 완료 - productId: {}, key: {}", productId, cacheKey);
+		} catch (Exception e) {
+			log.warn("상품 캐시 제거 실패 - productId: {}, key: {}", productId, cacheKey, e);
+		}
 	}
 
 	public void evictProductListCache() {
-		productL1Cache.invalidateAll();
-		productL2Cache.delete(CACHE_KEY_PREFIX_PRODUCT_LIST + ":*");
+		try {
+			evictL1ProductListCaches();
+
+			String listKeyPattern = CACHE_KEY_PREFIX_PRODUCT_LIST + ":*";
+			productL2Cache.delete(listKeyPattern);
+
+			log.debug("상품 리스트 캐시 제거 완료 - pattern: {}", listKeyPattern);
+		} catch (Exception e) {
+			log.warn("상품 리스트 캐시 제거 실패", e);
+		}
+	}
+
+	void evictL1ProductListCaches() {
+		productL1Cache.asMap().keySet().stream()
+			.filter(key -> key.startsWith(CACHE_KEY_PREFIX_PRODUCT_LIST + ":"))
+			.forEach(productL1Cache::invalidate);
+	}
+
+	public void evictProductRelatedCaches(Long productId) {
+		evictProductCache(productId);
+		evictProductListCache();
 	}
 }

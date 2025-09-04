@@ -9,6 +9,7 @@ import com.loopers.domain.product.ProductAggregateService;
 import com.loopers.domain.product.ProductService;
 import com.loopers.domain.product.event.ProductLikedEvent;
 import com.loopers.domain.product.event.ProductUnLikedEvent;
+import com.loopers.support.event.Envelope;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -23,33 +24,39 @@ public class LikeEventHandler {
 
 	@Async
 	@TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
-	public void handleProductLiked(ProductLikedEvent event) {
+	public void handleProductLiked(Envelope<ProductLikedEvent> event) {
+		if (!ProductLikedEvent.EVENT_TYPE.equals(event.getEventType())) {
+			return;
+		}
+		ProductLikedEvent productLikedEvent = event.getPayload();
+
 		// Update Query로 원자적 처리
-		boolean success = productAggregateService.incrementLikeCount(event.productId());
+		boolean success = productAggregateService.incrementLikeCount(productLikedEvent.productId());
 
 		if (!success) {
-			log.warn("좋아요 수 업데이트 실패 - 상품 없음: {}", event.productId());
-			productAggregateService.createIfNotExists(event.productId());
-			productAggregateService.incrementLikeCount(event.productId());
+			log.warn("좋아요 수 업데이트 실패 - 상품 없음: {}", productLikedEvent.productId());
+			productAggregateService.createIfNotExists(productLikedEvent.productId());
+			productAggregateService.incrementLikeCount(productLikedEvent.productId());
 		}
 
-		// 캐시 무효화
-		productService.evictProductCache(event.productId());
-		productService.evictProductListCache();
+		productService.evictProductRelatedCaches(productLikedEvent.productId());
 	}
 
 	@Async
 	@TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
-	public void handleProductUnliked(ProductUnLikedEvent event) {
-		boolean success = productAggregateService.decrementLikeCount(event.productId());
+	public void handleProductUnliked(Envelope<ProductUnLikedEvent> event) {
+		if (!ProductUnLikedEvent.EVENT_TYPE.equals(event.getEventType())) {
+			return;
+		}
+		ProductUnLikedEvent productUnLikedEvent = event.getPayload();
+
+		boolean success = productAggregateService.decrementLikeCount(productUnLikedEvent.productId());
 
 		if (!success) {
-			log.warn("좋아요 취소 업데이트 실패: productId={}", event.productId());
+			log.warn("좋아요 취소 업데이트 실패: productId={}", productUnLikedEvent.productId());
 			return;
 		}
 
-		// 캐시 무효화
-		productService.evictProductCache(event.productId());
-		productService.evictProductListCache();
+		productService.evictProductRelatedCaches(productUnLikedEvent.productId());
 	}
 }

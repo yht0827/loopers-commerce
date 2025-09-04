@@ -8,16 +8,17 @@ import org.springframework.kafka.support.Acknowledgment;
 import org.springframework.stereotype.Component;
 
 import com.loopers.config.kafka.KafkaConfig;
+import com.loopers.config.kafka.KafkaTopics;
 
 @Component
 public class DemoKafkaConsumer {
 
 	@KafkaListener(
-		topics = "${demo-kafka.test.topic-name}",
+		topics = KafkaTopics.ORDER,
 		containerFactory = KafkaConfig.BATCH_LISTENER
 	)
 	public void demoListener(
-		List<ConsumerRecord<Object, Object>> messages,
+		List<ConsumerRecord<String, Object>> messages,
 		Acknowledgment acknowledgment
 	) {
 		System.out.println(messages);

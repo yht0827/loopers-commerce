@@ -42,12 +42,14 @@ public class ProductAggregateRepositoryImpl implements ProductAggregateRepositor
 
 	@Override
 	public boolean incrementLikeCount(final Long productId) {
-		return productAggregateJpaRepository.incrementLikeCount(productId);
+		int updatedCount = productAggregateJpaRepository.incrementLikeCount(productId);
+		return updatedCount > 0;
 	}
 
 	@Override
 	public boolean decrementLikeCount(final Long productId) {
-		return productAggregateJpaRepository.decrementLikeCount(productId);
+		int updatedCount = productAggregateJpaRepository.decrementLikeCount(productId);
+		return updatedCount > 0;
 	}
 
 	@Override

@@ -37,6 +37,11 @@ public record PaymentRequestEvent(
 	}
 
 	@Override
+	public String getCorrelationId() {
+		return orderId;
+	}
+
+	@Override
 	public String getOrderId() {
 		return orderId;
 	}

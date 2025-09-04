@@ -28,7 +28,7 @@ public record PaymentFailedEvent(
 
 	@Override
 	public String getAggregateId() {
-		return transactionKey;
+		return orderId;
 	}
 
 	@Override
@@ -39,6 +39,11 @@ public record PaymentFailedEvent(
 	@Override
 	public String getEventType() {
 		return EVENT_TYPE;
+	}
+
+	@Override
+	public String getCorrelationId() {
+		return orderId;
 	}
 
 	@Override
