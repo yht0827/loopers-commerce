@@ -59,4 +59,9 @@ public record OrderCreatedEvent(
 	public String getEventType() {
 		return EVENT_TYPE;
 	}
+
+	@Override
+	public String getCorrelationId() {
+		return orderId;
+	}
 }

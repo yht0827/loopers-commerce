@@ -25,25 +25,17 @@ public class Product extends BaseEntity {
 
 	private Price price;
 
-	private LikeCount likeCount;
-
 	private Quantity quantity;
 
 	@Version
 	private Long version;
 
 	@Builder
-	public Product(final BrandId brandId, final ProductName name, final Price price, final LikeCount likeCount,
-		final Quantity quantity) {
+	public Product(final BrandId brandId, final ProductName name, final Price price, final Quantity quantity) {
 		this.brandId = brandId;
 		this.name = name;
 		this.price = price;
-		this.likeCount = likeCount;
 		this.quantity = quantity;
-	}
-
-	public void updateLikeCount(final LikeCount likeCount) {
-		this.likeCount = likeCount;
 	}
 
 	public void deduct(final Quantity amount) {

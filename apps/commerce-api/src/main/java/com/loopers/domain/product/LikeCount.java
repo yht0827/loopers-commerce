@@ -16,12 +16,7 @@ public record LikeCount(Long likeCount) implements Serializable {
 		}
 	}
 
-	public LikeCount increase() {
-		return new LikeCount(this.likeCount + 1);
-	}
-
-	public LikeCount decrease() {
-		long newCount = Math.max(0, this.likeCount - 1);
-		return new LikeCount(newCount);
+	public static LikeCount Zero() {
+		return new LikeCount(0L);
 	}
 }

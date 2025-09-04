@@ -12,7 +12,6 @@ import com.loopers.domain.brand.BrandName;
 import com.loopers.domain.common.BrandId;
 import com.loopers.domain.common.Price;
 import com.loopers.domain.common.Quantity;
-import com.loopers.domain.product.LikeCount;
 import com.loopers.domain.product.Product;
 import com.loopers.domain.product.ProductName;
 import com.loopers.domain.product.ProductRepository;
@@ -52,7 +51,7 @@ public class LikeConcurrencyTest {
 		Brand brand1 = brandRepository.save(brand);
 
 		product = new Product(new BrandId(brand1.getId()), new ProductName("티셔츠"),
-			new Price(1000L), new LikeCount(10L), new Quantity(100L));
+			new Price(1000L), new Quantity(100L));
 
 		productJpaRepository.save(product);
 	}

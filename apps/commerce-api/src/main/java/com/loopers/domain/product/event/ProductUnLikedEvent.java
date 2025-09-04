@@ -1,4 +1,4 @@
-package com.loopers.domain.like.event;
+package com.loopers.domain.product.event;
 
 import java.time.LocalDateTime;
 
@@ -28,5 +28,10 @@ public record ProductUnLikedEvent(String userId, Long productId, LocalDateTime o
 	@Override
 	public String getEventType() {
 		return EVENT_TYPE;
+	}
+
+	@Override
+	public String getCorrelationId() {
+		return "";
 	}
 }

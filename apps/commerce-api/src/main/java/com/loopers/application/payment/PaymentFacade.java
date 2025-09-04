@@ -16,6 +16,6 @@ public class PaymentFacade {
 	@Transactional
 	public PaymentResult processCallback(final PaymentCommand.ProcessCallback command) {
 		PaymentInfo paymentInfo = paymentService.processCallback(command);
-		return PaymentResult.from(paymentInfo);
+		return PaymentResult.success(paymentInfo);
 	}
 }

@@ -1,13 +1,10 @@
 package com.loopers.domain.product;
 
-import com.loopers.domain.common.BrandId;
-import com.loopers.domain.common.Price;
-import com.loopers.domain.common.Quantity;
+import com.querydsl.core.annotations.QueryProjection;
 
-public record ProductInfo(Long productId, ProductName productName, Price price, LikeCount likeCount,
-						  Quantity quantity, BrandId brandId) {
-	public static ProductInfo from(Product product) {
-		return new ProductInfo(product.getId(), product.getName(), product.getPrice(), product.getLikeCount(),
-			product.getQuantity(), product.getBrandId());
+public record ProductInfo(Long productId, String productName, Long price, Long quantity, String bradName, Long likeCount) {
+
+	@QueryProjection
+	public ProductInfo {
 	}
 }

@@ -3,17 +3,19 @@ package com.loopers.application.like;
 import java.util.List;
 
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.loopers.domain.like.LikeInfo;
 import com.loopers.domain.like.LikeService;
-import com.loopers.domain.like.event.ProductLikedEvent;
-import com.loopers.domain.like.event.ProductUnLikedEvent;
+import com.loopers.domain.product.event.ProductLikedEvent;
+import com.loopers.domain.product.event.ProductUnLikedEvent;
 import com.loopers.support.event.EventPublisher;
 
 import lombok.RequiredArgsConstructor;
 
 @Component
 @RequiredArgsConstructor
+@Transactional
 public class LikeFacade {
 
 	private final LikeService likeService;
@@ -35,6 +37,7 @@ public class LikeFacade {
 		eventPublisher.publish(event);
 	}
 
+	@Transactional(readOnly = true)
 	public List<LikeResult> getLikedProductList(Long userId) {
 		List<LikeInfo> likeInfos = likeService.getAllLikedProductIds(userId);
 
