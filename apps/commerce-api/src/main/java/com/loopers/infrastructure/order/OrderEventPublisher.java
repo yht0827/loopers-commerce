@@ -14,7 +14,7 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class OrderEventPublisher {
 
-	private final KafkaTemplate<String, Object> kafkaTemplate;
+	private final KafkaTemplate<Object, Object> kafkaTemplate;
 
 	public void publish(String userId, String orderId, Long totalAmount) {
 		try {

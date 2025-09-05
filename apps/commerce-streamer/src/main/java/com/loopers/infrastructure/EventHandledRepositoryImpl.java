@@ -28,35 +28,29 @@ public class EventHandledRepositoryImpl implements EventHandledRepository {
 	}
 
 	@Override
-	public boolean existsByEventIdAndConsumerGroup(String eventId, String consumerGroup) {
-		return eventHandledJpaRepository.existsByEventIdAndConsumerGroup(eventId, consumerGroup);
-	}
-	
-	@Override
 	public Optional<EventHandled> findByEventIdAndConsumerGroup(String eventId, String consumerGroup) {
 		return eventHandledJpaRepository.findByEventIdAndConsumerGroup(eventId, consumerGroup);
 	}
-	
+
 	@Override
 	public boolean isNewerVersion(String eventId, String consumerGroup, Long version, LocalDateTime processedAt) {
 		Optional<EventHandled> existing = findByEventIdAndConsumerGroup(eventId, consumerGroup);
-		
+
 		if (existing.isEmpty()) {
-			return true; // 처음 처리하는 이벤트
+			return false;
 		}
-		
+
 		EventHandled handled = existing.get();
-		
-		// 버전 비교 (버전이 있는 경우)
+
+		// 버전 비교
 		if (version != null && handled.getVersion() != null) {
-			return version > handled.getVersion();
+			return version <= handled.getVersion();
 		}
-		
-		// 시간 비교 (버전이 없거나 같은 경우)
+		// 시간 비교
 		if (processedAt != null && handled.getLastProcessedAt() != null) {
-			return processedAt.isAfter(handled.getLastProcessedAt());
+			return !processedAt.isAfter(handled.getLastProcessedAt());
 		}
-		
-		return false; // 기존 것이 더 최신이거나 비교할 수 없는 경우
+
+		return true;
 	}
 }

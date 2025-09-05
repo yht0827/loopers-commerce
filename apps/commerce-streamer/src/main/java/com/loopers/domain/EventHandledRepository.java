@@ -10,9 +10,7 @@ public interface EventHandledRepository {
 
 	void saveAll(List<EventHandled> eventHandledList);
 
-	boolean existsByEventIdAndConsumerGroup(String eventId, String consumerGroup);
-	
 	Optional<EventHandled> findByEventIdAndConsumerGroup(String eventId, String consumerGroup);
-	
+
 	boolean isNewerVersion(String eventId, String consumerGroup, Long version, LocalDateTime processedAt);
 }

@@ -25,18 +25,20 @@ public class AuditLogService {
 
 		for (AuditLogData data : auditLogDataList) {
 			try {
-				// 1. 중복/버전 체크 (핵심 비즈니스 로직)
-				if (!eventHandledRepository.isNewerVersion(data.eventId(), KafkaGroups.AuditLog, 
-						data.version(), data.occurredAt())) {
+				// 중복/버전 체크
+				if (eventHandledRepository.isNewerVersion(data.eventId(), KafkaGroups.AuditLog,
+					data.version(), data.occurredAt())) {
 					log.debug("이미 처리된 또는 오래된 감사 로그 이벤트 - EventId: {}, Version: {}, OccurredAt: {}",
 						data.eventId(), data.version(), data.occurredAt());
 					continue;
 				}
 
-				// 2. 도메인 객체 생성
+
 				EventLog eventLog = createEventLog(data);
 				EventHandled eventHandled = createEventHandled(data);
 
+
+				// 처리된 이벤트 기록
 				eventLogs.add(eventLog);
 				handledEvents.add(eventHandled);
 
@@ -46,7 +48,7 @@ public class AuditLogService {
 			}
 		}
 
-		// 3. 배치 저장 (트랜잭션 보장)
+		// 배치 저장
 		saveAuditLogs(eventLogs, handledEvents);
 	}
 

@@ -10,5 +10,4 @@ public interface EventHandledJpaRepository extends JpaRepository<EventHandled, L
 
 	Optional<EventHandled> findByEventIdAndConsumerGroup(String eventId, String consumerGroup);
 
-	boolean existsByEventIdAndConsumerGroup(String eventId, String consumerGroup);
 }
