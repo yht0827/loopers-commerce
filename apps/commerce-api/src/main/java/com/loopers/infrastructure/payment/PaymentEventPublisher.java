@@ -20,7 +20,7 @@ public class PaymentEventPublisher {
 	public void publishSuccess(String orderId, Long amount) {
 		try {
 			PaymentSuccessEvent event = PaymentSuccessEvent.create(orderId, amount);
-			kafkaTemplate.send(KafkaTopics.PAYMENT_SUCCESS, event);
+			kafkaTemplate.send(KafkaTopics.PAYMENT_SUCCESS, orderId, event);
 		} catch (Exception e) {
 			log.error("결제 성공 이벤트 카프카 전송 실패: orderId={}", orderId, e);
 		}
@@ -29,7 +29,7 @@ public class PaymentEventPublisher {
 	public void publishFail(String orderId, Long amount, String failureReason) {
 		try {
 			PaymentFailEvent event = PaymentFailEvent.create(orderId, amount, failureReason);
-			kafkaTemplate.send(KafkaTopics.PAYMENT_FAIL, event);
+			kafkaTemplate.send(KafkaTopics.PAYMENT_SUCCESS, orderId, event);
 		} catch (Exception e) {
 			log.error("결제 실패 이벤트 카프카 전송 실패: orderId={}", orderId, e);
 		}
