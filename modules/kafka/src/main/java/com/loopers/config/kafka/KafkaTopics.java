@@ -6,7 +6,7 @@ public final class KafkaTopics {
 	public static final String PAYMENT_FAIL = "payment-fail-events";
 	public static final String PRODUCT_LIKE = "product-like-events";
 	public static final String PRODUCT_UNLIKE = "product-unlike-events";
-
+	public static final String LIKE_AGGREGATION = "like-aggregation-events";
 
 	private KafkaTopics() {
 	}
