@@ -9,6 +9,7 @@ import com.loopers.domain.order.OrderData;
 import com.loopers.domain.order.OrderInfo;
 import com.loopers.domain.order.OrderService;
 import com.loopers.domain.order.event.OrderCreatedEvent;
+import com.loopers.infrastructure.order.OrderEventPublisher;
 import com.loopers.support.event.EventPublisher;
 
 import lombok.RequiredArgsConstructor;
@@ -20,6 +21,7 @@ public class OrderFacade {
 	private final OrderService orderService;
 	private final OrderProcessor orderProcessor;
 	private final EventPublisher eventPublisher;
+	private final OrderEventPublisher orderEventPublisher;
 
 	@Transactional
 	public OrderResult createOrder(final OrderCommand.CreateOrder command) {
@@ -33,6 +35,7 @@ public class OrderFacade {
 
 		OrderCreatedEvent orderCreatedEvent = OrderCreatedEvent.from(orderInfo, paymentMetadata);
 		eventPublisher.publish(orderCreatedEvent);
+		orderEventPublisher.publish(orderCreatedEvent.userId(), orderCreatedEvent.orderId(), orderCreatedEvent.totalAmount());
 
 		return OrderResult.from(orderInfo);
 	}
