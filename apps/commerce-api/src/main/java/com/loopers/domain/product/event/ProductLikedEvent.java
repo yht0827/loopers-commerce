@@ -6,7 +6,7 @@ public record ProductLikedEvent(
 	String userId,
 	Long productId,
 	LocalDateTime occurredAt
-) implements LikeEvent {
+) implements ProductEvent {
 
 	public static final String EVENT_TYPE = "PRODUCT_LIKED";
 
@@ -34,8 +34,12 @@ public record ProductLikedEvent(
 		return "";
 	}
 
-	@Override
 	public String getUserId() {
 		return userId;
+	}
+
+	@Override
+	public Long getProductId() {
+		return productId;
 	}
 }

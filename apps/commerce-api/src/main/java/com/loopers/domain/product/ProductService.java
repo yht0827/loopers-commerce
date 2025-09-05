@@ -9,9 +9,11 @@ import org.springframework.stereotype.Service;
 
 import com.github.benmanes.caffeine.cache.Cache;
 import com.loopers.domain.order.OrderItem;
+import com.loopers.domain.product.event.ProductOutOfStockEvent;
 import com.loopers.support.cache.CacheablePage;
 import com.loopers.support.error.CoreException;
 import com.loopers.support.error.ErrorType;
+import com.loopers.support.event.EventPublisher;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -29,6 +31,7 @@ public class ProductService {
 	private final ProductRepository productRepository;
 	private final Cache<String, Object> productL1Cache;
 	private final RedisTemplate<String, Object> productL2Cache;
+	private final EventPublisher eventPublisher;
 
 	@SuppressWarnings("unchecked")
 	public Page<ProductInfo> getProductList(final ProductCommand.GetProductList command) {
@@ -104,9 +107,16 @@ public class ProductService {
 			Product product = productRepository.findByIdWithPessimisticLock(items.getId())
 				.orElseThrow(() -> new CoreException(ErrorType.NOT_FOUND, "상품을 찾을 수 없습니다."));
 
+			Long oldQuantity = product.getQuantity().quantity();
+
 			product.deduct(items.getQuantity());
 
-			productRepository.save(product);
+			// 품절 상태가 되었을 때만 이벤트 발행
+			if (oldQuantity > 0 && product.getQuantity().isOutOfStock()) {
+				ProductOutOfStockEvent event = ProductOutOfStockEvent.create(product.getId());
+				eventPublisher.publish(event);
+				log.info("품절 이벤트 발행: productId={}", product.getId());
+			}
 		}
 	}
 

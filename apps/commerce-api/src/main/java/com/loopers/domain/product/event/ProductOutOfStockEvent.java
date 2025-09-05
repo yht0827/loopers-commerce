@@ -2,21 +2,20 @@ package com.loopers.domain.product.event;
 
 import java.time.LocalDateTime;
 
-public record ProductUnLikedEvent(String userId, Long productId, LocalDateTime occurredAt) implements ProductEvent {
+public record ProductOutOfStockEvent(
+	Long productId,
+	LocalDateTime occurredAt
+) implements ProductEvent {
 
-	public static final String EVENT_TYPE = "PRODUCT_UNLIKED";
+	public static final String EVENT_TYPE = "PRODUCT_OUT_OF_STOCK";
 
-	public static ProductUnLikedEvent create(String userId, Long productId) {
-		return new ProductUnLikedEvent(userId, productId, LocalDateTime.now());
-	}
-
-	public String getUserId() {
-		return userId;
+	public static ProductOutOfStockEvent create(Long productId) {
+		return new ProductOutOfStockEvent(productId, LocalDateTime.now());
 	}
 
 	@Override
 	public String getAggregateId() {
-		return userId;
+		return productId.toString();
 	}
 
 	@Override
