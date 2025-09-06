@@ -1,9 +1,12 @@
 package com.loopers.config.kafka;
 
 public final class KafkaTopics {
-	public static final String DATA_PLATFORM = "data.platform.events-v1";
-	public static final String ORDER = "order.topic-v1";
-	public static final String PAYMENT = "payment.topic-v1";
+	public static final String ORDER = "order-events";
+	public static final String PAYMENT_SUCCESS = "payment-success-events";
+	public static final String PAYMENT_FAIL = "payment-fail-events";
+	public static final String PRODUCT_LIKE = "product-like-events";
+	public static final String PRODUCT_UNLIKE = "product-unlike-events";
+	public static final String LIKE_AGGREGATION = "like-aggregation-events";
 
 	private KafkaTopics() {
 	}

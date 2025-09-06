@@ -5,11 +5,12 @@ import lombok.Getter;
 @Getter
 public enum EventType {
 	ORDER_CREATED("ORDER_CREATED"),
-	PAYMENT_COMPLETED("PaymentCompletedEvent"),
-	PAYMENT_FAILED("PaymentFailedEvent"),
-	PRODUCT_LIKED("ProductLikedEvent"),
-	PRODUCT_UNLIKED("ProductUnLikedEvent"),
-	DATA_PLATFORM("DataPlatformEvent");
+	PAYMENT_COMPLETED("PAYMENT_COMPLETED"),
+	PAYMENT_FAILED("PAYMENT_FAILED"),
+	PRODUCT_LIKED("PRODUCT_LIKED"),
+	PRODUCT_UNLIKED("PRODUCT_UNLIKED"),
+	PRODUCT_OUT_OF_STOCK("PRODUCT_OUT_OF_STOCK"),
+	DATA_PLATFORM("DATA_PLATFORM");
 
 	private final String className;
 

@@ -29,4 +29,8 @@ public record Quantity(Long quantity) implements Serializable {
 	public Quantity add(Quantity amount) {
 		return new Quantity(this.quantity + amount.quantity());
 	}
+
+	public boolean isOutOfStock() {
+		return this.quantity == 0;
+	}
 }
