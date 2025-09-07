@@ -32,7 +32,7 @@ public class PaymentStatusSynchronizer {
 		if (pgStatus != TransactionStatus.PENDING && payment.getStatus() == TransactionStatus.PENDING) {
 			updatePaymentStatus(payment, pgStatus);
 			log.info("스케줄러 - 결제 상태 동기화: PENDING → {}, transactionKey: {}",
-				pgStatus, payment.getTransactionKey().transactionKey());
+				pgStatus, payment.getTransactionKey().getTransactionKey());
 		}
 	}
 

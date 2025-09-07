@@ -1,8 +1,9 @@
 package com.loopers.domain.point;
 
 import com.loopers.domain.BaseEntity;
-import com.loopers.domain.common.UserId;
+import com.loopers.domain.user.UserId;
 
+import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
@@ -16,7 +17,10 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Point extends BaseEntity {
 
+	@Embedded
 	private UserId userId;
+
+	@Embedded
 	private Balance balance;
 
 	@Builder

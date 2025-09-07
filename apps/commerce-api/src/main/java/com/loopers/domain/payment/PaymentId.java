@@ -1,4 +1,4 @@
-package com.loopers.domain.common;
+package com.loopers.domain.payment;
 
 import java.io.Serializable;
 
@@ -14,15 +14,15 @@ import lombok.NoArgsConstructor;
 @Embeddable
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Price implements Serializable {
+public class PaymentId implements Serializable {
 	
-	@Column(name = "price")
-	private Long price;
+	@Column(name = "payment_id")
+	private Long paymentId;
 	
-	public Price(Long price) {
-		if (price == null || price < 0) {
-			throw new CoreException(ErrorType.BAD_REQUEST, "가격은 0 이상이어야 합니다.");
+	public PaymentId(Long paymentId) {
+		if (paymentId == null || paymentId <= 0) {
+			throw new CoreException(ErrorType.BAD_REQUEST, "결제 ID는 비어있을 수 없습니다.");
 		}
-		this.price = price;
+		this.paymentId = paymentId;
 	}
 }

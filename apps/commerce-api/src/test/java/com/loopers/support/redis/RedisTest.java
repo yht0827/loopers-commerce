@@ -9,7 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.redis.core.RedisTemplate;
 
-import com.loopers.domain.common.UserId;
+import com.loopers.domain.user.UserId;
 import com.loopers.domain.user.Birthday;
 import com.loopers.domain.user.Email;
 import com.loopers.domain.user.Gender;
@@ -82,10 +82,10 @@ public class RedisTest {
 		assertThat(result).isInstanceOf(User.class);
 
 		if (result instanceof User user) {
-			assertThat(user.getName().name()).isEqualTo("홍길동");
-			assertThat(user.getEmail().email()).isEqualTo("hong@example.com");
-			assertThat(user.getUserId().userId()).isEqualTo("testuser2");
-			assertThat(user.getBirthday().birthday()).isEqualTo("1990-01-01");
+			assertThat(user.getName().getName()).isEqualTo("홍길동");
+			assertThat(user.getEmail().getEmail()).isEqualTo("hong@example.com");
+			assertThat(user.getUserId().getUserId()).isEqualTo("testuser2");
+			assertThat(user.getBirthday().getBirthday()).isEqualTo("1990-01-01");
 			assertThat(user.getGender().name()).isEqualTo("M");
 		}
 	}
@@ -121,10 +121,10 @@ public class RedisTest {
 		User retrievedUserObj1 = (User)retrievedUser1;
 		User retrievedUserObj2 = (User)retrievedUser2;
 
-		assertThat(retrievedUserObj1.getName().name()).isEqualTo("홍길동");
-		assertThat(retrievedUserObj1.getUserId().userId()).isEqualTo("testuser1");
-		assertThat(retrievedUserObj2.getName().name()).isEqualTo("이영희");
-		assertThat(retrievedUserObj2.getUserId().userId()).isEqualTo("testuser2");
+		assertThat(retrievedUserObj1.getName().getName()).isEqualTo("홍길동");
+		assertThat(retrievedUserObj1.getUserId().getUserId()).isEqualTo("testuser1");
+		assertThat(retrievedUserObj2.getName().getName()).isEqualTo("이영희");
+		assertThat(retrievedUserObj2.getUserId().getUserId()).isEqualTo("testuser2");
 	}
 
 }

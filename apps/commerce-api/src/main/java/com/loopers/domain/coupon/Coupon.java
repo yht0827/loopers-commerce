@@ -1,15 +1,18 @@
 package com.loopers.domain.coupon;
 
 import com.loopers.domain.BaseEntity;
-import com.loopers.domain.common.BrandId;
-import com.loopers.domain.common.ProductId;
-import com.loopers.domain.common.UserId;
+import com.loopers.domain.brand.BrandId;
 import com.loopers.domain.order.CouponDiscountAmount;
 import com.loopers.domain.order.TotalOrderPrice;
+import com.loopers.domain.product.ProductId;
+import com.loopers.domain.user.UserId;
 import com.loopers.support.error.CoreException;
 import com.loopers.support.error.ErrorType;
 
+import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.Table;
 import jakarta.persistence.Version;
 import lombok.AccessLevel;
@@ -23,14 +26,31 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Coupon extends BaseEntity {
 
+	@Embedded
 	private UserId userId;
+
+	@Embedded
 	private ProductId productId;
+
+	@Embedded
 	private BrandId brandId;
+
+	@Embedded
 	private CouponName couponName;
+
+	@Embedded
 	private DiscountPolicy discountPolicy;
+
+	@Embedded
 	private CouponIssuedAt couponIssuedAt;
+
+	@Embedded
 	private CouponUsedAt couponUsedAt;
+
+	@Embedded
 	private CouponExpiredAt couponExpiredAt;
+
+	@Enumerated(EnumType.STRING)
 	private CouponStatus couponStatus;
 
 	@Version
@@ -64,7 +84,7 @@ public class Coupon extends BaseEntity {
 		if (couponStatus == CouponStatus.USED) {
 			throw new CoreException(ErrorType.BAD_REQUEST, "이미 사용된 쿠폰입니다.");
 		}
-		Long discountAmount = calculateDisCount(totalOrderPrice.totalPrice());
+		Long discountAmount = calculateDisCount(totalOrderPrice.getTotalPrice());
 		markAsUsed();
 		return new CouponDiscountAmount(discountAmount);
 	}

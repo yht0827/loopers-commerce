@@ -1,10 +1,11 @@
 package com.loopers.domain.product;
 
 import com.loopers.domain.BaseEntity;
-import com.loopers.domain.common.BrandId;
+import com.loopers.domain.brand.BrandId;
 import com.loopers.domain.common.Price;
 import com.loopers.domain.common.Quantity;
 
+import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 import jakarta.persistence.Version;
@@ -19,12 +20,16 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Product extends BaseEntity {
 
+	@Embedded
 	private BrandId brandId;
 
+	@Embedded
 	private ProductName name;
 
+	@Embedded
 	private Price price;
 
+	@Embedded
 	private Quantity quantity;
 
 	@Version

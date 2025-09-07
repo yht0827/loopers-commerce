@@ -13,13 +13,13 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.support.PageableExecutionUtils;
 import org.springframework.stereotype.Repository;
 
-import com.loopers.domain.common.BrandId;
+import com.loopers.domain.brand.BrandId;
 import com.loopers.domain.product.Product;
 import com.loopers.domain.product.ProductInfo;
 import com.loopers.domain.product.ProductRepository;
-import com.loopers.domain.product.QProductInfo;
 import com.querydsl.core.types.Order;
 import com.querydsl.core.types.OrderSpecifier;
+import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 
@@ -35,8 +35,15 @@ public class ProductRepositoryImpl implements ProductRepository {
 	public Optional<ProductInfo> findById(final Long id) {
 
 		ProductInfo productInfo = jpaQueryFactory.select(
-				new QProductInfo(product.id, product.name.name, product.price.price, product.quantity.quantity,
-					brand.brandName.brandName, productAggregate.likeCount.likeCount.coalesce(0L)))
+				Projections.constructor(
+					ProductInfo.class,
+					product.id,
+					product.name.name,
+					product.price.price,
+					product.quantity.quantity,
+					brand.brandName.brandName,
+					productAggregate.likeCount.likeCount.coalesce(0L)
+				))
 			.from(product)
 			.leftJoin(brand)
 			.on(product.brandId.brandId.eq(brand.id))
@@ -94,6 +101,14 @@ public class ProductRepositoryImpl implements ProductRepository {
 			idQuery.where(product.brandId.eq(brand));
 		}
 
+		// If sorting requires fields from other tables, add necessary joins here
+		boolean requiresLikeJoin = pageable.getSort().stream()
+			.anyMatch(o -> o.getProperty().equals("likesCount"));
+		if (requiresLikeJoin) {
+			idQuery.leftJoin(productAggregate)
+				.on(productAggregate.productId.productId.eq(product.id));
+		}
+
 		applyOrderByForIdQuery(idQuery, pageable);
 
 		return idQuery.offset(pageable.getOffset()).limit(pageable.getPageSize()).fetch();
@@ -113,7 +128,8 @@ public class ProductRepositoryImpl implements ProductRepository {
 	private List<ProductInfo> getProductInfosByIds(List<Long> productIds) {
 		// ID 순서를 보장하기 위한 Map 생성
 		List<ProductInfo> allProductInfos = jpaQueryFactory.select(
-				new QProductInfo(
+				Projections.constructor(
+					ProductInfo.class,
 					product.id,
 					product.name.name,
 					product.price.price,

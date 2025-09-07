@@ -9,7 +9,7 @@ import com.loopers.domain.user.User;
 
 public interface UserJpaRepository extends JpaRepository<User, Long> {
 
-	boolean existsByUserId_UserId(String userId);
+	boolean existsByUserIdUserId(String userId);
 
 	@Query("SELECT u FROM User u WHERE u.userId.userId = :userId")
 	Optional<User> findByUserId(String userId);

@@ -14,15 +14,15 @@ import lombok.NoArgsConstructor;
 @Embeddable
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class OrderNumber implements Serializable {
+public class OrderId implements Serializable {
 	
-	@Column(name = "order_number")
-	private String orderNumber;
+	@Column(name = "order_id")
+	private String orderId;
 	
-	public OrderNumber(String orderNumber) {
-		if (orderNumber == null || orderNumber.isBlank()) {
-			throw new CoreException(ErrorType.BAD_REQUEST, "주문 번호는 비어있을 수 없습니다.");
+	public OrderId(String orderId) {
+		if (orderId == null || orderId.isBlank()) {
+			throw new CoreException(ErrorType.BAD_REQUEST, "주문 ID는 비어있을 수 없습니다.");
 		}
-		this.orderNumber = orderNumber;
+		this.orderId = orderId;
 	}
 }

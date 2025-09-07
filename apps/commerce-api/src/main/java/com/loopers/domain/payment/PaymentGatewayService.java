@@ -32,7 +32,7 @@ public class PaymentGatewayService {
 				verifyAndSyncPaymentStatusByScheduler(payment);
 			} catch (Exception e) {
 				log.error("결제 상태 확인 실패. transactionKey: {}, error: {}",
-					payment.getTransactionKey().transactionKey(), e.getMessage());
+					payment.getTransactionKey().getTransactionKey(), e.getMessage());
 			}
 		}
 
@@ -40,11 +40,11 @@ public class PaymentGatewayService {
 	}
 
 	private void verifyAndSyncPaymentStatusByScheduler(Payment payment) {
-		PaymentInfo.order pgOrder = pgClient.findOrder(payment.getOrderId().orderId());
+		PaymentInfo.order pgOrder = pgClient.findOrder(payment.getOrderId().getOrderId());
 
 		// PG 상태에 따라 동기화
 		if (pgOrder == null || pgOrder.transactions() == null || pgOrder.transactions().isEmpty()) {
-			log.warn("PG 응답이 비어있음. transactionKey: {}", payment.getTransactionKey().transactionKey());
+			log.warn("PG 응답이 비어있음. transactionKey: {}", payment.getTransactionKey().getTransactionKey());
 			return;
 		}
 

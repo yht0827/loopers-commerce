@@ -1,7 +1,7 @@
 package com.loopers.interfaces.api.user;
 
-import com.loopers.application.user.UserCommand;
-import com.loopers.application.user.UserInfo;
+import com.loopers.application.user.CreateUserCommand;
+import com.loopers.application.user.UserResult;
 
 public record UserDto() {
 
@@ -13,13 +13,13 @@ public record UserDto() {
 			String birthday,
 			String gender
 		) {
-			public UserCommand.CreateUser toCommand() {
-				return new UserCommand.CreateUser(userId, name, email, birthday, gender);
+			public CreateUserCommand toCommand() {
+				return new CreateUserCommand(userId, name, email, birthday, gender);
 			}
 		}
 
 		public record UserResponse(Long id, String userId, String name, String email, String birthday, String gender) {
-			public static UserResponse from(final UserInfo info) {
+			public static UserResponse from(final UserResult info) {
 				return new UserResponse(
 					info.id(),
 					info.userId(),

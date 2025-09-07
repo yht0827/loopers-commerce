@@ -8,7 +8,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
-import com.loopers.domain.common.UserId;
 import com.loopers.support.error.CoreException;
 import com.loopers.support.error.ErrorType;
 
@@ -35,14 +34,15 @@ public class UserTest {
 				.build();
 
 			// assert
-			assertAll(
-				() -> assertThat(user).isNotNull(),
-				() -> assertThat(user.getUserId().userId()).isEqualTo(userId),
-				() -> assertThat(user.getName().name()).isEqualTo(name),
-				() -> assertThat(user.getEmail().email()).isEqualTo(email),
-				() -> assertThat(user.getBirthday().birthday()).isEqualTo(birthday),
-				() -> assertThat(user.getGender()).isEqualTo(Gender.M)
-			);
+			assertThat(user)
+				.isNotNull()
+				.satisfies(u -> {
+					assertThat(u.getUserId().getUserId()).isEqualTo(userId);
+					assertThat(u.getName().getName()).isEqualTo(name);
+					assertThat(u.getEmail().getEmail()).isEqualTo(email);
+					assertThat(u.getBirthday().getBirthday()).isEqualTo(birthday);
+					assertThat(u.getGender()).isEqualTo(Gender.M);
+				});
 		}
 
 		@DisplayName("사용자 이름이 형식에 맞지 않으면, BAD_REQUEST 예외가 발생한다.")

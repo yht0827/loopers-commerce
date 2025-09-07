@@ -3,7 +3,7 @@ package com.loopers.application.order;
 import java.util.List;
 
 import com.loopers.domain.common.Price;
-import com.loopers.domain.common.ProductId;
+import com.loopers.domain.product.ProductId;
 import com.loopers.domain.common.Quantity;
 import com.loopers.domain.order.OrderData;
 import com.loopers.domain.order.OrderItem;

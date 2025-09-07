@@ -8,20 +8,30 @@ import java.util.regex.Pattern;
 
 import com.loopers.support.error.CoreException;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Embeddable
-public record Email(String email) implements Serializable {
+@Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+public class Email implements Serializable {
 
 	private static final Pattern EMAIL_PATTERN = Pattern.compile(
 		"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$");
 
-	public Email {
+	@Column(name = "email")
+	private String email;
+	
+	public Email(String email) {
 		if (email == null || email.isBlank()) {
 			throw new CoreException(BAD_REQUEST, USER_EMAIL_REQUIRED.getMessage());
 		}
 		if (!EMAIL_PATTERN.matcher(email.trim()).matches()) {
 			throw new CoreException(BAD_REQUEST, EMAIL_INVALID_FORMAT.getMessage());
 		}
+		this.email = email;
 	}
 }

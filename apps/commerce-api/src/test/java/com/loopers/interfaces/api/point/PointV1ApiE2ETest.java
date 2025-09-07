@@ -19,7 +19,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 
-import com.loopers.domain.common.UserId;
+import com.loopers.domain.user.UserId;
 import com.loopers.domain.point.Balance;
 import com.loopers.domain.point.Point;
 import com.loopers.infrastructure.point.PointJpaRepository;
@@ -68,7 +68,7 @@ public class PointV1ApiE2ETest {
 
 			assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
 			assertThat(response.getBody()).isNotNull();
-			assertThat(responseData.balance()).isEqualByComparingTo(balance.balance());
+			assertThat(responseData.balance()).isEqualByComparingTo(balance.getBalance());
 		}
 
 		@Test

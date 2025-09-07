@@ -63,11 +63,11 @@ public class OrderEventHandler {
 		}
 		OrderCreatedEvent orderEvent = event.getPayload();
 		try {
-			DataPlatformEvent dataPlatformEvent = DataPlatformEvent.create(orderEvent.getEventType(), orderEvent.getOrderId());
+			DataPlatformEvent dataPlatformEvent = DataPlatformEvent.create(orderEvent.getEventType(), orderEvent.orderId());
 			eventPublisher.publish(dataPlatformEvent);
-			log.info("주문 생성 이벤트를 데이터 플랫폼 이벤트로 발행: {}", orderEvent.getOrderId());
+			log.info("주문 생성 이벤트를 데이터 플랫폼 이벤트로 발행: {}", orderEvent.orderId());
 		} catch (Exception e) {
-			log.error("데이터 플랫폼 이벤트 발행 실패: 주문 ID {}", orderEvent.getOrderId(), e);
+			log.error("데이터 플랫폼 이벤트 발행 실패: 주문 ID {}", orderEvent.orderId(), e);
 		}
 	}
 }

@@ -26,6 +26,6 @@ public class UserRepositoryImpl implements UserRepository {
 
 	@Override
 	public boolean existsByUserId(final String userId) {
-		return userJpaRepository.existsByUserId_UserId(userId);
+		return userJpaRepository.existsByUserIdUserId(userId);
 	}
 }

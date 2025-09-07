@@ -9,7 +9,7 @@ import org.springframework.test.context.ActiveProfiles;
 import com.loopers.application.like.LikeFacade;
 import com.loopers.domain.brand.Brand;
 import com.loopers.domain.brand.BrandName;
-import com.loopers.domain.common.BrandId;
+import com.loopers.domain.brand.BrandId;
 import com.loopers.domain.common.Price;
 import com.loopers.domain.common.Quantity;
 import com.loopers.domain.product.Product;

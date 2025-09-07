@@ -1,31 +1,44 @@
 package com.loopers.application.user;
 
+import static com.loopers.support.error.ErrorMessage.*;
+import static com.loopers.support.error.ErrorType.*;
+
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.loopers.domain.user.User;
-import com.loopers.domain.user.UserCommandService;
-import com.loopers.domain.user.UserQueryService;
+import com.loopers.domain.user.UserRepository;
+import com.loopers.domain.user.UserValidator;
+import com.loopers.support.error.CoreException;
 
 import lombok.RequiredArgsConstructor;
 
 @Service
 @Transactional
 @RequiredArgsConstructor
-public class UserApplicationService {
-	private final UserCommandService userCommandService;
-	private final UserQueryService userQueryService;
+public class UserApplicationService implements UserUseCase {
+	private final UserRepository userRepository;
+	private final UserValidator userValidator;
 
-	public UserInfo createUser(final UserCommand.CreateUser userCommand) {
+	@Override
+	public UserResult createUser(final CreateUserCommand userCommand) {
 		final User user = userCommand.toEntity();
-		User savedUser = userCommandService.createUser(user);
-		return UserInfo.from(savedUser);
+		userValidator.validateUniqueUserId(user.getUserId());
+		try {
+			User savedUser = userRepository.save(user);
+			return UserResult.from(savedUser);
+		} catch (DataIntegrityViolationException e) {
+			throw new CoreException(BAD_REQUEST, USER_ID_ALREADY_EXISTS.getMessage());
+		}
 	}
 
+	@Override
 	@Transactional(readOnly = true)
-	public UserInfo getUser(final UserQuery.GetUser query) {
-		User user = userQueryService.getUser(query.userId());
-		return UserInfo.from(user);
+	public UserResult getUser(final GetUserQuery query) {
+		User user = userRepository.findByUserId(query.userId())
+			.orElseThrow(() -> new CoreException(NOT_FOUND, USER_NOT_FOUND.format(query.userId())));
+		return UserResult.from(user);
 	}
 
 }

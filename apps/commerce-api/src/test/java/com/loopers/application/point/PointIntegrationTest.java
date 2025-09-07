@@ -12,14 +12,15 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import com.loopers.domain.common.UserId;
 import com.loopers.domain.point.Balance;
 import com.loopers.domain.point.Point;
+import com.loopers.domain.user.UserId;
 import com.loopers.infrastructure.point.PointJpaRepository;
 import com.loopers.support.error.CoreException;
 import com.loopers.utils.DatabaseCleanUp;
 
 @SpringBootTest
+@DisplayName("포인트 통합테스트")
 public class PointIntegrationTest {
 
 	@Autowired

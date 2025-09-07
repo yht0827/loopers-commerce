@@ -107,7 +107,7 @@ public class ProductService {
 			Product product = productRepository.findByIdWithPessimisticLock(items.getId())
 				.orElseThrow(() -> new CoreException(ErrorType.NOT_FOUND, "상품을 찾을 수 없습니다."));
 
-			Long oldQuantity = product.getQuantity().quantity();
+			Long oldQuantity = product.getQuantity().getQuantity();
 
 			product.deduct(items.getQuantity());
 

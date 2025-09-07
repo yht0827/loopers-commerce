@@ -1,8 +1,8 @@
 package com.loopers.domain.user;
 
 import com.loopers.domain.BaseEntity;
-import com.loopers.domain.common.UserId;
 
+import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -18,12 +18,16 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class User extends BaseEntity {
 
+	@Embedded
 	private UserId userId;
 
+	@Embedded
 	private UserName name;
 
+	@Embedded
 	private Email email;
 
+	@Embedded
 	private Birthday birthday;
 
 	@Enumerated(EnumType.STRING)
@@ -37,5 +41,4 @@ public class User extends BaseEntity {
 		this.birthday = birthday;
 		this.gender = gender;
 	}
-
 }

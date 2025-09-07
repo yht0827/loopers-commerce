@@ -21,6 +21,7 @@ import com.loopers.domain.product.ProductAggregateService;
 import com.loopers.domain.product.ProductService;
 
 @SpringBootTest
+@DisplayName("좋아요 이벤트 통합테스트")
 class LikeEventHandlerIntegrationTest {
 
 	@Autowired

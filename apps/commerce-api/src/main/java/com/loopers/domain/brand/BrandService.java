@@ -6,7 +6,6 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
 import com.github.benmanes.caffeine.cache.Cache;
-import com.loopers.domain.common.BrandId;
 import com.loopers.support.error.CoreException;
 import com.loopers.support.error.ErrorType;
 
@@ -25,8 +24,8 @@ public class BrandService {
 	private final Cache<String, Object> brandL1Cache;
 	private final RedisTemplate<String, Object> brandL2Cache;
 
-	public BrandInfo getBrandById(final BrandId brandId) {
-		String cacheKey = CACHE_KEY_PREFIX_BRAND + ":" + brandId.brandId();
+	public BrandInfo getBrandById(final Long brandId) {
+		String cacheKey = CACHE_KEY_PREFIX_BRAND + ":" + brandId;
 
 		// 1. L1 캐시 확인 (Cache-Aside)
 		BrandInfo l1Result = (BrandInfo)brandL1Cache.getIfPresent(cacheKey);

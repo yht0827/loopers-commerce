@@ -62,7 +62,7 @@ public class OrderService {
 		Order order = orderRepository.findByIdAndUserId(data.orderId(), data.userId())
 			.orElseThrow(() -> new CoreException(ErrorType.NOT_FOUND, "주문을 찾을 수 없습니다."));
 
-		List<OrderItem> orderItems = orderItemRepository.findAllByOrderId(order.getOrderNumber().orderNumber());
+		List<OrderItem> orderItems = orderItemRepository.findAllByOrderId(order.getOrderNumber().getOrderNumber());
 
 		return OrderInfo.from(order, orderItems);
 	}

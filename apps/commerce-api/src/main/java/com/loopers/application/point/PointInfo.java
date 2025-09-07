@@ -12,8 +12,8 @@ public record PointInfo(
 	public static PointInfo from(final Point point) {
 		return new PointInfo(
 			point.getId(),
-			point.getUserId().userId(),
-			point.getBalance().balance()
+			point.getUserId().getUserId(),
+			point.getBalance().getBalance()
 		);
 	}
 }

@@ -1,12 +1,13 @@
 package com.loopers.domain.payment;
 
 import com.loopers.domain.BaseEntity;
-import com.loopers.domain.common.OrderId;
+import com.loopers.domain.order.OrderId;
 import com.loopers.domain.common.Price;
-import com.loopers.domain.common.UserId;
+import com.loopers.domain.user.UserId;
 import com.loopers.support.error.CoreException;
 import com.loopers.support.error.ErrorType;
 
+import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -22,24 +23,32 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Payment extends BaseEntity {
 
-	OrderId orderId;
+	@Embedded
+	private OrderId orderId;
 
-	UserId userId;
+	@Embedded
+	private UserId userId;
 
 	@Enumerated(EnumType.STRING)
-	CardType cardType;
+	private CardType cardType;
 
-	CardNo cardNo;
+	@Embedded
+	private CardNo cardNo;
 
-	Price amount;
+	@Embedded
+	private Price amount;
 
-	CallbackUrl callbackUrl;
+	@Embedded
+	private CallbackUrl callbackUrl;
 
-	TransactionKey transactionKey;
+	@Embedded
+	private TransactionKey transactionKey;
 
-	TransactionStatus status;
+	@Enumerated(EnumType.STRING)
+	private TransactionStatus status;
 
-	PaymentReason reason;
+	@Embedded
+	private PaymentReason reason;
 
 	@Builder
 	public Payment(OrderId orderId, UserId userId, CardType cardType, CardNo cardNo, Price amount, CallbackUrl callbackUrl,

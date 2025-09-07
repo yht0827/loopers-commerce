@@ -1,7 +1,6 @@
 package com.loopers.domain.like;
 
 import static org.assertj.core.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.*;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -18,24 +17,26 @@ public class LikeTest {
 		@Test
 		void createLikeModel_success() {
 			// arrange
-			LikeId likeId = LikeId.builder().userId(1L).targetId(100L).build();
+			LikeId likeId = new LikeId(1L, 100L);
 
 			// act
 			Like like = Like.builder().targetId(likeId).build();
 
 			// assert
-			assertAll(
-				() -> assertThat(like.getTargetId()).isNotNull(),
-				() -> assertThat(like.getTargetId().userId()).isEqualTo(1L),
-				() -> assertThat(like.getTargetId().targetId()).isEqualTo(100L)
-			);
+			assertThat(like)
+				.isNotNull()
+				.satisfies(l -> {
+					assertThat(l.getTargetId()).isNotNull();
+					assertThat(like.getTargetId().getUserId()).isEqualTo(1L);
+					assertThat(like.getTargetId().getTargetId()).isEqualTo(100L);
+				});
 		}
 
 		@DisplayName("사용자 ID가 null이면, 예외가 발생한다.")
 		@Test
 		void createLike_withNullUserId_throwsException() {
 			// assert
-			assertThatThrownBy(() -> LikeId.builder().userId(null).targetId(100L).build())
+			assertThatThrownBy(() -> new LikeId(null, 100L))
 				.isInstanceOf(CoreException.class)
 				.hasMessage("사용자 ID는 비어있을 수 없습니다.");
 		}
@@ -44,7 +45,7 @@ public class LikeTest {
 		@Test
 		void createLike_withZeroTargetId_throwsException() {
 			// assert
-			assertThatThrownBy(() -> LikeId.builder().userId(1L).targetId(0L).build())
+			assertThatThrownBy(() -> new LikeId(1L, 0L))
 				.isInstanceOf(CoreException.class)
 				.hasMessage("좋아요 대상 ID는 비어있을 수 없습니다.");
 		}
