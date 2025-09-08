@@ -6,6 +6,8 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
+import com.loopers.domain.product.ProductId;
+import com.loopers.domain.user.UserId;
 import com.loopers.support.error.CoreException;
 
 public class LikeTest {
@@ -17,18 +19,18 @@ public class LikeTest {
 		@Test
 		void createLikeModel_success() {
 			// arrange
-			LikeId likeId = new LikeId(1L, 100L);
+			Like like = Like.builder()
+				.userId(UserId.of("yht0827"))
+				.productId(ProductId.of(100L))
+				.build();
 
-			// act
-			Like like = Like.builder().targetId(likeId).build();
-
-			// assert
+			// act and assert
 			assertThat(like)
 				.isNotNull()
 				.satisfies(l -> {
-					assertThat(l.getTargetId()).isNotNull();
-					assertThat(like.getTargetId().getUserId()).isEqualTo(1L);
-					assertThat(like.getTargetId().getTargetId()).isEqualTo(100L);
+					assertThat(l).isNotNull();
+					assertThat(l.getUserId().getUserId()).isEqualTo("yht0827");
+					assertThat(l.getProductId().getProductId()).isEqualTo(100L);
 				});
 		}
 
@@ -36,18 +38,24 @@ public class LikeTest {
 		@Test
 		void createLike_withNullUserId_throwsException() {
 			// assert
-			assertThatThrownBy(() -> new LikeId(null, 100L))
+			assertThatThrownBy(() -> Like.builder()
+				.userId(UserId.of(null))
+				.productId(ProductId.of(100L))
+				.build())
 				.isInstanceOf(CoreException.class)
-				.hasMessage("사용자 ID는 비어있을 수 없습니다.");
+				.hasMessage("사용자 ID는 필수입니다.");
 		}
 
-		@DisplayName("대상 ID가 0 이하면, 예외가 발생한다.")
+		@DisplayName("제품 ID가 0 이하면, 예외가 발생한다.")
 		@Test
-		void createLike_withZeroTargetId_throwsException() {
+		void createLike_withZeroProductId_throwsException() {
 			// assert
-			assertThatThrownBy(() -> new LikeId(1L, 0L))
+			assertThatThrownBy(() -> Like.builder()
+				.userId(UserId.of("yht0827"))
+				.productId(ProductId.of(0L))
+				.build())
 				.isInstanceOf(CoreException.class)
-				.hasMessage("좋아요 대상 ID는 비어있을 수 없습니다.");
+				.hasMessage("제품 ID는 비어있을 수 없습니다.");
 		}
 	}
 }

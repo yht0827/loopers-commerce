@@ -25,4 +25,8 @@ public class ProductId implements Serializable {
 		}
 		this.productId = productId;
 	}
+
+	public static ProductId of(Long productId) {
+		return new ProductId(productId);
+	}
 }

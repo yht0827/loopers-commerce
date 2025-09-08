@@ -7,10 +7,10 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.loopers.application.user.UserUseCase;
 import com.loopers.application.user.CreateUserCommand;
-import com.loopers.application.user.UserResult;
 import com.loopers.application.user.GetUserQuery;
+import com.loopers.application.user.UserResult;
+import com.loopers.application.user.UserUseCase;
 import com.loopers.interfaces.api.ApiResponse;
 
 import lombok.RequiredArgsConstructor;

@@ -6,10 +6,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 
-import com.loopers.application.like.LikeFacade;
 import com.loopers.domain.brand.Brand;
-import com.loopers.domain.brand.BrandName;
 import com.loopers.domain.brand.BrandId;
+import com.loopers.domain.brand.BrandName;
 import com.loopers.domain.common.Price;
 import com.loopers.domain.common.Quantity;
 import com.loopers.domain.product.Product;
@@ -23,9 +22,6 @@ import com.loopers.infrastructure.product.ProductJpaRepository;
 @ActiveProfiles("test")
 @SpringBootTest
 public class LikeConcurrencyTest {
-
-	@Autowired
-	private LikeFacade likeFacade;
 
 	@Autowired
 	private LikeJpaRepository likeJpaRepository;

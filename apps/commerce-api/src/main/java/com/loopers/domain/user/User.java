@@ -22,9 +22,6 @@ public class User extends BaseEntity {
 	private UserId userId;
 
 	@Embedded
-	private UserName name;
-
-	@Embedded
 	private Email email;
 
 	@Embedded
@@ -33,10 +30,9 @@ public class User extends BaseEntity {
 	@Enumerated(EnumType.STRING)
 	private Gender gender;
 
-	@Builder
-	public User(UserId userId, UserName name, Email email, Birthday birthday, Gender gender) {
+	@Builder(builderMethodName = "create")
+	public User(UserId userId, Email email, Birthday birthday, Gender gender) {
 		this.userId = userId;
-		this.name = name;
 		this.email = email;
 		this.birthday = birthday;
 		this.gender = gender;

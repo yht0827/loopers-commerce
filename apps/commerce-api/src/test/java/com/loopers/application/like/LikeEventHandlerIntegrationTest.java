@@ -15,10 +15,11 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
 
 import com.loopers.domain.like.Like;
-import com.loopers.domain.like.LikeId;
 import com.loopers.domain.like.LikeRepository;
 import com.loopers.domain.product.ProductAggregateService;
+import com.loopers.domain.product.ProductId;
 import com.loopers.domain.product.ProductService;
+import com.loopers.domain.user.UserId;
 
 @SpringBootTest
 @DisplayName("좋아요 이벤트 통합테스트")
@@ -40,7 +41,7 @@ class LikeEventHandlerIntegrationTest {
 	@DisplayName("상품 좋아요 시 이벤트 핸들러가 정상적으로 처리되는지 확인")
 	void testLikeProductEventHandling() {
 		// Given
-		Long userId = 1L;
+		String userId = "yht0827";
 		Long productId = 100L;
 
 		given(productAggregateService.incrementLikeCount(productId)).willReturn(true);
@@ -62,7 +63,7 @@ class LikeEventHandlerIntegrationTest {
 	@DisplayName("상품 좋아요 취소 시 이벤트 핸들러가 정상적으로 처리되는지 확인")
 	void testUnlikeProductEventHandling() {
 		// Given
-		Long userId = 1L;
+		String userId = "yht0827";
 		Long productId = 100L;
 
 		given(productAggregateService.decrementLikeCount(productId)).willReturn(true);
@@ -84,7 +85,7 @@ class LikeEventHandlerIntegrationTest {
 	@DisplayName("좋아요 수 업데이트 실패 시 Aggregate 생성 후 재시도")
 	void testLikeProductWithAggregateCreation() {
 		// Given
-		Long userId = 1L;
+		String userId = "yht0827";
 		Long productId = 200L;
 
 		// 첫 번째 호출은 실패, 두 번째 호출은 성공
@@ -113,10 +114,10 @@ class LikeEventHandlerIntegrationTest {
 	@DisplayName("좋아요 취소 시 실패하면 캐시 무효화가 호출되지 않는지 확인")
 	void testUnlikeProductFailure() {
 		// Given
-		Long userId = 1L;
+		String userId = "yht0827";
 		Long productId = 300L;
 
-		Like like = new Like(new LikeId(userId, productId));
+		Like like = new Like(UserId.of(userId), ProductId.of(productId));
 		likeRepository.save(like);
 
 		given(productAggregateService.decrementLikeCount(productId)).willReturn(false);

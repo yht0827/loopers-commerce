@@ -20,7 +20,7 @@ import com.loopers.support.error.CoreException;
 import com.loopers.utils.DatabaseCleanUp;
 
 @SpringBootTest
-@DisplayName("유저 통합테스트")
+@DisplayName("회원 통합 테스트")
 public class UserIntegrationTest {
 
 	@Autowired
@@ -33,7 +33,6 @@ public class UserIntegrationTest {
 	private DatabaseCleanUp databaseCleanUp;
 
 	private static final String TEST_USER_ID = "yht0827";
-	private static final String TEST_NAME = "양희태";
 	private static final String TEST_EMAIL = "yht0827@naver.com";
 	private static final String TEST_BIRTHDAY = "1999-01-01";
 
@@ -43,14 +42,13 @@ public class UserIntegrationTest {
 	}
 
 	private CreateUserCommand createTestCommand() {
-		return new CreateUserCommand(TEST_USER_ID, TEST_NAME, TEST_EMAIL, TEST_BIRTHDAY, "M");
+		return new CreateUserCommand(TEST_USER_ID, TEST_EMAIL, TEST_BIRTHDAY, "M");
 	}
 
 	private void assertUserInfoEquals(UserResult info) {
 		assertAll(
 			() -> assertThat(info).isNotNull(),
 			() -> assertThat(info.userId()).isEqualTo(TEST_USER_ID),
-			() -> assertThat(info.name()).isEqualTo(TEST_NAME),
 			() -> assertThat(info.email()).isEqualTo(TEST_EMAIL),
 			() -> assertThat(info.birthday()).isEqualTo(TEST_BIRTHDAY),
 			() -> assertThat(info.gender()).isEqualTo(Gender.M.name())
@@ -61,7 +59,6 @@ public class UserIntegrationTest {
 		assertAll(
 			() -> assertThat(user).isNotNull(),
 			() -> assertThat(user.getUserId().getUserId()).isEqualTo(TEST_USER_ID),
-			() -> assertThat(user.getName().getName()).isEqualTo(TEST_NAME),
 			() -> assertThat(user.getEmail().getEmail()).isEqualTo(TEST_EMAIL),
 			() -> assertThat(user.getBirthday().getBirthday()).isEqualTo(TEST_BIRTHDAY),
 			() -> assertThat(user.getGender()).isEqualTo(Gender.M)

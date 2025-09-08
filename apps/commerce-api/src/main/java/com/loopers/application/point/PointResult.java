@@ -4,13 +4,13 @@ import java.math.BigDecimal;
 
 import com.loopers.domain.point.Point;
 
-public record PointInfo(
+public record PointResult(
 	Long id,
 	String userId,
 	BigDecimal balance
 ) {
-	public static PointInfo from(final Point point) {
-		return new PointInfo(
+	public static PointResult from(final Point point) {
+		return new PointResult(
 			point.getId(),
 			point.getUserId().getUserId(),
 			point.getBalance().getBalance()

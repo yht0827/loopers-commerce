@@ -23,7 +23,7 @@ public class Point extends BaseEntity {
 	@Embedded
 	private Balance balance;
 
-	@Builder
+	@Builder(builderMethodName = "create")
 	public Point(final UserId userId, final Balance balance) {
 		this.userId = userId;
 		this.balance = balance;

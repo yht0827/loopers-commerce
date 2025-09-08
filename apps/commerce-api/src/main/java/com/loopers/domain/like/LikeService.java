@@ -4,6 +4,8 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 
+import com.loopers.domain.product.ProductId;
+import com.loopers.domain.user.UserId;
 import com.loopers.support.error.CoreException;
 import com.loopers.support.error.ErrorType;
 
@@ -17,7 +19,7 @@ public class LikeService {
 
 	private final LikeRepository likeRepository;
 
-	public LikeInfo likeProduct(Long userId, Long productId) {
+	public Like likeProduct(final UserId userId, final ProductId productId) {
 
 		// 이미 좋아요를 눌렀는지 확인
 		if (likeRepository.findByUserIdAndProductId(userId, productId).isPresent()) {
@@ -25,21 +27,22 @@ public class LikeService {
 		}
 
 		// 좋아요 정보 저장
-		LikeId likeId = new LikeId(userId, productId);
-		Like productLike = new Like(likeId);
+		Like productLike = new Like(userId, productId);
 
-		Like save = likeRepository.save(productLike);
-		return LikeInfo.from(save);
+		return likeRepository.save(productLike);
 	}
 
-	public void unlikeProduct(Long userId, Long productId) {
+	public void unlikeProduct(final UserId userId, final ProductId productId) {
 		Like productLike = likeRepository.findByUserIdAndProductId(userId, productId)
 			.orElseThrow(() -> new CoreException(ErrorType.NOT_FOUND, "좋아요 정보를 찾을 수 없습니다."));
 
 		likeRepository.delete(productLike);
 	}
 
-	public List<LikeInfo> getAllLikedProductIds(Long userId) {
-		return likeRepository.getAllLikedByUserId(userId).stream().map(LikeInfo::from).toList();
+	public List<Like> getAllLikedProductIds(final UserId userId) {
+		return likeRepository.getAllLikedByUserId(userId)
+			.stream()
+			.map(Like::from)
+			.toList();
 	}
 }

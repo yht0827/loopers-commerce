@@ -19,13 +19,14 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 
-import com.loopers.domain.user.UserId;
 import com.loopers.domain.point.Balance;
 import com.loopers.domain.point.Point;
+import com.loopers.domain.user.UserId;
 import com.loopers.infrastructure.point.PointJpaRepository;
 import com.loopers.interfaces.api.ApiResponse;
 import com.loopers.utils.DatabaseCleanUp;
 
+@DisplayName("포인트 E2E 테스트")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class PointV1ApiE2ETest {
 

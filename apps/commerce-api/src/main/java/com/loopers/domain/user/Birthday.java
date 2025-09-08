@@ -30,4 +30,8 @@ public class Birthday implements Serializable {
 		}
 		this.birthday = birthday;
 	}
+
+	public static Birthday of(String birthday) {
+		return new Birthday(birthday);
+	}
 }

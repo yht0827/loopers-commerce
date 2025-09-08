@@ -1,6 +1,10 @@
 package com.loopers.domain.like;
 
-import jakarta.persistence.EmbeddedId;
+import com.loopers.domain.BaseEntity;
+import com.loopers.domain.product.ProductId;
+import com.loopers.domain.user.UserId;
+
+import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 import jakarta.persistence.Version;
@@ -13,17 +17,28 @@ import lombok.NoArgsConstructor;
 @Getter
 @Table(name = "likes")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Like {
+public class Like extends BaseEntity {
 
-	@EmbeddedId
-	private LikeId targetId;
+	@Embedded
+	private UserId userId;
+
+	@Embedded
+	private ProductId productId;
 
 	@Version
 	private Long version;
 
 	@Builder
-	public Like(LikeId targetId) {
-		this.targetId = targetId;
+	public Like(UserId userId, ProductId productId) {
+		this.userId = userId;
+		this.productId = productId;
+	}
+
+	public Like from() {
+		return Like.builder()
+			.userId(userId)
+			.productId(productId)
+			.build();
 	}
 
 }
