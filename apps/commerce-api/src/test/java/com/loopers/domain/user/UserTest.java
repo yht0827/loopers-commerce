@@ -8,10 +8,10 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
-import com.loopers.domain.common.UserId;
 import com.loopers.support.error.CoreException;
 import com.loopers.support.error.ErrorType;
 
+@DisplayName("회원 단위 테스트")
 public class UserTest {
 	@DisplayName("회원을 생성할 때, ")
 	@Nested
@@ -21,44 +21,40 @@ public class UserTest {
 		void createsUsersModel_whenFieldsAreProvided() {
 			// arrange
 			String userId = "yht0827";
-			String name = "양희태";
 			String email = "yht0827@naver.com";
 			String birthday = "1999-01-01";
 
 			// act
-			User user = User.builder()
+			User user = User.create()
 				.userId(new UserId(userId))
-				.name(new UserName(name))
 				.email(new Email(email))
 				.birthday(new Birthday(birthday))
 				.gender(Gender.M)
 				.build();
 
 			// assert
-			assertAll(
-				() -> assertThat(user).isNotNull(),
-				() -> assertThat(user.getUserId().userId()).isEqualTo(userId),
-				() -> assertThat(user.getName().name()).isEqualTo(name),
-				() -> assertThat(user.getEmail().email()).isEqualTo(email),
-				() -> assertThat(user.getBirthday().birthday()).isEqualTo(birthday),
-				() -> assertThat(user.getGender()).isEqualTo(Gender.M)
-			);
+			assertThat(user)
+				.isNotNull()
+				.satisfies(u -> {
+					assertThat(u.getUserId().getUserId()).isEqualTo(userId);
+					assertThat(u.getEmail().getEmail()).isEqualTo(email);
+					assertThat(u.getBirthday().getBirthday()).isEqualTo(birthday);
+					assertThat(u.getGender()).isEqualTo(Gender.M);
+				});
 		}
 
-		@DisplayName("사용자 이름이 형식에 맞지 않으면, BAD_REQUEST 예외가 발생한다.")
+		@DisplayName("사용자 ID 가 영문 및 숫자 10자 이내 형식에 맞지 않으면, User 객체 생성에 실패한다.")
 		@Test
 		void throwsBadRequestException_whenUserNameIsInvalid() {
 			// arrange
-			String userId = "yht0827";
-			String invalidName = "test123!@#"; // 숫자와 특수문자 포함
+			String invalidUserId = "test123!@#"; // 숫자와 특수문자 포함
 			String email = "yht0827@naver.com";
 			String birthday = "1999-01-01";
 
 			// act and assert
 			CoreException result = assertThrows(CoreException.class, () ->
-				User.builder()
-					.userId(new UserId(userId))
-					.name(new UserName(invalidName))
+				User.create()
+					.userId(new UserId(invalidUserId))
 					.email(new Email(email))
 					.birthday(new Birthday(birthday))
 					.gender(Gender.M)
@@ -69,20 +65,18 @@ public class UserTest {
 			assertThat(result.getCustomMessage()).contains(USER_NAME_INVALID_FORMAT.format(10));
 		}
 
-		@DisplayName("이메일이 xx@yy.zz 형식에 맞지 않으면, BAD_REQUEST 예외가 발생한다.")
+		@DisplayName("이메일이 xx@yy.zz 형식에 맞지 않으면, User 객체 생성에 실패한다.")
 		@Test
 		void throwsBadRequestException_whenEmailIsInvalid() {
 			// arrange
 			String userId = "yht0827";
-			String name = "양희태";
 			String invalidEmail = "yht0827@naver";
 			String birthday = "1999-01-01";
 
 			// act and assert
 			CoreException result = assertThrows(CoreException.class, () ->
-				User.builder()
+				User.create()
 					.userId(new UserId(userId))
-					.name(new UserName(name))
 					.email(new Email(invalidEmail))
 					.birthday(new Birthday(birthday))
 					.gender(Gender.M)
@@ -93,20 +87,18 @@ public class UserTest {
 			assertThat(result.getCustomMessage()).isEqualTo(EMAIL_INVALID_FORMAT.getMessage());
 		}
 
-		@DisplayName("생년월일이 yyyy-MM-dd 형식에 맞지 않으면, BAD_REQUEST 예외가 발생한다.")
+		@DisplayName("생년월일이 yyyy-MM-dd 형식에 맞지 않으면, User 객체 생성에 실패한다.")
 		@Test
 		void throwsBadRequestException_whenBirthdayIsInvalid() {
 			// arrange
 			String userId = "yht0827";
-			String name = "양희태";
 			String email = "yht0827@naver.com";
 			String invalidBirthday = "19990101";
 
 			// act and assert
 			CoreException result = assertThrows(CoreException.class, () ->
-				User.builder()
+				User.create()
 					.userId(new UserId(userId))
-					.name(new UserName(name))
 					.email(new Email(email))
 					.birthday(new Birthday(invalidBirthday))
 					.gender(Gender.M)

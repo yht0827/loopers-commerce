@@ -16,11 +16,11 @@ public record PaymentInfo(
 
 	public static PaymentInfo from(final Payment payment) {
 		return new PaymentInfo(
-			payment.getTransactionKey().transactionKey(),
-			payment.getOrderId().orderId(),
+			payment.getTransactionKey().getTransactionKey(),
+			payment.getOrderId().getOrderId(),
 			payment.getCardType(),
-			payment.getCardNo().cardNo(),
-			payment.getAmount().price(),
+			payment.getCardNo().getCardNo(),
+			payment.getAmount().getPrice(),
 			payment.getStatus(),
 			payment.getReason().reason()
 		);

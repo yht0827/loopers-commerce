@@ -6,19 +6,37 @@ import com.loopers.support.error.CoreException;
 import com.loopers.support.error.ErrorType;
 
 import jakarta.persistence.Embeddable;
+import jakarta.persistence.Embedded;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Embeddable
-public record DiscountPolicy(
-	DiscountValue discountValue, MaxDisCountAmount maxDiscountAmount, CouponType couponType
-) implements Serializable {
+@Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+public class DiscountPolicy implements Serializable {
 
-	public DiscountPolicy {
+	@Embedded
+	private DiscountValue discountValue;
+
+	@Embedded
+	private MaxDisCountAmount maxDiscountAmount;
+
+	@Enumerated(EnumType.STRING)
+	private CouponType couponType;
+
+	public DiscountPolicy(DiscountValue discountValue, MaxDisCountAmount maxDiscountAmount, CouponType couponType) {
 		if (discountValue == null) {
 			throw new CoreException(ErrorType.BAD_REQUEST, "할인 값이 설정되지 않았습니다.");
 		}
 		if (couponType == null) {
 			throw new CoreException(ErrorType.BAD_REQUEST, "쿠폰 타입이 설정되지 않았습니다.");
 		}
+		this.discountValue = discountValue;
+		this.maxDiscountAmount = maxDiscountAmount;
+		this.couponType = couponType;
 	}
 
 	public Long calculate(Long amount) {

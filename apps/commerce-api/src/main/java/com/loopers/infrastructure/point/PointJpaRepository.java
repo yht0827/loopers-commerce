@@ -7,20 +7,21 @@ import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Query;
 
 import com.loopers.domain.point.Point;
+import com.loopers.domain.user.UserId;
 
 import jakarta.persistence.LockModeType;
 
 public interface PointJpaRepository extends JpaRepository<Point, Long> {
 
-	@Query("SELECT p FROM Point p WHERE p.userId.userId = :userId")
-	Optional<Point> findByUserId(final String userId);
+	@Query("SELECT p FROM Point p WHERE p.userId = :userId")
+	Optional<Point> findByUserId(final UserId userId);
 
 	@Lock(LockModeType.PESSIMISTIC_WRITE)
-	@Query("SELECT p FROM Point p WHERE p.userId.userId = :userId")
-	Optional<Point> findByUserIdWithPessimisticLock(final String userId);
+	@Query("SELECT p FROM Point p WHERE p.userId = :userId")
+	Optional<Point> findByUserIdWithPessimisticLock(final UserId userId);
 
 	@Lock(LockModeType.OPTIMISTIC)
-	@Query("SELECT p FROM Point p WHERE p.userId.userId = :userId")
-	Optional<Point> findByUserIdWithOptimisticLock(final String userId);
+	@Query("SELECT p FROM Point p WHERE p.userId = :userId")
+	Optional<Point> findByUserIdWithOptimisticLock(final UserId userId);
 
 }

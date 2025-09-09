@@ -1,11 +1,11 @@
 package com.loopers.domain.order;
 
 import com.loopers.domain.BaseEntity;
-import com.loopers.domain.common.OrderId;
 import com.loopers.domain.common.Price;
-import com.loopers.domain.common.ProductId;
 import com.loopers.domain.common.Quantity;
+import com.loopers.domain.product.ProductId;
 
+import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
@@ -19,12 +19,16 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class OrderItem extends BaseEntity {
 
+	@Embedded
 	private OrderId orderId;
 
+	@Embedded
 	private ProductId productId;
 
+	@Embedded
 	private Quantity quantity;
 
+	@Embedded
 	private Price price;
 
 	@Builder

@@ -13,25 +13,18 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
 
-import com.loopers.domain.common.UserId;
-import com.loopers.domain.user.Birthday;
-import com.loopers.domain.user.Email;
 import com.loopers.domain.user.Gender;
 import com.loopers.domain.user.User;
-import com.loopers.domain.user.UserCommandService;
-import com.loopers.domain.user.UserName;
-import com.loopers.domain.user.UserQueryService;
 import com.loopers.infrastructure.user.UserJpaRepository;
 import com.loopers.support.error.CoreException;
 import com.loopers.utils.DatabaseCleanUp;
 
 @SpringBootTest
+@DisplayName("회원 통합 테스트")
 public class UserIntegrationTest {
-	@Autowired
-	private UserCommandService userCommandService;
 
 	@Autowired
-	private UserQueryService userQueryService;
+	private UserUseCase userUseCase;
 
 	@MockitoSpyBean
 	private UserJpaRepository userJpaRepository;
@@ -40,7 +33,6 @@ public class UserIntegrationTest {
 	private DatabaseCleanUp databaseCleanUp;
 
 	private static final String TEST_USER_ID = "yht0827";
-	private static final String TEST_NAME = "양희태";
 	private static final String TEST_EMAIL = "yht0827@naver.com";
 	private static final String TEST_BIRTHDAY = "1999-01-01";
 
@@ -49,23 +41,26 @@ public class UserIntegrationTest {
 		databaseCleanUp.truncateAllTables();
 	}
 
-	private User createTestUser() {
-		return User.builder()
-			.userId(new UserId(TEST_USER_ID))
-			.name(new UserName(TEST_NAME))
-			.email(new Email(TEST_EMAIL))
-			.birthday(new Birthday(TEST_BIRTHDAY))
-			.gender(Gender.M)
-			.build();
+	private CreateUserCommand createTestCommand() {
+		return new CreateUserCommand(TEST_USER_ID, TEST_EMAIL, TEST_BIRTHDAY, "M");
+	}
+
+	private void assertUserInfoEquals(UserResult info) {
+		assertAll(
+			() -> assertThat(info).isNotNull(),
+			() -> assertThat(info.userId()).isEqualTo(TEST_USER_ID),
+			() -> assertThat(info.email()).isEqualTo(TEST_EMAIL),
+			() -> assertThat(info.birthday()).isEqualTo(TEST_BIRTHDAY),
+			() -> assertThat(info.gender()).isEqualTo(Gender.M.name())
+		);
 	}
 
 	private void assertUserEquals(User user) {
 		assertAll(
 			() -> assertThat(user).isNotNull(),
-			() -> assertThat(user.getUserId().userId()).isEqualTo(TEST_USER_ID),
-			() -> assertThat(user.getName().name()).isEqualTo(TEST_NAME),
-			() -> assertThat(user.getEmail().email()).isEqualTo(TEST_EMAIL),
-			() -> assertThat(user.getBirthday().birthday()).isEqualTo(TEST_BIRTHDAY),
+			() -> assertThat(user.getUserId().getUserId()).isEqualTo(TEST_USER_ID),
+			() -> assertThat(user.getEmail().getEmail()).isEqualTo(TEST_EMAIL),
+			() -> assertThat(user.getBirthday().getBirthday()).isEqualTo(TEST_BIRTHDAY),
 			() -> assertThat(user.getGender()).isEqualTo(Gender.M)
 		);
 	}
@@ -74,20 +69,19 @@ public class UserIntegrationTest {
 	class Read {
 		@DisplayName("유저를 조회할 때,")
 		@Nested
-		class GetUser {
+		class GetUserTest {
 
 			@DisplayName("해당 ID의 회원이 존재할 경우, 회원 정보가 반환된다.")
 			@Test
 			void shouldReturnUserInfo_whenUserExists() {
 				// arrange
-				User user = createTestUser();
-				User savedUser = userCommandService.createUser(user);
+				UserResult created = userUseCase.createUser(createTestCommand());
 
 				// act
-				User foundUser = userQueryService.getUser(savedUser.getUserId().userId());
+				UserResult found = userUseCase.getUser(GetUserQuery.of(created.userId()));
 
 				// assert
-				assertUserEquals(foundUser);
+				assertUserInfoEquals(found);
 			}
 
 			@DisplayName("해당 ID의 회원이 존재하지 않을 경우, 예외가 발생한다.")
@@ -97,7 +91,7 @@ public class UserIntegrationTest {
 				String nonExistentUserId = "nonExistent";
 
 				// act and assert
-				assertThrows(CoreException.class, () -> userQueryService.getUser(nonExistentUserId));
+				assertThrows(CoreException.class, () -> userUseCase.getUser(GetUserQuery.of(nonExistentUserId)));
 			}
 		}
 	}
@@ -106,23 +100,23 @@ public class UserIntegrationTest {
 	class Create {
 		@DisplayName("유저를 생성할 때,")
 		@Nested
-		class CreateUser {
+		class CreateUserTest {
 
 			@DisplayName("올바른 정보로 회원 가입시, User 저장이 수행된다.")
 			@Test
 			void shouldSaveUser_whenValidUserCommandProvided() {
 				// arrange
-				User user = createTestUser();
+				CreateUserCommand command = createTestCommand();
 
 				// act
-				User result = userCommandService.createUser(user);
+				UserResult result = userUseCase.createUser(command);
 
 				// assert
 				ArgumentCaptor<User> captor = ArgumentCaptor.forClass(User.class);
 				verify(userJpaRepository, times(1)).save(captor.capture());
 				User savedUser = captor.getValue();
 
-				assertUserEquals(result);
+				assertUserInfoEquals(result);
 				assertUserEquals(savedUser);
 			}
 
@@ -130,14 +124,14 @@ public class UserIntegrationTest {
 			@Test
 			void shouldThrowException_whenUserIdAlreadyExists() {
 				// arrange
-				User user = createTestUser();
-				userCommandService.createUser(user);
+				CreateUserCommand command = createTestCommand();
+				userUseCase.createUser(command);
 
-				User duplicateUser = createTestUser();
+				CreateUserCommand duplicate = createTestCommand();
 
 				// act and assert
 				assertThrows(
-					CoreException.class, () -> userCommandService.createUser(duplicateUser));
+					CoreException.class, () -> userUseCase.createUser(duplicate));
 			}
 		}
 	}

@@ -6,6 +6,7 @@ import org.springframework.stereotype.Repository;
 
 import com.loopers.domain.point.Point;
 import com.loopers.domain.point.PointRepository;
+import com.loopers.domain.user.UserId;
 
 import lombok.RequiredArgsConstructor;
 
@@ -16,17 +17,17 @@ public class PointRepositoryImpl implements PointRepository {
 	private final PointJpaRepository pointJpaRepository;
 
 	@Override
-	public Optional<Point> findByUsersId(final String userId) {
+	public Optional<Point> findByUsersId(final UserId userId) {
 		return pointJpaRepository.findByUserId(userId);
 	}
 
 	@Override
-	public Optional<Point> findByUserIdWithPessimisticLock(final String userId) {
+	public Optional<Point> findByUserIdWithPessimisticLock(final UserId userId) {
 		return pointJpaRepository.findByUserIdWithPessimisticLock(userId);
 	}
 
 	@Override
-	public Optional<Point> findByUserIdWithOptimisticLock(final String userId) {
+	public Optional<Point> findByUserIdWithOptimisticLock(final UserId userId) {
 		return pointJpaRepository.findByUserIdWithOptimisticLock(userId);
 	}
 

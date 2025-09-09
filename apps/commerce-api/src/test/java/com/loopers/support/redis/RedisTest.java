@@ -9,12 +9,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.redis.core.RedisTemplate;
 
-import com.loopers.domain.common.UserId;
 import com.loopers.domain.user.Birthday;
 import com.loopers.domain.user.Email;
 import com.loopers.domain.user.Gender;
 import com.loopers.domain.user.User;
-import com.loopers.domain.user.UserName;
+import com.loopers.domain.user.UserId;
 import com.loopers.utils.RedisCleanUp;
 
 @SpringBootTest
@@ -46,9 +45,8 @@ public class RedisTest {
 	@Test
 	@DisplayName("JSON 직렬화 테스트 - User 객체를 Redis에 저장")
 	public void jsonObjectSerializationTest() {
-		User user = User.builder()
+		User user = User.create()
 			.userId(new UserId("testuser1"))
-			.name(new UserName("홍길동"))
 			.email(new Email("hong@example.com"))
 			.birthday(new Birthday("1990-01-01"))
 			.gender(Gender.M)
@@ -64,9 +62,8 @@ public class RedisTest {
 	@Test
 	@DisplayName("JSON 역직렬화 테스트 - Redis에서 User 객체 조회")
 	public void jsonObjectDeserializationTest() {
-		User originalUser = User.builder()
+		User originalUser = User.create()
 			.userId(new UserId("testuser2"))
-			.name(new UserName("홍길동"))
 			.email(new Email("hong@example.com"))
 			.birthday(new Birthday("1990-01-01"))
 			.gender(Gender.M)
@@ -82,10 +79,9 @@ public class RedisTest {
 		assertThat(result).isInstanceOf(User.class);
 
 		if (result instanceof User user) {
-			assertThat(user.getName().name()).isEqualTo("홍길동");
-			assertThat(user.getEmail().email()).isEqualTo("hong@example.com");
-			assertThat(user.getUserId().userId()).isEqualTo("testuser2");
-			assertThat(user.getBirthday().birthday()).isEqualTo("1990-01-01");
+			assertThat(user.getEmail().getEmail()).isEqualTo("hong@example.com");
+			assertThat(user.getUserId().getUserId()).isEqualTo("testuser2");
+			assertThat(user.getBirthday().getBirthday()).isEqualTo("1990-01-01");
 			assertThat(user.getGender().name()).isEqualTo("M");
 		}
 	}
@@ -93,17 +89,15 @@ public class RedisTest {
 	@Test
 	@DisplayName("JSON Hash 연산 테스트 - Hash 구조에서 User 객체 저장/조회")
 	public void jsonHashOperationTest() {
-		User user1 = User.builder()
+		User user1 = User.create()
 			.userId(new UserId("testuser1"))
-			.name(new UserName("홍길동"))
 			.email(new Email("hong@example.com"))
 			.birthday(new Birthday("1990-01-01"))
 			.gender(Gender.M)
 			.build();
 
-		User user2 = User.builder()
+		User user2 = User.create()
 			.userId(new UserId("testuser2"))
-			.name(new UserName("이영희"))
 			.email(new Email("lee@example.com"))
 			.birthday(new Birthday("1988-03-20"))
 			.gender(Gender.F)
@@ -121,10 +115,8 @@ public class RedisTest {
 		User retrievedUserObj1 = (User)retrievedUser1;
 		User retrievedUserObj2 = (User)retrievedUser2;
 
-		assertThat(retrievedUserObj1.getName().name()).isEqualTo("홍길동");
-		assertThat(retrievedUserObj1.getUserId().userId()).isEqualTo("testuser1");
-		assertThat(retrievedUserObj2.getName().name()).isEqualTo("이영희");
-		assertThat(retrievedUserObj2.getUserId().userId()).isEqualTo("testuser2");
+		assertThat(retrievedUserObj1.getUserId().getUserId()).isEqualTo("testuser1");
+		assertThat(retrievedUserObj2.getUserId().getUserId()).isEqualTo("testuser2");
 	}
 
 }

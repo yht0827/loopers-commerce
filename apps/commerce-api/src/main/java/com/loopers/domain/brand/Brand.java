@@ -1,6 +1,10 @@
 package com.loopers.domain.brand;
 
 import com.loopers.domain.BaseEntity;
+
+import jakarta.persistence.AttributeOverride;
+import jakarta.persistence.Column;
+import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
@@ -14,6 +18,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Brand extends BaseEntity {
 
+	@Embedded
+	@AttributeOverride(name = "brandName", column = @Column(name = "brand_name"))
 	private BrandName brandName;
 
 	@Builder

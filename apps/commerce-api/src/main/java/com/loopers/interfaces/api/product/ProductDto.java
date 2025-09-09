@@ -35,12 +35,12 @@ public record ProductDto() {
 			}
 		}
 
-		public record ProductDetailResponse(Long productId, String productName, Long price, Long quantity, String bradName,
+		public record ProductDetailResponse(Long productId, String productName, Long price, Long quantity, String brandName,
 											Long likeCount) {
 			public static ProductDetailResponse from(final ProductDetailResult productDetailResult) {
 				return new ProductDetailResponse(
 					productDetailResult.productId(), productDetailResult.productName(), productDetailResult.price(),
-					productDetailResult.quantity(), productDetailResult.bradName(), productDetailResult.likeCount());
+					productDetailResult.quantity(), productDetailResult.brandName(), productDetailResult.likeCount());
 			}
 		}
 

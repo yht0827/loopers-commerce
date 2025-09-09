@@ -1,10 +1,11 @@
 package com.loopers.domain.order;
 
 import com.loopers.domain.BaseEntity;
-import com.loopers.domain.common.UserId;
+import com.loopers.domain.user.UserId;
 import com.loopers.support.error.CoreException;
 import com.loopers.support.error.ErrorType;
 
+import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -20,10 +21,19 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Order extends BaseEntity {
 
+	@Embedded
 	private UserId userId;
+
+	@Embedded
 	private TotalOrderPrice totalOrderPrice;
+
+	@Embedded
 	private CouponDiscountAmount couponDiscountAmount;
+
+	@Embedded
 	private FinalPaymentAmount finalPaymentAmount;
+
+	@Embedded
 	private OrderNumber orderNumber;
 
 	@Enumerated(EnumType.STRING)
@@ -43,8 +53,8 @@ public class Order extends BaseEntity {
 	public static Order create(OrderData.CreateOrder data, TotalOrderPrice totalOrderPrice,
 		CouponDiscountAmount couponDiscountAmount) {
 
-		Long totalPrice = totalOrderPrice.totalPrice();
-		Long discountAmount = couponDiscountAmount.couponDiscountAmount();
+		Long totalPrice = totalOrderPrice.getTotalPrice();
+		Long discountAmount = couponDiscountAmount.getCouponDiscountAmount();
 		FinalPaymentAmount finalPaymentAmount = FinalPaymentAmount.of(totalPrice, discountAmount);
 
 		return Order.builder()

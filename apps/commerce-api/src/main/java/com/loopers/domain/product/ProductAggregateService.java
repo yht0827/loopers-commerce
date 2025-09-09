@@ -3,8 +3,6 @@ package com.loopers.domain.product;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.loopers.domain.common.ProductId;
-
 import lombok.RequiredArgsConstructor;
 
 @Service

@@ -12,18 +12,19 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import com.loopers.domain.common.UserId;
 import com.loopers.domain.point.Balance;
 import com.loopers.domain.point.Point;
+import com.loopers.domain.user.UserId;
 import com.loopers.infrastructure.point.PointJpaRepository;
 import com.loopers.support.error.CoreException;
 import com.loopers.utils.DatabaseCleanUp;
 
 @SpringBootTest
+@DisplayName("포인트 통합 테스트")
 public class PointIntegrationTest {
 
 	@Autowired
-	private PointApplicationService pointApplicationService;
+	private PointService pointService;
 
 	@Autowired
 	private PointJpaRepository pointJpaRepository;
@@ -41,7 +42,7 @@ public class PointIntegrationTest {
 	}
 
 	private Point createTestPoint() {
-		return Point.builder()
+		return Point.create()
 			.userId(new UserId(TEST_USER_ID))
 			.balance(new Balance(INITIAL_AMOUNT))
 			.build();
@@ -58,10 +59,10 @@ public class PointIntegrationTest {
 			Point point = createTestPoint();
 			pointJpaRepository.save(point);
 
-			PointQuery.GetPoint query = PointQuery.GetPoint.of(TEST_USER_ID);
+			GetPointQuery query = GetPointQuery.of(TEST_USER_ID);
 
 			// act
-			PointInfo result = pointApplicationService.getPoint(query);
+			PointResult result = pointService.getPoint(query);
 
 			// assert
 			assertThat(result).isNotNull();
@@ -74,10 +75,10 @@ public class PointIntegrationTest {
 		void shouldThrowException_whenUserDoesNotExist() {
 			// arrange
 			String nonExistentUserId = "nonExistent";
-			PointQuery.GetPoint query = PointQuery.GetPoint.of(nonExistentUserId);
+			GetPointQuery query = GetPointQuery.of(nonExistentUserId);
 
 			// act and assert
-			assertThrows(CoreException.class, () -> pointApplicationService.getPoint(query));
+			assertThrows(CoreException.class, () -> pointService.getPoint(query));
 		}
 	}
 
@@ -92,10 +93,10 @@ public class PointIntegrationTest {
 			Point point = createTestPoint();
 			pointJpaRepository.save(point);
 
-			PointCommand.ChargePoint command = new PointCommand.ChargePoint(TEST_USER_ID, CHARGE_AMOUNT);
+			ChargePointCommand command = new ChargePointCommand(TEST_USER_ID, CHARGE_AMOUNT);
 
 			// act
-			PointInfo result = pointApplicationService.chargePoint(command);
+			PointResult result = pointService.chargePoint(command);
 
 			// assert
 			assertThat(result).isNotNull();
@@ -108,10 +109,10 @@ public class PointIntegrationTest {
 		void shouldThrowException_whenUserDoesNotExist() {
 			// arrange
 			String nonExistentUserId = "nonExistent";
-			PointCommand.ChargePoint command = new PointCommand.ChargePoint(nonExistentUserId, CHARGE_AMOUNT);
+			ChargePointCommand command = new ChargePointCommand(nonExistentUserId, CHARGE_AMOUNT);
 
 			// act and assert
-			assertThrows(CoreException.class, () -> pointApplicationService.chargePoint(command));
+			assertThrows(CoreException.class, () -> pointService.chargePoint(command));
 		}
 
 		@DisplayName("여러 번 충전할 경우, 포인트가 누적된다.")
@@ -121,12 +122,12 @@ public class PointIntegrationTest {
 			Point point = createTestPoint();
 			pointJpaRepository.save(point);
 
-			PointCommand.ChargePoint firstCommand = new PointCommand.ChargePoint(TEST_USER_ID, CHARGE_AMOUNT);
-			PointCommand.ChargePoint secondCommand = new PointCommand.ChargePoint(TEST_USER_ID, CHARGE_AMOUNT);
+			ChargePointCommand firstCommand = new ChargePointCommand(TEST_USER_ID, CHARGE_AMOUNT);
+			ChargePointCommand secondCommand = new ChargePointCommand(TEST_USER_ID, CHARGE_AMOUNT);
 
 			// act
-			pointApplicationService.chargePoint(firstCommand);
-			PointInfo result = pointApplicationService.chargePoint(secondCommand);
+			pointService.chargePoint(firstCommand);
+			PointResult result = pointService.chargePoint(secondCommand);
 
 			// assert
 			BigDecimal expectedAmount = INITIAL_AMOUNT.add(CHARGE_AMOUNT).add(CHARGE_AMOUNT);
