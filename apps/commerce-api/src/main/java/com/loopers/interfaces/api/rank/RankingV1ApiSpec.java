@@ -14,6 +14,6 @@ public interface RankingV1ApiSpec {
 		summary = "랭킹 Page 조회",
 		description = "랭킹 Page를 조회 합니다."
 	)
-	ApiResponse<RankingDto.V1.RankingResponse> getRanking(@RequestHeader("X-USER-ID") final String userId,
+	ApiResponse<RankingDto.V1.RankingPageResponse> getRanking(@RequestHeader("X-USER-ID") final String userId,
 		final RankingDto.V1.RankingRequest request);
 }

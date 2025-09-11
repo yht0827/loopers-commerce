@@ -6,10 +6,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.loopers.application.ranking.GetRankingQuery;
-import com.loopers.application.ranking.RankingResult;
+import com.loopers.application.ranking.RankingPageResult;
 import com.loopers.application.ranking.RankingUseCase;
 import com.loopers.interfaces.api.ApiResponse;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
@@ -21,12 +22,14 @@ public class RankingV1Controller implements RankingV1ApiSpec {
 
 	@GetMapping
 	@Override
-	public ApiResponse<RankingDto.V1.RankingResponse> getRanking(@RequestHeader("X-USER-ID") final String userId,
-		final RankingDto.V1.RankingRequest request) {
-		GetRankingQuery query = request.from(userId);
-		RankingResult rankingResult = rankingUseCase.getRanking(query);
+	public ApiResponse<RankingDto.V1.RankingPageResponse> getRanking(@RequestHeader("X-USER-ID") final String userId,
+		@Valid final RankingDto.V1.RankingRequest request) {
 
-		RankingDto.V1.RankingResponse response = RankingDto.V1.RankingResponse.from(rankingResult);
+		GetRankingQuery query = request.from(userId);
+
+		RankingPageResult result = rankingUseCase.getRanking(query);
+
+		RankingDto.V1.RankingPageResponse response = RankingDto.V1.RankingPageResponse.from(result);
 		return ApiResponse.success(response);
 	}
 }

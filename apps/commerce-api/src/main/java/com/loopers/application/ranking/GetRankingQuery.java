@@ -1,10 +1,12 @@
 package com.loopers.application.ranking;
 
+import java.time.LocalDate;
+
 import org.springframework.data.domain.Pageable;
 
 public record GetRankingQuery(
 	String userId,
-	String date,
+	LocalDate date,
 	Pageable pageable
 ) {
 }

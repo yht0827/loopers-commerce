@@ -10,11 +10,11 @@ import lombok.NoArgsConstructor;
 public class RankingItem {
 
 	private Long rank;
-	private String productId;
-	private Long score;
+	private Long productId;
+	private Double score;
 
 	@Builder(builderMethodName = "create")
-	public RankingItem(Long rank, String productId, Long score) {
+	public RankingItem(Long rank, Long productId, Double score) {
 		this.rank = rank;
 		this.productId = productId;
 		this.score = score;
