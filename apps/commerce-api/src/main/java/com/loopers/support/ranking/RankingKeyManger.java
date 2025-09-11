@@ -1,4 +1,4 @@
-package com.loopers.support.util;
+package com.loopers.support.ranking;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -35,7 +35,4 @@ public class RankingKeyManger {
 		};
 	}
 
-	public enum RankingType {
-		DAILY, HOURLY
-	}
 }

@@ -14,7 +14,7 @@ import org.springframework.stereotype.Component;
 
 import com.loopers.support.error.CoreException;
 import com.loopers.support.error.ErrorType;
-import com.loopers.support.util.RankingKeyManger;
+import com.loopers.support.ranking.RankingKeyManger;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
