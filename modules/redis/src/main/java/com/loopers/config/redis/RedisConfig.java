@@ -12,6 +12,7 @@ import org.springframework.data.redis.connection.RedisStaticMasterReplicaConfigu
 import org.springframework.data.redis.connection.lettuce.LettuceClientConfiguration;
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 
@@ -99,6 +100,13 @@ public class RedisConfig {
 		template.setHashKeySerializer(keySerializer);
 		template.setHashValueSerializer(valueSerializer);
 		template.setConnectionFactory(connectionFactory);
+		return template;
+	}
+
+	@Bean
+	public StringRedisTemplate rankingStringRedisTemplate(LettuceConnectionFactory defaultRedisConnectionFactory) {
+		StringRedisTemplate template = new StringRedisTemplate();
+		template.setConnectionFactory(defaultRedisConnectionFactory);
 		return template;
 	}
 }
