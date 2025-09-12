@@ -92,4 +92,20 @@ public class RankingReadService {
 
 		return items;
 	}
+
+	public Long getProductRanking(final Long productId) {
+		LocalDate validatedDate = rankingValidator.validateDate(LocalDate.now());
+
+		// 키 생성
+		String key = rankingKeyManger.getDailyRankingKey(validatedDate);
+
+		// 순위 조회
+		Long rank = redisTemplate.opsForZSet().reverseRank(key, productId.toString());
+		if (rank == null) {
+			return null; // 랭킹에 없음
+		}
+
+		return rank + 1;
+	}
+
 }
