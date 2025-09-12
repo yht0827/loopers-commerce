@@ -4,7 +4,7 @@ import java.util.List;
 
 import org.springframework.stereotype.Component;
 
-import com.loopers.config.event.ProductLikeAggregationEvent;
+import com.loopers.config.event.ProductAggregationEvent;
 import com.loopers.domain.ProductMetricData;
 
 import lombok.RequiredArgsConstructor;
@@ -15,13 +15,13 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class ProductMetricProcessor {
 
-	public List<ProductMetricData> parseEvents(List<ProductLikeAggregationEvent> events) {
+	public List<ProductMetricData> parseEvents(List<ProductAggregationEvent> events) {
 		return events.stream()
 			.map(this::parseEvent)
 			.toList();
 	}
 
-	public ProductMetricData parseEvent(ProductLikeAggregationEvent event) {
+	public ProductMetricData parseEvent(ProductAggregationEvent event) {
 		try {
 			return ProductMetricData.of(
 				event.eventId(),

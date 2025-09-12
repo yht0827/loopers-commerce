@@ -5,7 +5,7 @@ import java.util.List;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.loopers.config.event.ProductLikeAggregationEvent;
+import com.loopers.config.event.ProductAggregationEvent;
 import com.loopers.domain.ProductMetricData;
 import com.loopers.domain.ProductMetricService;
 
@@ -21,7 +21,7 @@ public class ProductMetricFacade {
 	private final ProductMetricService productMetricService;
 
 	@Transactional
-	public void handleLikeChangedEvents(List<ProductLikeAggregationEvent> events) {
+	public void handleLikeChangedEvents(List<ProductAggregationEvent> events) {
 
 		// Kafka 이벤트를 도메인 DTO로 변환
 		List<ProductMetricData> metricDataList = productMetricProcessor.parseEvents(events);

@@ -26,7 +26,7 @@ public class AuditLogConsumer {
 	private final AuditLogFacade auditLogFacade;
 
 	@KafkaListener(
-		topics = {ORDER, PAYMENT_SUCCESS, PAYMENT_FAIL, PRODUCT_LIKE, PRODUCT_UNLIKE},
+		topics = {ORDER, PAYMENT_SUCCESS, PAYMENT_FAIL, PRODUCT_LIKE},
 		groupId = AuditLog,
 		containerFactory = BATCH_LISTENER
 	)
