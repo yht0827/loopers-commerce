@@ -4,6 +4,7 @@ import static com.loopers.support.ranking.RankingType.*;
 
 import java.time.Duration;
 import java.time.LocalDate;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -156,7 +157,7 @@ public class RankingService {
 		String todayKey = rankingKeyManger.getDailyRankingKey(LocalDate.now());
 		String tomorrowKey = rankingKeyManger.getDailyRankingKey(LocalDate.now().plusDays(1));
 
-		redisTemplate.opsForZSet().unionAndStore(todayKey, tomorrowKey, tomorrowKey);
+		redisTemplate.opsForZSet().unionAndStore(todayKey, Collections.emptySet(), tomorrowKey);
 
 		Duration ttl = Duration.ofSeconds(rankingKeyManger.getTTL(DAILY));
 		redisTemplate.expire(tomorrowKey, ttl);
