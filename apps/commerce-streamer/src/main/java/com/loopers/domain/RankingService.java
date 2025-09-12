@@ -113,12 +113,13 @@ public class RankingService {
 			// 이벤트 타입에 따른 기본 점수 계산
 			RankingEventType rankingEventType = RankingEventMapper.toRankingEventType(event.eventType());
 
+			// 고정 가중치
 			double baseScore = scoreCalculator.calculateScore(rankingEventType);
 
-			// LIKE & UNLIKE 구분 적용
+			// LIKE & UNLIKE  액션 배수
 			double actionScore = baseScore * event.getScoreMultiplier();
 
-			// 시간 가중치 적용 (최근일수록 높은 점수)
+			// 시간 감쇠 적용 (최근일수록 높은 점수)
 			double finalScore = scoreCalculator.applyTimeDecay(actionScore, event.occurredAt());
 
 			log.trace("랭킹 점수 계산 처리 성공 - eventType: {}, baseScore: {}, actionScore: {}, finalScore: {}", event.eventType(),
@@ -149,5 +150,17 @@ public class RankingService {
 		// productId 역순으로 아주 작은 가중치 추가 (동점 시 큰 ID가 높은 순위)
 		double tieBreaker = (Long.MAX_VALUE - productId) * 0.000000001;
 		return baseScore + tieBreaker;
+	}
+
+	public void carryOverRankingScores() {
+		String todayKey = rankingKeyManger.getDailyRankingKey(LocalDate.now());
+		String tomorrowKey = rankingKeyManger.getDailyRankingKey(LocalDate.now().plusDays(1));
+
+		redisTemplate.opsForZSet().unionAndStore(todayKey, tomorrowKey, tomorrowKey);
+
+		Duration ttl = Duration.ofSeconds(rankingKeyManger.getTTL(DAILY));
+		redisTemplate.expire(tomorrowKey, ttl);
+
+		log.info("랭킹 점수 이월 완료: {} -> {}", todayKey, tomorrowKey);
 	}
 }
