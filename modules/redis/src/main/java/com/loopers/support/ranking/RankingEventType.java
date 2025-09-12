@@ -1,5 +1,5 @@
 package com.loopers.support.ranking;
 
-public enum WeightType {
+public enum RankingEventType {
 	VIEW, LIKE, ORDER
 }
