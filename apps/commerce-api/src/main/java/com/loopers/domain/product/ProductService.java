@@ -1,11 +1,15 @@
 package com.loopers.domain.product;
 
 import java.time.Duration;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.github.benmanes.caffeine.cache.Cache;
 import com.loopers.domain.order.OrderItem;
@@ -39,10 +43,9 @@ public class ProductService {
 
 		// 1-3 페이지만 캐싱 처리
 		if (pageNumber >= 0 && pageNumber < 3) {
-			String cacheKey = CACHE_KEY_PREFIX_PRODUCT_LIST + ":" +
-				command.brandId() + ":" +
-				command.pageable().getPageNumber() + ":" +
-				command.pageable().getPageSize();
+			String cacheKey =
+				CACHE_KEY_PREFIX_PRODUCT_LIST + ":" + command.brandId() + ":" + command.pageable().getPageNumber() + ":"
+					+ command.pageable().getPageSize();
 
 			// L1 캐시 확인
 			Page<ProductInfo> l1Result = (Page<ProductInfo>)productL1Cache.getIfPresent(cacheKey);
@@ -102,6 +105,62 @@ public class ProductService {
 		return result;
 	}
 
+	@Transactional(readOnly = true)
+	public Map<Long, ProductInfo> getProductByIds(List<Long> productIds) {
+		if (productIds == null || productIds.isEmpty()) {
+			return new HashMap<>();
+		}
+
+		Map<Long, ProductInfo> result = new HashMap<>();
+		List<Long> uncachedIds = new ArrayList<>();
+
+		int l1Hits = 0, l2Hits = 0;
+
+		for (Long productId : productIds) {
+			String cacheKey = CACHE_KEY_PREFIX_PRODUCT_DETAIL + ":" + productId;
+
+			// L1 캐시 확인
+			ProductInfo l1Result = (ProductInfo)productL1Cache.getIfPresent(cacheKey);
+			if (l1Result != null) {
+				result.put(productId, l1Result);
+				l1Hits++;
+				continue;
+			}
+
+			// L2 캐시 확인
+			ProductInfo l2Result = (ProductInfo)productL2Cache.opsForValue().get(cacheKey);
+
+			if (l2Result != null) {
+				productL1Cache.put(cacheKey, l2Result);
+				result.put(productId, l2Result);
+				l2Hits++;
+			} else {
+				uncachedIds.add(productId);
+			}
+		}
+
+		// 캐시 미스 - DB 조회 및 캐시 저장
+		if (!uncachedIds.isEmpty()) {
+			List<ProductInfo> productInfos = productRepository.findInfosByIds(uncachedIds);
+
+			for (ProductInfo productInfo : productInfos) {
+				String cacheKey = CACHE_KEY_PREFIX_PRODUCT_DETAIL + ":" + productInfo.productId();
+
+				productL2Cache.opsForValue().set(cacheKey, productInfo, L2_PRODUCT_DETAIL_TTL);
+				productL1Cache.put(cacheKey, productInfo);
+
+				result.put(productInfo.productId(), productInfo);
+			}
+		}
+
+		if (log.isDebugEnabled()) {
+			log.debug("getProductByIds - Total: {}, L1 hits: {}, L2 hits: {}, DB queries: {}",
+				productIds.size(), l1Hits, l2Hits, uncachedIds.size());
+		}
+
+		return result;
+	}
+
 	public void deductStock(List<OrderItem> orderItems) {
 		for (OrderItem items : orderItems) {
 			Product product = productRepository.findByIdWithPessimisticLock(items.getId())
@@ -146,7 +205,9 @@ public class ProductService {
 	}
 
 	void evictL1ProductListCaches() {
-		productL1Cache.asMap().keySet().stream()
+		productL1Cache.asMap()
+			.keySet()
+			.stream()
 			.filter(key -> key.startsWith(CACHE_KEY_PREFIX_PRODUCT_LIST + ":"))
 			.forEach(productL1Cache::invalidate);
 	}

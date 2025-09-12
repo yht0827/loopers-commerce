@@ -3,9 +3,9 @@ package com.loopers.application.product;
 import com.loopers.domain.product.ProductInfo;
 
 public record ProductDetailResult(
-	Long productId, String productName, Long price, Long quantity, String brandName, Long likeCount) {
-	public static ProductDetailResult from(ProductInfo productInfo) {
+	Long productId, String productName, Long price, Long quantity, String brandName, Long likeCount, Long rank) {
+	public static ProductDetailResult from(final ProductInfo productInfo, final Long rank) {
 		return new ProductDetailResult(productInfo.productId(), productInfo.productName(), productInfo.price(),
-			productInfo.quantity(), productInfo.brandName(), productInfo.likeCount());
+			productInfo.quantity(), productInfo.brandName(), productInfo.likeCount(), rank);
 	}
 }

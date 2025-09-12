@@ -1,5 +1,6 @@
 package com.loopers.domain.product;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.domain.Page;
@@ -15,5 +16,7 @@ public interface ProductRepository {
 	Page<ProductInfo> getProductList(final Long brandId, final Pageable pageable);
 
 	Product save(final Product product);
+
+	List<ProductInfo> findInfosByIds(List<Long> ids);
 }
 

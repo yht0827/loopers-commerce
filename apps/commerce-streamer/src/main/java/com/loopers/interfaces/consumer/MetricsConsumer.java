@@ -12,7 +12,7 @@ import org.springframework.kafka.support.Acknowledgment;
 import org.springframework.stereotype.Component;
 
 import com.loopers.application.ProductMetricFacade;
-import com.loopers.config.event.ProductLikeAggregationEvent;
+import com.loopers.config.event.ProductAggregationEvent;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -25,16 +25,16 @@ public class MetricsConsumer {
 	private final ProductMetricFacade productMetricFacade;
 
 	@KafkaListener(
-		topics = LIKE_AGGREGATION,
+		topics = PRODUCT_LIKE,
 		groupId = Metrics,
 		containerFactory = BATCH_LISTENER
 	)
 	public void handleLikeChangedEvent(
-		List<ConsumerRecord<String, ProductLikeAggregationEvent>> records,
+		List<ConsumerRecord<String, ProductAggregationEvent>> records,
 		Acknowledgment acknowledgment
 	) {
 		try {
-			List<ProductLikeAggregationEvent> events = records.stream()
+			List<ProductAggregationEvent> events = records.stream()
 				.map(ConsumerRecord::value)
 				.toList();
 

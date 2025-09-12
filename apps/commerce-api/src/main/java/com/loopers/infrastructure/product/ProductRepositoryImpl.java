@@ -4,6 +4,7 @@ import static com.loopers.domain.brand.QBrand.*;
 import static com.loopers.domain.product.QProduct.*;
 import static com.loopers.domain.product.QProductAggregate.*;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -75,6 +76,14 @@ public class ProductRepositoryImpl implements ProductRepository {
 		return productJpaRepository.save(product);
 	}
 
+	@Override
+	public List<ProductInfo> findInfosByIds(List<Long> ids) {
+		if (ids == null || ids.isEmpty()) {
+			return Collections.emptyList();
+		}
+		return getProductInfosByIds(ids);
+	}
+
 	// 커버링 인덱스를 사용한 최적화된 상품 목록 조회
 	private Page<ProductInfo> getProductListWithCoveringIndex(final Long brandId, final Pageable pageable) {
 		// 커버링 인덱스로 ID만 조회
@@ -101,7 +110,6 @@ public class ProductRepositoryImpl implements ProductRepository {
 			idQuery.where(product.brandId.eq(brand));
 		}
 
-		// If sorting requires fields from other tables, add necessary joins here
 		boolean requiresLikeJoin = pageable.getSort().stream()
 			.anyMatch(o -> o.getProperty().equals("likesCount"));
 		if (requiresLikeJoin) {
