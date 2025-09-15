@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 @Table(name = "product_metrics")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class ProductMetrics extends BaseEntity {
+public class ProductMetric extends BaseEntity {
 
 	private Long productId;
 	private Long viewCount = 0L;
@@ -19,15 +19,15 @@ public class ProductMetrics extends BaseEntity {
 	private Long salesCount = 0L;
 
 	@Builder
-	public ProductMetrics(Long productId, Long viewCount, Long likeCount, Long salesCount) {
+	public ProductMetric(Long productId, Long viewCount, Long likeCount, Long salesCount) {
 		this.productId = productId;
 		this.viewCount = viewCount;
 		this.likeCount = likeCount;
 		this.salesCount = salesCount;
 	}
 
-	public static ProductMetrics of(Long productId) {
-		ProductMetrics metrics = new ProductMetrics();
+	public static ProductMetric of(Long productId) {
+		ProductMetric metrics = new ProductMetric();
 		metrics.productId = productId;
 		return metrics;
 	}

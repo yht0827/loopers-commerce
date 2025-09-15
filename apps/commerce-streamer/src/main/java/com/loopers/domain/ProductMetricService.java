@@ -18,7 +18,7 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class ProductMetricService {
 
-	private final ProductMetricsRepository productMetricsRepository;
+	private final ProductMetricRepository productMetricRepository;
 	private final EventHandledRepository eventHandledRepository;
 
 	public void processProductMetrics(List<ProductMetricData> metricDataList) {
@@ -69,11 +69,11 @@ public class ProductMetricService {
 				Long productId = entry.getKey();
 				Long likeChange = entry.getValue();
 
-				ProductMetrics metrics = productMetricsRepository.findByProductId(productId)
-					.orElse(ProductMetrics.of(productId));
+				ProductMetric metrics = productMetricRepository.findByProductId(productId)
+					.orElse(ProductMetric.of(productId));
 
 				metrics.updateLikeCount(likeChange);
-				productMetricsRepository.save(metrics);
+				productMetricRepository.save(metrics);
 			}
 
 			eventHandledRepository.saveAll(handledEvents);
