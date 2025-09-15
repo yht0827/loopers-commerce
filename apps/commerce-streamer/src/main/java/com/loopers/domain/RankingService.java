@@ -31,7 +31,6 @@ public class RankingService {
 	private final StringRedisTemplate redisTemplate;
 	private final RankingKeyManger rankingKeyManger;
 	private final RankingScoreCalculator scoreCalculator;
-	private final ProductMetricsRepository productMetricsRepository;
 
 	public void handleAggregateScores(List<ConsumerRecord<String, ProductAggregationEvent>> records) {
 		if (records == null || records.isEmpty()) {
