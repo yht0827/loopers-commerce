@@ -10,6 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.loopers.domain.product.ProductInfo;
 import com.loopers.domain.product.ProductService;
 import com.loopers.domain.rank.RankingItem;
+import com.loopers.domain.rank.RankingPeriod;
 import com.loopers.domain.rank.RankingReadService;
 
 import lombok.RequiredArgsConstructor;
@@ -25,7 +26,15 @@ public class RankingService implements RankingUseCase {
 	@Transactional(readOnly = true)
 	@Override
 	public RankingPageResult getRanking(final GetRankingQuery query) {
+		RankingPeriod period = RankingPeriod.from(query.period());
+		return switch (period) {
+			case DAILY -> getDaily(query);
+			case WEEKLY -> getWeekly(query);
+			case MONTHLY -> getMonthly(query);
+		};
+	}
 
+	public RankingPageResult getDaily(final GetRankingQuery query) {
 		Page<RankingItem> page = rankingReadService.getRanking(query.date(), query.pageable());
 
 		if (page.isEmpty()) {
@@ -45,4 +54,13 @@ public class RankingService implements RankingUseCase {
 
 		return RankingPageResult.from(page, items);
 	}
+
+	public RankingPageResult getWeekly(GetRankingQuery query) {
+		return null;
+	}
+
+	public RankingPageResult getMonthly(GetRankingQuery query) {
+		return null;
+	}
+
 }
