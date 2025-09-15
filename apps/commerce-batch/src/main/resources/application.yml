@@ -25,6 +25,12 @@ spring:
       - kafka.yml
       - logging.yml
       - monitoring.yml
+      - resilience.yml
+
+springdoc:
+  use-fqn: true
+  swagger-ui:
+    path: /swagger-ui.html
 
 ---
 spring:
@@ -32,12 +38,17 @@ spring:
     activate:
       on-profile: local, test
 
+server:
+  port: 8084
+
 ---
 spring:
   config:
     activate:
       on-profile: dev
 
+server:
+  port: 8084
 ---
 spring:
   config:
@@ -49,3 +60,7 @@ spring:
   config:
     activate:
       on-profile: prd
+
+springdoc:
+  api-docs:
+    enabled: false

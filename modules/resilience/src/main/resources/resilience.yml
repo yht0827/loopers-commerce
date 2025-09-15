@@ -28,6 +28,7 @@ resilience4j:
   retry:
     instances:
       pgClient:
+        baseConfig: default
         maxAttempts: 3
         waitDuration: 300ms
         retryExceptions:
