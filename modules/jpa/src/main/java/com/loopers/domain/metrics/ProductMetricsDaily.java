@@ -5,11 +5,13 @@ import java.time.LocalDate;
 import com.loopers.domain.BaseEntity;
 
 import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+@Entity
 @Getter
 @Table(name = "product_metrics_daily")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -37,6 +39,10 @@ public class ProductMetricsDaily extends BaseEntity {
 		ProductMetricsDaily metrics = new ProductMetricsDaily();
 		metrics.productId = productId;
 		metrics.date = date;
+		metrics.viewCount = 0L;
+		metrics.likeCount = 0L;
+		metrics.orderCount = 0L;
+		metrics.score = 0.0;
 		return metrics;
 	}
 
