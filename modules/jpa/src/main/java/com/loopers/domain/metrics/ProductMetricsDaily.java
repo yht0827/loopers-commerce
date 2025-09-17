@@ -1,20 +1,19 @@
-package com.loopers.domain;
+package com.loopers.domain.metrics;
 
 import java.time.LocalDate;
 
+import com.loopers.domain.BaseEntity;
+
 import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-@Entity
-@Table(name = "product_metrics")
 @Getter
+@Table(name = "product_metrics_daily")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class ProductMetric extends BaseEntity {
+public class ProductMetricsDaily extends BaseEntity {
 
 	@Column(name = "product_id", nullable = false)
 	private Long productId;
@@ -34,23 +33,27 @@ public class ProductMetric extends BaseEntity {
 	@Column(name = "score", nullable = false)
 	private Double score;
 
-	@Builder
-	public ProductMetric(Long productId, LocalDate date, Long viewCount, Long likeCount, Long orderCount, Double score) {
-		this.productId = productId;
-		this.date = date;
-		this.viewCount = viewCount;
-		this.likeCount = likeCount;
-		this.orderCount = orderCount;
-		this.score = score;
-	}
-
-	public static ProductMetric of(Long productId) {
-		ProductMetric metrics = new ProductMetric();
+	public static ProductMetricsDaily create(Long productId, LocalDate date) {
+		ProductMetricsDaily metrics = new ProductMetricsDaily();
 		metrics.productId = productId;
+		metrics.date = date;
 		return metrics;
 	}
 
-	public void updateLikeCount(Long count) {
-		this.likeCount = count;
+	public void addLike(long delta) {
+		this.likeCount += delta;
 	}
+
+	public void addScore(double d) {
+		this.score += d;
+	}
+
+	public void addView(long delta) {
+		this.viewCount += delta;
+	}
+
+	public void addOrder(long delta) {
+		this.orderCount += delta;
+	}
+
 }
