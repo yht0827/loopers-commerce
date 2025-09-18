@@ -1,11 +1,11 @@
-package com.loopers.infrastructure;
+package com.loopers.infrastructure.event;
 
 import java.util.List;
 
 import org.springframework.stereotype.Repository;
 
-import com.loopers.domain.EventLog;
-import com.loopers.domain.EventLogRepository;
+import com.loopers.domain.event.EventLog;
+import com.loopers.domain.event.EventLogRepository;
 
 import lombok.RequiredArgsConstructor;
 

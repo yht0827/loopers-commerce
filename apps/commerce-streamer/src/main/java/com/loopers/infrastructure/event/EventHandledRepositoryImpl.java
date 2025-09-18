@@ -1,4 +1,4 @@
-package com.loopers.infrastructure;
+package com.loopers.infrastructure.event;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -6,8 +6,8 @@ import java.util.Optional;
 
 import org.springframework.stereotype.Repository;
 
-import com.loopers.domain.EventHandled;
-import com.loopers.domain.EventHandledRepository;
+import com.loopers.domain.event.EventHandled;
+import com.loopers.domain.event.EventHandledRepository;
 
 import lombok.RequiredArgsConstructor;
 

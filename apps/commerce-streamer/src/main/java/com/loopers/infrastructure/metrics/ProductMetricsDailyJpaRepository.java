@@ -10,5 +10,6 @@ import com.loopers.domain.metrics.ProductMetricsDaily;
 
 public interface ProductMetricsDailyJpaRepository extends JpaRepository<ProductMetricsDaily, Long> {
 
-	List<ProductMetricsDaily> findAllByDateAndProductIdIn(LocalDate date, Collection<Long> ids);
+    List<ProductMetricsDaily> findAllByDateAndProductIdIn(LocalDate date, Collection<Long> ids);
 }
+

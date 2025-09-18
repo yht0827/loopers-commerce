@@ -1,4 +1,4 @@
-package com.loopers.domain;
+package com.loopers.domain.metrics;
 
 import static com.loopers.support.ranking.RankingType.*;
 
@@ -20,8 +20,6 @@ import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Component;
 
 import com.loopers.config.event.ProductAggregationEvent;
-import com.loopers.domain.metrics.ProductMetricsDaily;
-import com.loopers.domain.metrics.ProductMetricsDailyRepository;
 import com.loopers.support.RankingEventMapper;
 import com.loopers.support.ranking.RankingEventType;
 import com.loopers.support.ranking.RankingKeyManger;

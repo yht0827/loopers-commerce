@@ -1,4 +1,4 @@
-package com.loopers.domain;
+package com.loopers.domain.metrics;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -9,8 +9,8 @@ import java.util.Map;
 import org.springframework.stereotype.Component;
 
 import com.loopers.config.kafka.KafkaGroups;
-import com.loopers.domain.metrics.ProductMetric;
-import com.loopers.domain.metrics.ProductMetricRepository;
+import com.loopers.domain.event.EventHandled;
+import com.loopers.domain.event.EventHandledRepository;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

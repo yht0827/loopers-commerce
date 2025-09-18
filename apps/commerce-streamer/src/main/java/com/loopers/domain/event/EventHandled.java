@@ -1,6 +1,8 @@
-package com.loopers.domain;
+package com.loopers.domain.event;
 
 import java.time.LocalDateTime;
+
+import com.loopers.domain.BaseEntity;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;

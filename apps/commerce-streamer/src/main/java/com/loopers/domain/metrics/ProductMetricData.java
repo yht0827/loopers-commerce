@@ -1,4 +1,4 @@
-package com.loopers.domain;
+package com.loopers.domain.metrics;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;

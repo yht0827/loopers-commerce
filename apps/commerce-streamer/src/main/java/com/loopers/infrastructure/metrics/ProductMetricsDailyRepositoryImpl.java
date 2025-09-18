@@ -27,3 +27,4 @@ public class ProductMetricsDailyRepositoryImpl implements ProductMetricsDailyRep
 		productMetricsDailyJpaRepository.saveAll(entities);
 	}
 }
+
