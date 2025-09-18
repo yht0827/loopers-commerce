@@ -1,11 +1,11 @@
-package com.loopers.infrastructure;
+package com.loopers.infrastructure.metrics;
 
 import java.util.Optional;
 
 import org.springframework.stereotype.Repository;
 
-import com.loopers.domain.ProductMetric;
-import com.loopers.domain.ProductMetricRepository;
+import com.loopers.domain.metrics.ProductMetric;
+import com.loopers.domain.metrics.ProductMetricRepository;
 
 import lombok.RequiredArgsConstructor;
 

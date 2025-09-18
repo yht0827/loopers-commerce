@@ -9,6 +9,8 @@ import java.util.Map;
 import org.springframework.stereotype.Component;
 
 import com.loopers.config.kafka.KafkaGroups;
+import com.loopers.domain.metrics.ProductMetric;
+import com.loopers.domain.metrics.ProductMetricRepository;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

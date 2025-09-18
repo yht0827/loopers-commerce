@@ -11,6 +11,7 @@ include(
     ":modules:feign",
     ":modules:resilience",
     ":modules:kafka",
+    ":modules:metrics",
     ":modules:batch",
     ":supports:jackson",
     ":supports:logging",
