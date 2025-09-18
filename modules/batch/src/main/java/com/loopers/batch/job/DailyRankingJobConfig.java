@@ -39,6 +39,7 @@ public class DailyRankingJobConfig {
 
 	@Bean
 	public Job dailyRankingJob(Step dailyRankingStep) {
+		log.info("DailyRankingJob 배치 등록 완료");
 		return new JobBuilder("dailyRankingJob", jobRepository)
 			.incrementer(new RunIdIncrementer())
 			.start(dailyRankingStep)
@@ -51,12 +52,13 @@ public class DailyRankingJobConfig {
 		ItemProcessor<ProductScoreRow, ProductScoreRow> dailyProcessor,
 		ItemWriter<ProductScoreRow> dailyWriter
 	) {
+		log.info("일간 랭킹 step 구성 완료 - stepName=dailyRankingStep, chunkSize={}", 100);
 		return new StepBuilder("dailyRankingStep", jobRepository)
 			.<ProductScoreRow, ProductScoreRow>chunk(100, transactionManager)
 			.reader(dailyReader)
 			.processor(dailyProcessor)
 			.writer(dailyWriter)
-			.faultTolerant() // 필요 시 skip/retry 추가
+			.faultTolerant()
 			.build();
 	}
 
@@ -67,10 +69,11 @@ public class DailyRankingJobConfig {
 		@Value("#{jobParameters['date']}") String dateStr,
 		@Value("#{jobParameters['topN']}") Integer topN
 	) {
+		log.info("일간 랭킹 reader 구성 완료 - date={}, topN={} (기본 100)", dateStr, topN);
 		String sql = """
 			SELECT product_id, score
 			FROM product_metrics_daily
-			WHERE rank_date = ?
+			WHERE snapshot_date = ?
 			ORDER BY score DESC, product_id DESC
 			LIMIT ?
 			""";
@@ -109,10 +112,10 @@ public class DailyRankingJobConfig {
 			private int nextRank = 1;
 
 			private static final String DELETE_SQL =
-				"DELETE FROM product_rank_daily WHERE rank_date = :date";
+				"DELETE FROM product_rank_daily WHERE snapshot_date = :date";
 			private static final String INSERT_SQL = """
-				INSERT INTO product_rank_daily (rank_date, product_id, rank_no, score)
-				VALUES (:date, :productId, :rankNo, :score)
+				INSERT INTO product_rank_daily (snapshot_date, product_id, ranking, score)
+				VALUES (:date, :productId, :ranking, :score)
 				""";
 
 			@Override
@@ -124,7 +127,7 @@ public class DailyRankingJobConfig {
 				Date sqlDate = Date.valueOf(date);
 
 				if (dryRun) {
-					log.info("[DRY-RUN] date={}, would write {} items (rank {}..{})",
+					log.info("[DRY-RUN] 일간 스냅샷 저장 예정 - date={}, 건수={}, 순위범위={}..{}",
 						date, chunk.size(), nextRank, nextRank + chunk.size() - 1);
 					nextRank += chunk.size();
 					return;
@@ -133,20 +136,20 @@ public class DailyRankingJobConfig {
 				if (!deleted) {
 					int del = jdbc.update(DELETE_SQL,
 						new MapSqlParameterSource().addValue("date", sqlDate));
-					log.info("cleared product_rank_daily date={}, deletedRows={}", date, del);
+					log.info("product_rank_daily 선 삭제 완료 - date={}, 삭제행수={}", date, del);
 					deleted = true;
 				}
 
 				List<MapSqlParameterSource> batch = new ArrayList<>(chunk.size());
 				for (ProductScoreRow row : chunk.getItems()) {
 					batch.add(new MapSqlParameterSource()
-						.addValue("date", sqlDate)
+						.addValue("snapshotDate", sqlDate)
 						.addValue("productId", row.productId())
-						.addValue("rankNo", nextRank++)
+						.addValue("ranking", nextRank++)
 						.addValue("score", row.score()));
 				}
 				jdbc.batchUpdate(INSERT_SQL, batch.toArray(MapSqlParameterSource[]::new));
-				log.info("inserted {} rows into product_rank_daily for date={}", chunk.size(), date);
+				log.info("product_rank_daily 적재 완료 - date={}, 저장행수={}", date, chunk.size());
 			}
 		};
 	}

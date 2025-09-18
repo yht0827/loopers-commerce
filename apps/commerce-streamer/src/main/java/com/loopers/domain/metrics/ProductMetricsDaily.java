@@ -20,8 +20,8 @@ public class ProductMetricsDaily extends BaseEntity {
 	@Column(name = "product_id", nullable = false)
 	private Long productId;
 
-	@Column(name = "rank_date", nullable = false)
-	private LocalDate date;
+	@Column(name = "snapshot_date", nullable = false)
+	private LocalDate snapshotDate;
 
 	@Column(name = "view_count", nullable = false)
 	private Long viewCount;
@@ -35,10 +35,10 @@ public class ProductMetricsDaily extends BaseEntity {
 	@Column(name = "score", nullable = false)
 	private Double score;
 
-	public static ProductMetricsDaily create(Long productId, LocalDate date) {
+	public static ProductMetricsDaily create(Long productId, LocalDate snapshotDate) {
 		ProductMetricsDaily metrics = new ProductMetricsDaily();
 		metrics.productId = productId;
-		metrics.date = date;
+		metrics.snapshotDate = snapshotDate;
 		metrics.viewCount = 0L;
 		metrics.likeCount = 0L;
 		metrics.orderCount = 0L;

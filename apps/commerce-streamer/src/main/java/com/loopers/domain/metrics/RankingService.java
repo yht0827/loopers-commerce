@@ -127,7 +127,7 @@ public class RankingService {
 		if (!ids.isEmpty()) {
 			// 기존 데이터 조회
 			List<ProductMetricsDaily> existing =
-				productMetricsDailyRepository.findAllByIdDateAndIdProductIdIn(date, ids);
+				productMetricsDailyRepository.findAllBySnapshotDateAndProductIdIn(date, ids);
 
 			Map<Long, ProductMetricsDaily> existingMap = existing.stream()
 				.collect(Collectors.toMap(ProductMetricsDaily::getProductId, e -> e));

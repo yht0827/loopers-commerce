@@ -7,7 +7,6 @@ import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.JobParametersBuilder;
 import org.springframework.batch.core.launch.JobLauncher;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -20,8 +19,6 @@ import lombok.extern.slf4j.Slf4j;
 public class DailyRankingJobScheduler {
 
 	private final JobLauncher jobLauncher;
-
-	@Qualifier("dailyRankingJob")
 	private final Job dailyRankingJob;
 
 	// 매일 00:10, KST (전일 기준 실행)
@@ -41,7 +38,7 @@ public class DailyRankingJobScheduler {
 		try {
 			jobLauncher.run(dailyRankingJob, params);
 		} catch (Exception e) {
-			log.error("dailyRankingJob failed (date={}, topN={}, dryRun={})", date, topN, dryRun, e);
+			log.error("일간 랭킹 배치 실패 (date={}, topN={}, dryRun={})", date, topN, dryRun, e);
 		}
 	}
 }

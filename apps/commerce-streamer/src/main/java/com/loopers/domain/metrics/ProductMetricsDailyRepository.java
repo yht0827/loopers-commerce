@@ -6,7 +6,7 @@ import java.util.List;
 
 public interface ProductMetricsDailyRepository {
 
-    List<ProductMetricsDaily> findAllByIdDateAndIdProductIdIn(final LocalDate date, final Collection<Long> ids);
+    List<ProductMetricsDaily> findAllBySnapshotDateAndProductIdIn(final LocalDate date, final Collection<Long> ids);
 
     void saveAll(final Iterable<ProductMetricsDaily> entities);
 }

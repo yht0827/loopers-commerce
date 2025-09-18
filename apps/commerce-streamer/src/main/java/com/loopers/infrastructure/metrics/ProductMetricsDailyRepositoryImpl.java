@@ -18,8 +18,8 @@ public class ProductMetricsDailyRepositoryImpl implements ProductMetricsDailyRep
 	private final ProductMetricsDailyJpaRepository productMetricsDailyJpaRepository;
 
 	@Override
-	public List<ProductMetricsDaily> findAllByIdDateAndIdProductIdIn(final LocalDate date, final Collection<Long> ids) {
-		return productMetricsDailyJpaRepository.findAllByDateAndProductIdIn(date, ids);
+	public List<ProductMetricsDaily> findAllBySnapshotDateAndProductIdIn(final LocalDate date, final Collection<Long> ids) {
+		return productMetricsDailyJpaRepository.findAllBySnapshotDateAndProductIdIn(date, ids);
 	}
 
 	@Override

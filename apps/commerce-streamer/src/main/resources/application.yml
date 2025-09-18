@@ -24,7 +24,6 @@ spring:
       - kafka.yml
       - logging.yml
       - monitoring.yml
-      - resilience.yml
 
 ---
 spring:
