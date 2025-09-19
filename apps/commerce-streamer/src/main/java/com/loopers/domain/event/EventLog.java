@@ -20,18 +20,18 @@ public class EventLog extends BaseEntity {
 	private String eventId;
 	private String eventType;
 	private String topic;
-	private Integer partition;
+	private Integer partitionId;
 	private Long offset;
 	private String payload;
 	private LocalDateTime occurredAt;
 
 	@Builder
-	public EventLog(String eventId, String eventType, String topic, Integer partition, Long offset, String payload,
+	public EventLog(String eventId, String eventType, String topic, Integer partitionId, Long offset, String payload,
 		LocalDateTime occurredAt) {
 		this.eventId = eventId;
 		this.eventType = eventType;
 		this.topic = topic;
-		this.partition = partition;
+		this.partitionId = partitionId;
 		this.offset = offset;
 		this.payload = payload;
 		this.occurredAt = occurredAt;

@@ -116,8 +116,8 @@ public class DailyRankingJobConfig {
 			private static final String DELETE_SQL =
 				"DELETE FROM product_rank_daily WHERE snapshot_date = :date";
 			private static final String INSERT_SQL = """
-				INSERT INTO product_rank_daily (snapshot_date, product_id, ranking, score)
-				VALUES (:date, :productId, :ranking, :score)
+				INSERT INTO product_rank_daily (snapshot_date, product_id, ranking, score, created_at, updated_at)
+				VALUES (:date, :productId, :ranking, :score, NOW(), NOW())
 				""";
 
 			@Override

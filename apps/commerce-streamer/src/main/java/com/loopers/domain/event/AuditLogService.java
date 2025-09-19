@@ -1,4 +1,4 @@
-package com.loopers.domain.auditLog;
+package com.loopers.domain.event;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -7,10 +7,6 @@ import java.util.List;
 import org.springframework.stereotype.Component;
 
 import com.loopers.config.kafka.KafkaGroups;
-import com.loopers.domain.event.EventHandled;
-import com.loopers.domain.event.EventHandledRepository;
-import com.loopers.domain.event.EventLog;
-import com.loopers.domain.event.EventLogRepository;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -61,7 +57,7 @@ public class AuditLogService {
 			.eventId(data.eventId())
 			.eventType(data.eventType())
 			.topic(data.topic())
-			.partition(data.partition())
+			.partitionId(data.partition())
 			.offset(data.offset())
 			.payload(data.payload())
 			.occurredAt(data.occurredAt())

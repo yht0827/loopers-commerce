@@ -1,4 +1,4 @@
-package com.loopers.domain.auditLog;
+package com.loopers.domain.event;
 
 import java.time.LocalDateTime;
 
