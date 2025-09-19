@@ -2,6 +2,7 @@ package com.loopers.application.ranking;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
@@ -10,8 +11,9 @@ import org.springframework.transaction.annotation.Transactional;
 import com.loopers.domain.product.ProductInfo;
 import com.loopers.domain.product.ProductService;
 import com.loopers.domain.rank.RankingItem;
+import com.loopers.domain.rank.RankingPageData;
 import com.loopers.domain.rank.RankingPeriod;
-import com.loopers.domain.rank.RankingReadService;
+import com.loopers.domain.rank.RankingQueryService;
 
 import lombok.RequiredArgsConstructor;
 
@@ -20,7 +22,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class RankingService implements RankingUseCase {
 
-	private final RankingReadService rankingReadService;
+	private final RankingQueryService rankingQueryService;
 	private final ProductService productService;
 
 	@Transactional(readOnly = true)
@@ -35,32 +37,53 @@ public class RankingService implements RankingUseCase {
 	}
 
 	public RankingPageResult getDaily(final GetRankingQuery query) {
-		Page<RankingItem> page = rankingReadService.getRanking(query.date(), query.pageable());
+		RankingPageData pageData = rankingQueryService.getDaily(query.date(), query.pageable());
+		Page<RankingItem> page = pageData == null || pageData.page() == null
+			? Page.empty(query.pageable())
+			: pageData.page();
 
-		if (page.isEmpty()) {
-			return RankingPageResult.from(page, List.of());
-		}
-
-		// 상품 ID 추출
-		List<Long> ids = page.getContent().stream().map(RankingItem::getProductId).toList();
-
-		// 상품 정보 배치 조회
-		Map<Long, ProductInfo> productMap = productService.getProductByIds(ids);
-
-		List<RankingProductResult> items = page.getContent().stream()
-			.filter(item -> productMap.containsKey(item.getProductId()))
-			.map(item -> RankingProductResult.from(item, productMap.get(item.getProductId())))
-			.toList();
-
-		return RankingPageResult.from(page, items);
+		return buildRankingPageResult(page);
 	}
 
 	public RankingPageResult getWeekly(GetRankingQuery query) {
-		return null;
+		RankingPageData pageData = rankingQueryService.getWeekly(query.date(), query.pageable());
+		Page<RankingItem> page = pageData == null || pageData.page() == null
+			? Page.empty(query.pageable())
+			: pageData.page();
+
+		return buildRankingPageResult(page);
 	}
 
 	public RankingPageResult getMonthly(GetRankingQuery query) {
-		return null;
+		RankingPageData pageData = rankingQueryService.getMonthly(query.date(), query.pageable());
+		Page<RankingItem> page = pageData == null || pageData.page() == null
+			? Page.empty(query.pageable())
+			: pageData.page();
+
+		return buildRankingPageResult(page);
+	}
+
+	public RankingPageResult buildRankingPageResult(Page<RankingItem> page) {
+		if (page == null || page.isEmpty()) {
+			Page<RankingItem> emptyPage = page == null ? Page.empty() : page;
+			return RankingPageResult.from(emptyPage, List.of());
+		}
+
+		List<Long> ids = page.getContent().stream()
+			.map(RankingItem::getProductId)
+			.toList();
+
+		Map<Long, ProductInfo> productMap = productService.getProductByIds(ids);
+
+		List<RankingProductResult> items = page.getContent().stream()
+			.map(item -> {
+				ProductInfo info = productMap.get(item.getProductId());
+				return info != null ? RankingProductResult.from(item, info) : null;
+			})
+			.filter(Objects::nonNull)
+			.toList();
+
+		return RankingPageResult.from(page, items);
 	}
 
 }
