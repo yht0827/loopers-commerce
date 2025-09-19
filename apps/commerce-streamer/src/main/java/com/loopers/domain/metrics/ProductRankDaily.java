@@ -29,12 +29,32 @@ public class ProductRankDaily extends BaseEntity {
 	@Column(name = "ranking", nullable = false)
 	private Long ranking;
 
-	public static ProductRankDaily create(Long productId, LocalDate snapshotDate, Double score, Long ranking) {
+	@Column(name = "like_count", nullable = false)
+	private Long likeCount;
+
+	@Column(name = "view_count", nullable = false)
+	private Long viewCount;
+
+	@Column(name = "order_count", nullable = false)
+	private Long orderCount;
+
+	public static ProductRankDaily create(
+		Long productId,
+		LocalDate snapshotDate,
+		Double score,
+		Long ranking,
+		Long likeCount,
+		Long viewCount,
+		Long orderCount
+	) {
 		ProductRankDaily metrics = new ProductRankDaily();
 		metrics.productId = productId;
 		metrics.snapshotDate = snapshotDate;
 		metrics.score = score;
 		metrics.ranking = ranking;
+		metrics.likeCount = likeCount;
+		metrics.viewCount = viewCount;
+		metrics.orderCount = orderCount;
 		return metrics;
 	}
 

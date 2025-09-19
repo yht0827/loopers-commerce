@@ -18,7 +18,7 @@ import org.springframework.batch.item.Chunk;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemWriter;
-import org.springframework.batch.item.database.JdbcCursorItemReader;
+import org.springframework.batch.item.database.builder.JdbcCursorItemReaderBuilder;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -26,7 +26,7 @@ import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.transaction.PlatformTransactionManager;
 
-import com.loopers.domain.metrics.ProductScoreRow;
+import com.loopers.batch.dto.ProductScoreRow;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -38,11 +38,32 @@ public class DailyRankingJobConfig {
 
 	private final JobRepository jobRepository;
 	private final PlatformTransactionManager transactionManager;
+	private final DataSource dataSource;
+	private final NamedParameterJdbcTemplate jdbc;
+
+	private static final String JOB_NAME = "dailyRankingJob";
+	private static final String STEP_NAME = "dailyRankingStep";
+	private static final String READER_NAME = "dailyReader";
+	private static final int CHUNK_SIZE = 100;
+	private static final int DEFAULT_TOP_N = 100;
+	private static final String SELECT_DAILY_SQL = """
+		SELECT product_id, score, like_count, view_count, order_count
+		FROM product_metrics_daily
+		WHERE snapshot_date = ?
+		ORDER BY score DESC, product_id DESC
+		LIMIT ?
+		""";
+	private static final String DELETE_SQL =
+		"DELETE FROM product_rank_daily WHERE snapshot_date = :date";
+	private static final String INSERT_SQL = """
+		INSERT INTO product_rank_daily (snapshot_date, product_id, ranking, score, like_count, view_count, order_count, created_at, updated_at)
+		VALUES (:date, :productId, :ranking, :score, :likeCount, :viewCount, :orderCount, NOW(), NOW())
+		""";
 
 	@Bean
 	public Job dailyRankingJob(Step dailyRankingStep) {
 		log.info("DailyRankingJob 배치 등록 완료");
-		return new JobBuilder("dailyRankingJob", jobRepository)
+		return new JobBuilder(JOB_NAME, jobRepository)
 			.incrementer(new RunIdIncrementer())
 			.start(dailyRankingStep)
 			.build();
@@ -54,9 +75,9 @@ public class DailyRankingJobConfig {
 		ItemProcessor<ProductScoreRow, ProductScoreRow> dailyProcessor,
 		ItemWriter<ProductScoreRow> dailyWriter
 	) {
-		log.info("일간 랭킹 step 구성 완료 - stepName=dailyRankingStep, chunkSize={}", 100);
-		return new StepBuilder("dailyRankingStep", jobRepository)
-			.<ProductScoreRow, ProductScoreRow>chunk(100, transactionManager)
+		log.info("일간 랭킹 step 구성 완료 - stepName={}, chunkSize={}", STEP_NAME, CHUNK_SIZE);
+		return new StepBuilder(STEP_NAME, jobRepository)
+			.<ProductScoreRow, ProductScoreRow>chunk(CHUNK_SIZE, transactionManager)
 			.reader(dailyReader)
 			.processor(dailyProcessor)
 			.writer(dailyWriter)
@@ -66,30 +87,29 @@ public class DailyRankingJobConfig {
 
 	@Bean
 	@StepScope
-	public JdbcCursorItemReader<ProductScoreRow> dailyReader(
-		DataSource dataSource,
+	public ItemReader<ProductScoreRow> dailyReader(
 		@Value("#{jobParameters['date']}") String dateStr,
 		@Value("#{jobParameters['topN']}") Integer topN
 	) {
-		log.info("일간 랭킹 reader 구성 완료 - date={}, topN={} (기본 100)", dateStr, topN);
-		String sql = """
-			SELECT product_id, score
-			FROM product_metrics_daily
-			WHERE snapshot_date = ?
-			ORDER BY score DESC, product_id DESC
-			LIMIT ?
-			""";
+		LocalDate date = LocalDate.parse(dateStr);
 
-		JdbcCursorItemReader<ProductScoreRow> r = new JdbcCursorItemReader<>();
-		r.setDataSource(dataSource);
-		r.setSql(sql);
-		r.setPreparedStatementSetter(ps -> {
-			ps.setDate(1, Date.valueOf(LocalDate.parse(dateStr)));
-			ps.setInt(2, topN != null ? topN : 100);
-		});
-		r.setRowMapper((rs, rowNum) -> new ProductScoreRow(
-			rs.getLong("product_id"), rs.getDouble("score")));
-		return r;
+		log.info("일간 랭킹 reader 구성 완료 - date={}, topN={} (기본 {})", date, topN, DEFAULT_TOP_N);
+
+		return new JdbcCursorItemReaderBuilder<ProductScoreRow>()
+			.name(READER_NAME)
+			.dataSource(dataSource)
+			.sql(SELECT_DAILY_SQL)
+			.preparedStatementSetter(ps -> {
+				ps.setDate(1, Date.valueOf(date));
+				ps.setInt(2, topN);
+			})
+			.rowMapper((rs, rowNum) -> new ProductScoreRow(
+				rs.getLong("product_id"),
+				rs.getDouble("score"),
+				rs.getLong("like_count"),
+				rs.getLong("view_count"),
+				rs.getLong("order_count")))
+			.build();
 	}
 
 	@Bean
@@ -105,20 +125,12 @@ public class DailyRankingJobConfig {
 	@Bean
 	@StepScope
 	public ItemWriter<ProductScoreRow> dailyWriter(
-		NamedParameterJdbcTemplate jdbc,
 		@Value("#{jobParameters['date']}") String dateParam,
 		@Value("#{jobParameters['dryRun'] ?: false}") boolean dryRun
 	) {
 		return new ItemWriter<>() {
 			private boolean deleted = false;
 			private int nextRank = 1;
-
-			private static final String DELETE_SQL =
-				"DELETE FROM product_rank_daily WHERE snapshot_date = :date";
-			private static final String INSERT_SQL = """
-				INSERT INTO product_rank_daily (snapshot_date, product_id, ranking, score, created_at, updated_at)
-				VALUES (:date, :productId, :ranking, :score, NOW(), NOW())
-				""";
 
 			@Override
 			public void write(Chunk<? extends ProductScoreRow> chunk) {
@@ -148,7 +160,10 @@ public class DailyRankingJobConfig {
 						.addValue("date", sqlDate)
 						.addValue("productId", row.productId())
 						.addValue("ranking", nextRank++)
-						.addValue("score", row.score()));
+						.addValue("score", row.score())
+						.addValue("likeCount", row.likeCount())
+						.addValue("viewCount", row.viewCount())
+						.addValue("orderCount", row.orderCount()));
 				}
 				jdbc.batchUpdate(INSERT_SQL, batch.toArray(MapSqlParameterSource[]::new));
 				log.info("product_rank_daily 적재 완료 - date={}, 저장행수={}", date, chunk.size());
