@@ -2,6 +2,7 @@ package com.loopers.interfaces.scheduler;
 
 import java.time.LocalDate;
 import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobParameters;
@@ -23,6 +24,11 @@ public class RankingScheduler {
 	private final RankingService rankingService;
 	private final JobLauncher jobLauncher;
 	private final Job dailyRankingJob;
+	private final Job weeklyRankingJob;
+
+	private static final ZoneId KST = ZoneId.of("Asia/Seoul");
+	private static final int DEFAULT_TOP_N = 100;
+	private static final DateTimeFormatter WEEKLY_PERIOD_FORMAT = DateTimeFormatter.ofPattern("yyyyMMdd");
 
 	/**
 	 * 매일 23시 50분에 전날의 랭킹 데이터를 다음날 랭킹으로 이월
@@ -37,8 +43,16 @@ public class RankingScheduler {
 	// 매일 00:10, KST (전일 기준 실행)
 	@Scheduled(cron = "0 10 0 * * *", zone = "Asia/Seoul")
 	public void runDaily() {
-		LocalDate target = LocalDate.now(ZoneId.of("Asia/Seoul")).minusDays(1);
-		run(target, 100, false);  // topN=100, dryRun=false
+		LocalDate target = LocalDate.now(KST).minusDays(1);
+		run(target, DEFAULT_TOP_N, false);
+	}
+
+	@Scheduled(cron = "0 20 0 * * MON", zone = "Asia/Seoul")
+	public void runWeeklyScheduled() {
+		LocalDate today = LocalDate.now(KST);
+		LocalDate end = today.minusDays(1);
+		LocalDate start = end.minusDays(6);
+		runWeekly(start, end, DEFAULT_TOP_N, false);
 	}
 
 	// 필요할 때 수동 호출
@@ -48,10 +62,28 @@ public class RankingScheduler {
 			.addLong("topN", (long)topN)
 			.addString("dryRun", Boolean.toString(dryRun))
 			.toJobParameters();
+		runJob(dailyRankingJob, params, "일간", "date=" + date + ", topN=" + topN + ", dryRun=" + dryRun);
+	}
+
+	public void runWeekly(LocalDate startDate, LocalDate endDate, int topN, boolean dryRun) {
+
+		String periodKey = startDate.format(WEEKLY_PERIOD_FORMAT);
+		JobParameters params = new JobParametersBuilder()
+			.addString("startDate", startDate.toString())
+			.addString("endDate", endDate.toString())
+			.addString("periodKey", periodKey)
+			.addLong("topN", (long)topN)
+			.addString("dryRun", Boolean.toString(dryRun))
+			.toJobParameters();
+		runJob(weeklyRankingJob, params, "주간",
+			"startDate=" + startDate + ", endDate=" + endDate + ", topN=" + topN + ", dryRun=" + dryRun);
+	}
+
+	private void runJob(Job job, JobParameters params, String label, String detail) {
 		try {
-			jobLauncher.run(dailyRankingJob, params);
+			jobLauncher.run(job, params);
 		} catch (Exception e) {
-			log.error("일간 랭킹 배치 실패 (date={}, topN={}, dryRun={})", date, topN, dryRun, e);
+			log.error("{} 랭킹 배치 실패 ({})", label, detail, e);
 		}
 	}
 
