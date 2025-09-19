@@ -15,7 +15,6 @@ import org.springframework.batch.core.launch.support.RunIdIncrementer;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.step.builder.StepBuilder;
 import org.springframework.batch.item.Chunk;
-import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.database.builder.JdbcCursorItemReaderBuilder;
@@ -26,7 +25,10 @@ import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.transaction.PlatformTransactionManager;
 
+import com.loopers.batch.dto.RankedProduct;
 import com.loopers.batch.dto.ProductScoreRow;
+import com.loopers.support.ranking.RankingEventType;
+import com.loopers.support.ranking.RankingScoreCalculator;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -48,14 +50,14 @@ public class MonthlyRankingJobConfig {
 	private static final int DEFAULT_TOP_N = 100;
 	private static final String SELECT_MONTHLY_SQL = """
 		SELECT product_id,
-			SUM(score) AS total_score,
-			SUM(like_count) AS total_like,
-			SUM(view_count) AS total_view,
-			SUM(order_count) AS total_order
+		       SUM(like_count) AS total_like,
+		       SUM(view_count) AS total_view,
+		       SUM(order_count) AS total_order,
+		       (SUM(like_count) * ?) + (SUM(view_count) * ?) + (SUM(order_count) * ?) AS weighted_score
 		FROM product_metrics_daily
 		WHERE snapshot_date BETWEEN ? AND ?
 		GROUP BY product_id
-		ORDER BY total_score DESC, product_id DESC
+		ORDER BY weighted_score DESC, product_id DESC
 		LIMIT ?
 		""";
 	private static final String DELETE_SQL =
@@ -77,14 +79,13 @@ public class MonthlyRankingJobConfig {
 	@Bean
 	public Step monthlyRankingStep(
 		ItemReader<ProductScoreRow> monthlyReader,
-		ItemProcessor<ProductScoreRow, ProductScoreRow> monthlyProcessor,
-		ItemWriter<ProductScoreRow> monthlyWriter
+		ItemWriter<RankedProduct> monthlyWriter
 	) {
 		log.info("월간 랭킹 step 구성 완료 - stepName={}, chunkSize={}", STEP_NAME, CHUNK_SIZE);
 		return new StepBuilder(STEP_NAME, jobRepository)
-			.<ProductScoreRow, ProductScoreRow>chunk(CHUNK_SIZE, transactionManager)
+			.<ProductScoreRow, RankedProduct>chunk(CHUNK_SIZE, transactionManager)
 			.reader(monthlyReader)
-			.processor(monthlyProcessor)
+			.processor(this::toRankedProduct)
 			.writer(monthlyWriter)
 			.faultTolerant()
 			.build();
@@ -95,50 +96,54 @@ public class MonthlyRankingJobConfig {
 	public ItemReader<ProductScoreRow> monthlyReader(
 		@Value("#{jobParameters['startDate']}") String startDateParam,
 		@Value("#{jobParameters['endDate']}") String endDateParam,
-		@Value("#{jobParameters['topN']}") Integer topN
+		@Value("#{jobParameters['topN']}") Integer topN,
+		RankingScoreCalculator rankingScoreCalculator
 	) {
 		LocalDate startDate = LocalDate.parse(startDateParam);
 		LocalDate endDate = LocalDate.parse(endDateParam);
+		int limit = topN != null ? topN : DEFAULT_TOP_N;
 
-		log.info("월간 랭킹 reader 구성 완료 - startDate={}, endDate={}, topN={} (기본 {})",
-			startDate, endDate, topN, DEFAULT_TOP_N);
+		double likeWeight = rankingScoreCalculator.calculateScore(RankingEventType.LIKE);
+		double viewWeight = rankingScoreCalculator.calculateScore(RankingEventType.VIEW);
+		double orderWeight = rankingScoreCalculator.calculateScore(RankingEventType.ORDER);
+
+		log.info(
+			"월간 랭킹 reader 구성 완료 - startDate={}, endDate={}, topN={} (기본 {}), weights=[like:{}, view:{}, order:{}]",
+			startDate, endDate, limit, DEFAULT_TOP_N, likeWeight, viewWeight, orderWeight);
 
 		return new JdbcCursorItemReaderBuilder<ProductScoreRow>()
 			.name(READER_NAME)
 			.dataSource(dataSource)
 			.sql(SELECT_MONTHLY_SQL)
 			.preparedStatementSetter(ps -> {
-				ps.setDate(1, Date.valueOf(startDate));
-				ps.setDate(2, Date.valueOf(endDate));
-				ps.setInt(3, topN);
+				ps.setDouble(1, likeWeight);
+				ps.setDouble(2, viewWeight);
+				ps.setDouble(3, orderWeight);
+				ps.setDate(4, Date.valueOf(startDate));
+				ps.setDate(5, Date.valueOf(endDate));
+				ps.setInt(6, limit);
 			})
 			.rowMapper((rs, rowNum) -> new ProductScoreRow(
 				rs.getLong("product_id"),
-				rs.getDouble("total_score"),
 				rs.getLong("total_like"),
 				rs.getLong("total_view"),
-				rs.getLong("total_order")))
+				rs.getLong("total_order"),
+				rs.getDouble("weighted_score")))
 			.build();
 	}
 
 	@Bean
 	@StepScope
-	public ItemProcessor<ProductScoreRow, ProductScoreRow> monthlyProcessor() {
-		return item -> item;
-	}
-
-	@Bean
-	@StepScope
-	public ItemWriter<ProductScoreRow> monthlyWriter(
+	public ItemWriter<RankedProduct> monthlyWriter(
 		@Value("#{jobParameters['periodKey']}") String periodKey,
-		@Value("#{jobParameters['dryRun']}") boolean dryRun
+		@Value("#{jobParameters['dryRun'] ?: false}") boolean dryRun
 	) {
 		return new ItemWriter<>() {
 			private boolean deleted = false;
 			private long nextRank = 1L;
 
 			@Override
-			public void write(Chunk<? extends ProductScoreRow> chunk) {
+			public void write(Chunk<? extends RankedProduct> chunk) {
 				if (chunk == null || chunk.isEmpty()) {
 					return;
 				}
@@ -158,7 +163,7 @@ public class MonthlyRankingJobConfig {
 				}
 
 				List<MapSqlParameterSource> batch = new ArrayList<>(chunk.size());
-				for (ProductScoreRow row : chunk.getItems()) {
+				for (RankedProduct row : chunk.getItems()) {
 					batch.add(new MapSqlParameterSource()
 						.addValue("periodKey", periodKey)
 						.addValue("productId", row.productId())
@@ -172,5 +177,15 @@ public class MonthlyRankingJobConfig {
 				log.info("product_metrics_monthly 적재 완료 - periodKey={}, 저장행수={}", periodKey, chunk.size());
 			}
 		};
+	}
+
+	private RankedProduct toRankedProduct(ProductScoreRow row) {
+		return new RankedProduct(
+			row.productId(),
+			row.weightedScore(),
+			row.likeCount(),
+			row.viewCount(),
+			row.orderCount()
+		);
 	}
 }
