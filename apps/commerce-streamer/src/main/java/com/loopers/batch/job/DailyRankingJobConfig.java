@@ -26,6 +26,8 @@ import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.transaction.PlatformTransactionManager;
 
+import com.loopers.domain.metrics.ProductScoreRow;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -82,7 +84,7 @@ public class DailyRankingJobConfig {
 		r.setDataSource(dataSource);
 		r.setSql(sql);
 		r.setPreparedStatementSetter(ps -> {
-			ps.setDate(1, java.sql.Date.valueOf(LocalDate.parse(dateStr)));
+			ps.setDate(1, Date.valueOf(LocalDate.parse(dateStr)));
 			ps.setInt(2, topN != null ? topN : 100);
 		});
 		r.setRowMapper((rs, rowNum) -> new ProductScoreRow(
@@ -143,7 +145,7 @@ public class DailyRankingJobConfig {
 				List<MapSqlParameterSource> batch = new ArrayList<>(chunk.size());
 				for (ProductScoreRow row : chunk.getItems()) {
 					batch.add(new MapSqlParameterSource()
-						.addValue("snapshotDate", sqlDate)
+						.addValue("date", sqlDate)
 						.addValue("productId", row.productId())
 						.addValue("ranking", nextRank++)
 						.addValue("score", row.score()));
